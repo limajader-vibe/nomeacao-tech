@@ -625,16 +625,57 @@ export default function App() {
     return <AuthScreen auth={auth} />;
   }
 
+  // ITENS DA BOTTOM NAVIGATION BAR (Exclusivo para Mobile)
+  const mobileNavItems = [
+    { id: 'dashboard', icon: Activity, label: 'Painel' },
+    { id: 'disciplinas', icon: Folder, label: 'Arsenal' },
+    { id: 'planner', icon: LayoutGrid, label: 'Metas' },
+    { id: 'cronograma', icon: Calendar, label: 'Sprints', badge: customSprint.length > 0 ? customSprint.length : 0 },
+    { id: 'revisoes', icon: BrainCircuit, label: 'Revisões', badge: pendingReviewsCount },
+    { id: 'admin', icon: Settings, label: 'Admin' }
+  ];
+
   // SE PASSOU POR TUDO, RENDERIZA O APP NORMAL
   return (
     <div className={isDarkMode ? 'dark' : ''}>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 flex flex-col md:flex-row font-sans transition-colors duration-300">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 flex flex-col md:flex-row font-sans transition-colors duration-300 relative">
         <ConfettiOverlay fire={confettiFire} />
         <LevelUpModal data={levelUpData} onClose={() => setLevelUpData(null)} />
         {showLevelMap && <LevelMapModal currentXp={gamification.xp} onClose={() => setShowLevelMap(false)} />}
 
-        <aside className="w-full md:w-72 bg-white dark:bg-slate-900 shadow-xl flex flex-col z-10 shrink-0 border-r border-slate-200 dark:border-slate-800">
-          <div className={`p-6 bg-gradient-to-br ${themeColors.sidebar} text-white relative transition-colors duration-500`}>
+        {/* ======================================================== */}
+        {/* MOBILE TOP HEADER (Visível apenas em ecrãs pequenos) */}
+        {/* ======================================================== */}
+        <div className={`md:hidden flex items-center justify-between p-4 bg-gradient-to-br ${themeColors.sidebar} text-white shadow-md z-20 sticky top-0`}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center overflow-hidden shrink-0 border border-white/30 backdrop-blur-sm shadow-inner">
+              <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-cover opacity-90 bg-white p-0.5" />
+            </div>
+            <div className="flex flex-col">
+              <h2 className="font-bold text-base leading-tight tracking-tight shadow-sm truncate max-w-[150px]">{projectConfig.appName}</h2>
+              <p className="text-[10px] text-amber-300 font-bold uppercase tracking-wider flex items-center gap-1 mt-0.5">Lvl {userLevel.nivel} <Award className="w-3 h-3"/></p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer">
+              {isDarkMode ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-white" />}
+            </button>
+            {user && (
+              <button 
+                onClick={() => { if(window.confirm('Tem certeza que deseja trancar o sistema e sair?')) { auth && signOut(auth); } }} 
+                className="p-2.5 bg-red-500/80 hover:bg-red-500 rounded-full transition-colors cursor-pointer"
+              >
+                <LogOut className="w-4 h-4 text-white" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* ======================================================== */}
+        {/* SIDEBAR DESKTOP (Escondida no mobile, fixa à esquerda no PC) */}
+        {/* ======================================================== */}
+        <aside className="hidden md:flex w-72 bg-white dark:bg-slate-900 shadow-xl flex-col z-10 shrink-0 border-r border-slate-200 dark:border-slate-800 sticky top-0 h-screen overflow-hidden">
+          <div className={`p-6 bg-gradient-to-br ${themeColors.sidebar} text-white relative transition-colors duration-500 shrink-0`}>
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer">
               {isDarkMode ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-white" />}
             </button>
@@ -664,7 +705,7 @@ export default function App() {
               </div>
             </div>
           </div>
-          <nav className="flex-1 p-4 space-y-2 overflow-y-auto flex flex-col bg-slate-50/50 dark:bg-slate-900">
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar flex flex-col bg-slate-50/50 dark:bg-slate-900">
             {navPhases.map((phaseGroup, pIdx) => (
               <div key={pIdx} className={pIdx > 0 ? "pt-4" : ""}>
                 <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-4 text-left">{phaseGroup.phase}</h3>
@@ -685,9 +726,9 @@ export default function App() {
             ))}
           </nav>
 
-          {/* NOVO: BOTÃO DE SAIR NA BARRA LATERAL */}
+          {/* BOTÃO DE SAIR NA BARRA LATERAL (Apenas Desktop) */}
           {user && (
-            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 mt-auto">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 mt-auto shrink-0">
               <button 
                 onClick={() => {
                   if(window.confirm('Tem certeza que deseja sair do sistema?')) {
@@ -702,7 +743,10 @@ export default function App() {
           )}
         </aside>
 
-        <main className="flex-1 p-6 md:p-8 overflow-y-auto pb-24 text-left">
+        {/* ======================================================== */}
+        {/* ÁREA DE CONTEÚDO PRINCIPAL */}
+        {/* ======================================================== */}
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-28 md:pb-8 text-left">
           <div className="max-w-5xl mx-auto">
             {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} userProgress={userProgress} edital={edital} activeSubjectIds={activeSubjectIds} onShowLevelMap={() => setShowLevelMap(true)} themeColors={themeColors} />}
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} />}
@@ -712,6 +756,38 @@ export default function App() {
             {activeTab === 'admin' && <TabAdmin auth={auth} config={projectConfig} setConfig={setProjectConfig} userProgress={userProgress} setUserProgress={setUserProgress} gamification={gamification} setGamification={setGamification} edital={edital} setEdital={setEdital} customSprint={customSprint} setCustomSprint={setCustomSprint} initialEdital={initialEdital} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} themeColors={themeColors} playLevelUpSound={playLevelUpSound} />}
           </div>
         </main>
+
+        {/* ======================================================== */}
+        {/* MOBILE BOTTOM NAVIGATION BAR (Visível apenas em telemóveis) */}
+        {/* ======================================================== */}
+        <nav className="md:hidden fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-between items-end px-2 py-2 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-50">
+          {mobileNavItems.map(item => {
+            const IconComponent = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button 
+                key={item.id} 
+                onClick={() => setActiveTab(item.id)}
+                className={`flex flex-col items-center justify-center w-full py-1 gap-1 relative transition-colors ${isActive ? themeColors.text.split(' ')[0] + ' dark:' + themeColors.text.split(' ')[1] : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+              >
+                <div className={`p-1.5 rounded-xl transition-all duration-300 ${isActive ? themeColors.lightBg.split(' ')[0] + ' dark:' + themeColors.lightBg.split(' ')[1] + ' scale-110' : ''}`}>
+                  <IconComponent className={`w-5 h-5 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
+                </div>
+                <span className={`text-[9px] font-bold tracking-tight transition-all duration-300 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 h-0 overflow-hidden translate-y-2'}`}>
+                  {item.label}
+                </span>
+                
+                {/* Badge Notificação Mobile */}
+                {item.badge > 0 && (
+                  <span className="absolute top-0 right-1/4 translate-x-1/2 -translate-y-1/4 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full border-2 border-white dark:border-slate-900 shadow-sm">
+                    {item.badge > 9 ? '9+' : item.badge}
+                  </span>
+                )}
+              </button>
+            )
+          })}
+        </nav>
+
       </div>
     </div>
   );
