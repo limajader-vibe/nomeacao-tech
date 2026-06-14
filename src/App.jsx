@@ -4,7 +4,7 @@ import {
   Layers, FileText, ChevronDown, Folder, FolderOpen, ChevronRight, PlayCircle, 
   RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Link, Pencil, Settings,
   Edit, AlertTriangle, ChevronUp, Flame, Trophy, TrendingUp, Activity, Award, ListPlus, ArrowRight, ArrowLeft, BarChart2,
-  Thermometer, CalendarDays, LayoutGrid, BrainCircuit, Eye, Zap, Image as ImageIcon, ShieldAlert, Download, Sliders, Lock,
+  Thermometer, CalendarDays, LayoutGrid, BrainCircuit, Eye, Zap, Image as ImageIcon, ShieldAlert, Download, Sliders, Lock, LogOut,
   UnfoldVertical, FoldVertical, FilePlus, Upload, Filter, Play, Pause, Coffee, PartyPopper, X
 } from 'lucide-react';
 
@@ -690,13 +690,13 @@ export default function App() {
             <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 mt-auto">
               <button 
                 onClick={() => {
-                  if(window.confirm('Tem certeza que deseja trancar o sistema e sair?')) {
+                  if(window.confirm('Tem certeza que deseja sair do sistema?')) {
                     auth && signOut(auth);
                   }
                 }} 
                 className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors font-bold text-sm cursor-pointer"
               >
-                <Lock className="w-4 h-4" /> Trancar Sistema
+                <LogOut className="w-4 h-4" /> Sair do Sistema
               </button>
             </div>
           )}
