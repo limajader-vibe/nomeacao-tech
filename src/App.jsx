@@ -4,7 +4,7 @@ import {
   Layers, FileText, ChevronDown, Folder, FolderOpen, ChevronRight, PlayCircle, 
   RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Link, Pencil, Settings,
   Edit, AlertTriangle, ChevronUp, Flame, Trophy, TrendingUp, Activity, Award, ListPlus, ArrowRight, ArrowLeft, BarChart2,
-  Thermometer, CalendarDays, LayoutGrid, BrainCircuit, Eye, Zap, Image as ImageIcon, ShieldAlert, Download, Sliders
+  Thermometer, CalendarDays, LayoutGrid, BrainCircuit, Eye, Zap, Image as ImageIcon, ShieldAlert, Download, Sliders, Lock
 } from 'lucide-react';
 
 // --- HELPERS LOCAL STORAGE ---
@@ -20,23 +20,22 @@ const setStorage = (key, value) => { try { localStorage.setItem(key, JSON.string
 // --- CONFIGURAÇÃO INICIAL ---
 const initialConfig = { 
   appName: 'Nomeação.Tech',
-  logoUrl: 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png', // Logo padrão (Mestre/Guru)
-  concurso: 'Base de TI (Iniciantes)', 
-  cargo: 'Núcleo Duro - Qualquer Cargo', 
-  banca: 'Principais (CEBRASPE, FCC, FGV)', 
+  logoUrl: 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png', 
+  concurso: 'Base de TI', 
+  cargo: 'Núcleo Duro', 
+  banca: 'CEBRASPE', 
   horasDia: 4,
   revBom: 7,
   revFacil: 15
 };
 
-// --- ÁRVORE DA TRILHA BASE ---
 const initialEdital = [
   {
-    id: 'bloco-gerais', nome: 'Conhecimentos Gerais (Base)', icone: 'Layers',
+    id: 'bloco-gerais', nome: 'Conhecimentos Gerais', icone: 'Layers',
     disciplinas: [
       { id: 'port', nome: 'Língua Portuguesa', cor: 'text-rose-700 bg-rose-100', 
         assuntos: [
-          { id: 'port_1', titulo: 'Compreensão de Textos', temp: '🔥 QUENTE', linkTec: '', indent: 0, pergunta: "Qual a diferença entre Depreende-se e Infere-se no Cebraspe?", resposta: "Depreende-se = Interpretação (conclusão além do texto). Infere-se = Compreensão (está escrito no texto)." },
+          { id: 'port_1', titulo: 'Compreensão de Textos', temp: '🔥 QUENTE', linkTec: '', indent: 0, pergunta: "Diferença Depreende-se vs Infere-se?", resposta: "Depreende-se = Interpretação. Infere-se = Compreensão." },
           { id: 'port_2', titulo: 'Reescritura de Frases', temp: '🔥 QUENTE', linkTec: '', indent: 0, pergunta: "Posso trocar 'Conquanto' por 'Porquanto' mantendo o sentido?", resposta: "NÃO! Conquanto é Concessão (embora). Porquanto é Causa (porque)." }
         ] 
       }
@@ -47,13 +46,7 @@ const initialEdital = [
     disciplinas: [
       { id: 'bd', nome: 'Banco de Dados', cor: 'text-cyan-700 bg-cyan-100', 
         assuntos: [
-          { id: 'conceitos', titulo: 'Conceitos Iniciais e Esquemas', temp: '🔥 QUENTE', linkTec: 'https://www.tecconcursos.com.br/caderno/abrir/Q6VKGo', indent: 0, pergunta: "Diferencie Esquema de Instância num SGBD.", resposta: "Esquema é a ESTRUTURA (o projeto, raramente muda). Instância é a fotografia dos DADOS num dado momento (muda a todo instante)." }
-        ] 
-      },
-      { id: 'eng_soft', nome: 'Engenharia de Software', cor: 'text-emerald-700 bg-emerald-100', 
-        assuntos: [
-          { id: 'ciclos', titulo: 'Abordagens de Ciclo de Vida', temp: '☀️ MORNO', linkTec: '', indent: 0, pergunta: "", resposta: "" }, 
-          { id: 'processos', titulo: 'Processos de Desenvolvimento', temp: '🔥 QUENTE', linkTec: '', indent: 0, pergunta: "Modelagem é uma Atividade Guarda-Chuva?", resposta: "FALSO. Modelagem é fase do Framework Genérico. Guarda-chuva são atividades transversais (ex: Qualidade, Gerência de Riscos)." }
+          { id: 'conceitos', titulo: 'Conceitos Iniciais e Esquemas', temp: '🔥 QUENTE', linkTec: '', indent: 0, pergunta: "Diferencie Esquema de Instância.", resposta: "Esquema é ESTRUTURA. Instância é DADO no momento." }
         ] 
       }
     ]
@@ -61,36 +54,32 @@ const initialEdital = [
 ];
 
 export default function App() {
-  // ESTADOS GERAIS
-  const [isDarkMode, setIsDarkMode] = useState(() => getStorage('pareto_theme_v14', false));
+  const [isDarkMode, setIsDarkMode] = useState(() => getStorage('pareto_theme_v16', false));
   const [activeTab, setActiveTab] = useState('dashboard'); 
-  const [expandedMenus, setExpandedMenus] = useState({ planejamento: true, acao: true, sistema: true });
 
-  // ESTADOS PRINCIPAIS (Mesclando com initialConfig para evitar quebras se a chave appName não existir)
   const [projectConfig, setProjectConfig] = useState(() => {
-    const saved = getStorage('pareto_config_v14', initialConfig);
+    const saved = getStorage('pareto_config_v16', initialConfig);
     return { ...initialConfig, ...saved };
   });
   
-  const [edital, setEdital] = useState(() => getStorage('pareto_edital_v14', initialEdital));
-  const [userProgress, setUserProgress] = useState(() => getStorage('pareto_progress_v14', {}));
-  const [customSprint, setCustomSprint] = useState(() => getStorage('pareto_custom_sprint_v14', []));
-  const [sprintsCompleted, setSprintsCompleted] = useState(() => getStorage('pareto_sprints_completed_v14', 0));
+  const [edital, setEdital] = useState(() => getStorage('pareto_edital_v16', initialEdital));
+  const [userProgress, setUserProgress] = useState(() => getStorage('pareto_progress_v16', {}));
+  const [customSprint, setCustomSprint] = useState(() => getStorage('pareto_custom_sprint_v16', []));
+  const [sprintsCompleted, setSprintsCompleted] = useState(() => getStorage('pareto_sprints_completed_v16', 0));
   
-  const [gamification, setGamification] = useState(() => getStorage('pareto_gamification_v14', { xp: 0, streak: 0, lastActiveDate: '' }));
-  const [dailyLogs, setDailyLogs] = useState(() => getStorage('pareto_daily_logs_v14', {}));
+  const [gamification, setGamification] = useState(() => getStorage('pareto_gamification_v16', { xp: 0, streak: 0, lastActiveDate: '' }));
+  const [dailyLogs, setDailyLogs] = useState(() => getStorage('pareto_daily_logs_v16', {}));
 
   // PERSISTÊNCIA
-  useEffect(() => { setStorage('pareto_theme_v14', isDarkMode); }, [isDarkMode]);
-  useEffect(() => { setStorage('pareto_config_v14', projectConfig); }, [projectConfig]);
-  useEffect(() => { setStorage('pareto_edital_v14', edital); }, [edital]);
-  useEffect(() => { setStorage('pareto_progress_v14', userProgress); }, [userProgress]);
-  useEffect(() => { setStorage('pareto_custom_sprint_v14', customSprint); }, [customSprint]);
-  useEffect(() => { setStorage('pareto_sprints_completed_v14', sprintsCompleted); }, [sprintsCompleted]);
-  useEffect(() => { setStorage('pareto_gamification_v14', gamification); }, [gamification]);
-  useEffect(() => { setStorage('pareto_daily_logs_v14', dailyLogs); }, [dailyLogs]);
+  useEffect(() => { setStorage('pareto_theme_v16', isDarkMode); }, [isDarkMode]);
+  useEffect(() => { setStorage('pareto_config_v16', projectConfig); }, [projectConfig]);
+  useEffect(() => { setStorage('pareto_edital_v16', edital); }, [edital]);
+  useEffect(() => { setStorage('pareto_progress_v16', userProgress); }, [userProgress]);
+  useEffect(() => { setStorage('pareto_custom_sprint_v16', customSprint); }, [customSprint]);
+  useEffect(() => { setStorage('pareto_sprints_completed_v16', sprintsCompleted); }, [sprintsCompleted]);
+  useEffect(() => { setStorage('pareto_gamification_v16', gamification); }, [gamification]);
+  useEffect(() => { setStorage('pareto_daily_logs_v16', dailyLogs); }, [dailyLogs]);
 
-  // LÓGICA DE STREAK
   useEffect(() => {
     const today = new Date().toLocaleDateString();
     if (gamification.lastActiveDate !== today) {
@@ -98,26 +87,20 @@ export default function App() {
       const currentDate = new Date(today.split('/').reverse().join('-'));
       const diffTime = Math.abs(currentDate - lastDate);
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-
       let newStreak = gamification.streak;
-      if (diffDays > 1 && gamification.lastActiveDate !== '') {
-        newStreak = 0; 
-      }
+      if (diffDays > 1 && gamification.lastActiveDate !== '') newStreak = 0; 
       setGamification(prev => ({ ...prev, streak: newStreak }));
     }
   }, []);
 
   const addXP = (amount) => { setGamification(prev => ({ ...prev, xp: prev.xp + amount })); };
-  const toggleMenu = (id) => setExpandedMenus(prev => ({ ...prev, [id]: !prev[id] }));
 
   const toggleProgress = (assId, type) => {
     setUserProgress(prev => {
       const current = prev[assId] || {};
       const newState = { ...current, [type]: !current[type] };
-      
       if (type === 'estudado' && !newState.estudado) { newState.questoes = false; newState.revisado = false; }
       if (type === 'questoes' && !newState.questoes) { newState.revisado = false; }
-      
       if (type === 'revisado') {
         if (newState.revisado) {
           const now = new Date().getTime();
@@ -159,7 +142,6 @@ export default function App() {
     });
   };
 
-  // CÁLCULOS GERAIS
   const activeSubjectIds = new Set();
   edital.forEach(b => b.disciplinas.forEach(d => d.assuntos.forEach(a => activeSubjectIds.add(a.id))));
 
@@ -174,12 +156,10 @@ export default function App() {
 
   const totalAssuntos = activeSubjectIds.size;
   const totalCheckboxes = totalAssuntos * 3; 
-  
   const completedCheckboxes = Object.entries(userProgress).reduce((acc, [assId, data]) => {
     if (!activeSubjectIds.has(assId)) return acc;
     return acc + (data.estudado ? 1 : 0) + (data.questoes ? 1 : 0) + (data.revisado ? 1 : 0);
   }, 0);
-  
   const progressPerc = totalCheckboxes === 0 ? 0 : Math.round((completedCheckboxes / totalCheckboxes) * 100);
 
   const calculateLevel = (xp) => {
@@ -192,7 +172,6 @@ export default function App() {
   };
   const userLevel = calculateLevel(gamification.xp);
 
-  // NAVEGAÇÃO LATERAL
   const navPhases = [
     { phase: 'Cockpit', items: [{ id: 'dashboard', icon: Activity, label: 'Visão Geral' }] },
     { phase: 'Planejamento', id: 'planejamento', items: [
@@ -220,14 +199,9 @@ export default function App() {
             
             <div className="flex items-center gap-3 mt-2">
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center overflow-hidden shrink-0 border border-white/30 backdrop-blur-sm shadow-inner">
-                <img 
-                  src={projectConfig.logoUrl} 
-                  alt="Logo" 
-                  onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} 
-                  className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity bg-white p-1" 
-                />
+                <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity bg-white p-1" />
               </div>
-              <h2 className="font-bold text-2xl tracking-tight text-white shadow-sm truncate" title={projectConfig.appName}>{projectConfig.appName}</h2>
+              <h2 className="font-bold text-2xl tracking-tight text-white shadow-sm truncate">{projectConfig.appName}</h2>
             </div>
             
             <div className="mt-5 p-4 bg-white/10 rounded-xl relative">
@@ -236,9 +210,8 @@ export default function App() {
                 <p className="font-bold text-lg leading-tight mb-2">{projectConfig.cargo}</p>
                 <div className="flex flex-wrap gap-2 text-xs text-blue-100 font-medium">
                   <span className="bg-blue-900/60 px-2 py-1 rounded border border-white/10">{projectConfig.banca}</span>
-                  <span className="bg-blue-900/60 px-2 py-1 rounded border border-white/10">Meta: {projectConfig.horasDia}h/dia</span>
+                  <span className="bg-blue-900/60 px-2 py-1 rounded border border-white/10">Meta: {projectConfig.horasDia}h</span>
                 </div>
-                
                 <div className="mt-4 pt-4 border-t border-white/20 flex items-center gap-3">
                   <div className="bg-blue-800 p-2 rounded-lg"><Award className="w-5 h-5 text-amber-300"/></div>
                   <div>
@@ -272,7 +245,6 @@ export default function App() {
           </nav>
         </aside>
 
-        {/* CONTENT AREA */}
         <main className="flex-1 p-6 md:p-8 overflow-y-auto pb-24 text-left">
           <div className="max-w-5xl mx-auto">
             {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} />}
@@ -288,20 +260,312 @@ export default function App() {
   );
 }
 
-// ==========================================
-// ABA NOVA: PAINEL DE CONTROLE (ADMINISTRAÇÃO)
-// ==========================================
+// --- SUB-COMPONENTES DAS ABAS ---
+
+function TabDashboard({ config, progressPerc, gamification, setGamification, dailyLogs, setDailyLogs, userLevel, pendingReviewsCount, setActiveTab, customSprint }) {
+  const [loggedHoursToday, setLoggedHoursToday] = useState('');
+  const today = new Date().toLocaleDateString();
+  const todayHours = dailyLogs[today] || 0;
+  const progressDaily = Math.min((todayHours / config.horasDia) * 100, 100);
+
+  const handleLogHours = (e) => {
+    e.preventDefault();
+    const hours = parseFloat(loggedHoursToday);
+    if (!isNaN(hours) && hours > 0) {
+      setDailyLogs(prev => ({ ...prev, [today]: (prev[today] || 0) + hours }));
+      if ((todayHours + hours) >= config.horasDia && gamification.lastActiveDate !== today) {
+        setGamification(prev => ({ ...prev, streak: prev.streak + 1, lastActiveDate: today }));
+      } else if (gamification.lastActiveDate !== today) {
+        setGamification(prev => ({ ...prev, lastActiveDate: today }));
+      }
+      setLoggedHoursToday('');
+    }
+  };
+
+  return (
+    <div className="space-y-6 animate-in fade-in">
+      <header className="border-b border-slate-200 dark:border-slate-800 pb-4">
+        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">{config.appName} Cockpit</h2>
+        <p className="text-slate-500 mt-2 text-lg">Mensure a sua execução diária e visualize as suas métricas.</p>
+      </header>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-2 bg-white dark:bg-slate-900 rounded-3xl p-6 flex flex-col md:flex-row items-center gap-8 border border-slate-200 dark:border-slate-800">
+          <div className="relative w-32 h-32 flex items-center justify-center">
+            <svg className="w-full h-full transform -rotate-90">
+              <circle cx="64" cy="64" r="56" className="stroke-slate-100 dark:stroke-slate-800" strokeWidth="12" fill="none" />
+              <circle cx="64" cy="64" r="56" className="stroke-blue-500" strokeWidth="12" fill="none" strokeDasharray="351.85" strokeDashoffset={351.85 - (351.85 * progressDaily) / 100} strokeLinecap="round" />
+            </svg>
+            <div className="absolute flex flex-col items-center justify-center">
+              <span className="text-3xl font-black text-slate-800 dark:text-white">{todayHours.toFixed(1)}<span className="text-lg">h</span></span>
+            </div>
+          </div>
+          <div className="flex-1 w-full text-left">
+            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-1">Foco de Hoje</h3>
+            <p className="text-sm text-slate-500 mb-5">Registe as horas líquidas de estudo.</p>
+            <form onSubmit={handleLogHours} className="flex gap-2">
+              <input type="number" step="0.5" placeholder="Ex: 2.5" value={loggedHoursToday} onChange={(e) => setLoggedHoursToday(e.target.value)} className="w-24 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500 font-bold text-center" />
+              <button type="submit" className="bg-slate-800 dark:bg-blue-600 text-white px-5 py-3 rounded-xl font-bold cursor-pointer">Adicionar</button>
+            </form>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl p-6 text-white flex flex-col justify-between">
+          <div>
+            <h3 className="font-bold text-amber-100 flex items-center gap-2 text-sm uppercase tracking-wider mb-4"><Flame className="w-4 h-4"/> Ofensiva</h3>
+            <div className="flex items-end gap-2">
+              <span className="text-5xl font-black">{gamification.streak}</span>
+              <span className="text-amber-200 font-medium mb-1">Dias Seguidos</span>
+            </div>
+          </div>
+          <div className="mt-6 pt-4 border-t border-amber-400/30">
+            <div className="flex justify-between items-end mb-2">
+              <span className="font-bold">Nível {userLevel.nivel}</span>
+              <span className="text-xs text-amber-200">{gamification.xp} / {userLevel.max} XP</span>
+            </div>
+            <div className="w-full h-2 bg-black/20 rounded-full overflow-hidden">
+              <div className="h-full bg-white transition-all" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprintItem, resetProgress }) {
+  const [expanded, setExpanded] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
+  
+  const [newTopic, setNewTopic] = useState({ discId: '', titulo: '', linkTec: '' });
+  const [editingTopicId, setEditingTopicId] = useState(null);
+  const [editTopicData, setEditTopicData] = useState({ titulo: '', linkTec: '', pergunta: '', resposta: '' });
+
+  const toggleNode = (id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
+
+  const handleAddTopic = (discId) => {
+    if(!newTopic.titulo) return;
+    const newAssId = `t_${Date.now()}`;
+    setEdital(prev => prev.map(b => ({
+      ...b, disciplinas: b.disciplinas.map(d => d.id === discId ? { ...d, assuntos: [...d.assuntos, { id: newAssId, titulo: newTopic.titulo, temp: '⭐ NOVO', linkTec: newTopic.linkTec, indent: 0, pergunta: '', resposta: '' }] } : d)
+    })));
+    setNewTopic({ discId: '', titulo: '', linkTec: '' });
+  };
+
+  const startEditTopic = (assunto) => { 
+    setEditingTopicId(assunto.id); 
+    setEditTopicData({ titulo: assunto.titulo || '', linkTec: assunto.linkTec || '', pergunta: assunto.pergunta || '', resposta: assunto.resposta || '' }); 
+  };
+  
+  const saveEditTopic = (discId, assId) => {
+    if (!editTopicData.titulo) return;
+    setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => d.id === discId ? { ...d, assuntos: d.assuntos.map(a => a.id === assId ? { ...a, ...editTopicData } : a) } : d) })));
+    setEditingTopicId(null);
+  };
+
+  const handleDeleteClick = (discId, assId) => {
+    if(window.confirm("Deseja apagar este assunto?")) {
+      setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => d.id === discId ? { ...d, assuntos: d.assuntos.filter(a => a.id !== assId) } : d) })));
+    }
+  };
+
+  return (
+    <div className="space-y-6 animate-in fade-in text-left">
+      <header className="border-b border-slate-200 dark:border-slate-800 pb-4 flex justify-between items-center">
+        <div>
+          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">Arsenal de Matérias</h2>
+        </div>
+        <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); }} className={`px-6 py-2.5 rounded-xl font-bold text-sm cursor-pointer ${isEditing ? 'bg-amber-500 text-white' : 'bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-200'}`}>
+          {isEditing ? 'Concluir Gestão' : 'Gerenciar Matérias'}
+        </button>
+      </header>
+
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+        <div className="flex flex-col gap-6">
+          {edital.map((bloco) => (
+            <div key={bloco.id}>
+              <h3 className="font-black text-xl text-slate-800 dark:text-slate-200 mb-4">{bloco.nome}</h3>
+              <div className="space-y-3">
+                {bloco.disciplinas.map((disc) => (
+                  <div key={disc.id}>
+                    <div onClick={() => toggleNode(disc.id)} className="flex items-center gap-2 cursor-pointer p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                      <FolderOpen className="w-5 h-5 text-indigo-500" />
+                      <span className="font-bold">{disc.nome}</span>
+                    </div>
+
+                    {expanded[disc.id] && (
+                      <div className="mt-2 space-y-2">
+                        {disc.assuntos.map((assunto) => {
+                          const isInSprint = customSprint.some(item => item.assId === assunto.id);
+                          const isCurrentlyEditing = editingTopicId === assunto.id;
+                          const mastered = progress[assunto.id]?.estudado && progress[assunto.id]?.questoes && progress[assunto.id]?.revisado;
+
+                          return (
+                            <div key={assunto.id} className={`flex items-center justify-between p-3 rounded-xl border ${isCurrentlyEditing ? 'bg-amber-50 dark:bg-amber-900/10 border-amber-300' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
+                              {isCurrentlyEditing ? (
+                                <div className="flex-1 flex flex-col gap-3">
+                                  <input type="text" value={editTopicData.titulo} onChange={(e) => setEditTopicData({...editTopicData, titulo: e.target.value})} className="p-2 border rounded dark:bg-slate-800" />
+                                  <input type="text" placeholder="Frente Flashcard (Pergunta)" value={editTopicData.pergunta} onChange={(e) => setEditTopicData({...editTopicData, pergunta: e.target.value})} className="p-2 border rounded dark:bg-slate-800" />
+                                  <input type="text" placeholder="Verso Flashcard (Resposta)" value={editTopicData.resposta} onChange={(e) => setEditTopicData({...editTopicData, resposta: e.target.value})} className="p-2 border rounded dark:bg-slate-800" />
+                                  <div className="flex gap-2">
+                                    <button onClick={() => saveEditTopic(disc.id, assunto.id)} className="bg-emerald-500 text-white px-4 py-2 rounded font-bold cursor-pointer">Salvar</button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <span className={`font-bold ${mastered && !isEditing ? 'line-through text-slate-400' : 'text-slate-700 dark:text-slate-300'}`}>{assunto.titulo}</span>
+                                  {!isEditing ? (
+                                    <button onClick={() => toggleSprintItem(disc.id, assunto.id, disc.nome, assunto.titulo, assunto.temp, assunto.linkTec)} className={`cursor-pointer px-3 py-1 text-xs font-bold rounded ${isInSprint ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
+                                      {isInSprint ? 'Na Sprint' : 'Add à Sprint'}
+                                    </button>
+                                  ) : (
+                                    <div className="flex gap-2">
+                                      <button onClick={() => startEditTopic(assunto)} className="text-blue-500 cursor-pointer"><Pencil className="w-4 h-4"/></button>
+                                      <button onClick={() => handleDeleteClick(disc.id, assunto.id)} className="text-red-500 cursor-pointer"><Trash2 className="w-4 h-4"/></button>
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          );
+                        })}
+                        {isEditing && (
+                          <div className="flex gap-2 mt-2">
+                            <input type="text" placeholder="Novo Tópico..." value={newTopic.discId === disc.id ? newTopic.titulo : ''} onChange={(e) => setNewTopic({...newTopic, discId: disc.id, titulo: e.target.value})} className="flex-1 p-2 border rounded dark:bg-slate-800" />
+                            <button onClick={() => handleAddTopic(disc.id)} className="bg-amber-500 text-white px-4 py-2 rounded font-bold cursor-pointer">Adicionar</button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TabPlanner({ customSprint, sprintsCompleted }) {
+  const sprintGroups = [];
+  for (let i = 0; i < customSprint.length; i += 2) sprintGroups.push(customSprint.slice(i, i + 2));
+  const backlogSprints = sprintGroups.slice(1);
+
+  return (
+    <div className="space-y-6">
+      <header className="border-b pb-4"><h2 className="text-3xl font-extrabold">Metas da Semana</h2></header>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-xl">
+          <h3 className="font-bold mb-4">Fila de Sprints ({backlogSprints.length})</h3>
+          {backlogSprints.map((group, idx) => (
+            <div key={idx} className="bg-white dark:bg-slate-900 p-4 rounded mb-2 shadow-sm">
+              <span className="text-xs font-bold text-slate-400">Sprint {sprintsCompleted + idx + 2}</span>
+              {group.map(i => <div key={i.assId} className="font-bold">{i.assTitulo}</div>)}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, progress, toggleProgress, addXP }) {
+  const sprintGroups = [];
+  for (let i = 0; i < customSprint.length; i += 2) sprintGroups.push(customSprint.slice(i, i + 2));
+
+  return (
+    <div className="space-y-6">
+      <header className="border-b pb-4"><h2 className="text-3xl font-extrabold">Sprints Diárias</h2></header>
+      {sprintGroups.length === 0 ? (
+        <div className="text-center p-12 text-slate-400">Fila Vazia. Adicione no Arsenal.</div>
+      ) : (
+        sprintGroups.map((group, idx) => {
+          const isActive = idx === 0;
+          return (
+            <div key={idx} className={`p-6 rounded-xl border ${isActive ? 'border-blue-500 shadow-lg' : 'border-slate-200 opacity-50'}`}>
+              <h3 className="font-bold mb-4">Sprint {sprintsCompleted + idx + 1}</h3>
+              {group.map(item => (
+                <div key={item.assId} className="mb-4">
+                  <span className="font-bold text-lg">{item.assTitulo}</span>
+                  <div className="flex gap-4 mt-2">
+                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={progress[item.assId]?.estudado||false} onChange={()=>toggleProgress(item.assId,'estudado')} disabled={!isActive} className="cursor-pointer"/> Teoria</label>
+                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={progress[item.assId]?.questoes||false} onChange={()=>toggleProgress(item.assId,'questoes')} disabled={!isActive} className="cursor-pointer"/> Questões</label>
+                    <label className="flex items-center gap-2 cursor-pointer"><input type="checkbox" checked={progress[item.assId]?.revisado||false} onChange={()=>toggleProgress(item.assId,'revisado')} disabled={!isActive} className="cursor-pointer"/> Revisão</label>
+                  </div>
+                </div>
+              ))}
+              {isActive && <button onClick={() => { setSprintsCompleted(p=>p+1); setCustomSprint(p=>p.slice(2)); addXP(50); }} className="bg-emerald-500 text-white px-4 py-2 rounded mt-4 cursor-pointer">Concluir Sprint</button>}
+            </div>
+          )
+        })
+      )}
+    </div>
+  );
+}
+
+function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds }) {
+  const [isFlipped, setIsFlipped] = useState(false);
+  let todosAssuntos = [];
+  edital.forEach(b => b.disciplinas.forEach(d => d.assuntos.forEach(a => todosAssuntos.push(a))));
+  
+  const now = new Date().getTime();
+  const pendentes = todosAssuntos.filter(a => activeSubjectIds.has(a.id) && progress[a.id]?.estudado && (!progress[a.id]?.revisado || (progress[a.id]?.nextReviewTimestamp <= now)));
+
+  if (pendentes.length > 0) {
+    const card = pendentes[0];
+    return (
+      <div className="p-8 text-center max-w-lg mx-auto bg-white dark:bg-slate-900 rounded-xl shadow-xl border">
+        <h3 className="text-2xl font-bold mb-8">{card.pergunta || `Explique: ${card.titulo}`}</h3>
+        {isFlipped ? (
+          <div>
+            <p className="mb-8">{card.resposta || "Sem resposta cadastrada."}</p>
+            <div className="flex gap-2 justify-center">
+              <button onClick={() => {handleReviewFeedback(card.id, 'dificil'); setIsFlipped(false);}} className="bg-red-500 text-white px-4 py-2 rounded cursor-pointer">Difícil</button>
+              <button onClick={() => {handleReviewFeedback(card.id, 'bom'); setIsFlipped(false);}} className="bg-amber-500 text-white px-4 py-2 rounded cursor-pointer">Bom</button>
+              <button onClick={() => {handleReviewFeedback(card.id, 'facil'); setIsFlipped(false);}} className="bg-emerald-500 text-white px-4 py-2 rounded cursor-pointer">Fácil</button>
+            </div>
+          </div>
+        ) : (
+          <button onClick={() => setIsFlipped(true)} className="bg-blue-600 text-white px-6 py-2 rounded cursor-pointer">Revelar Resposta</button>
+        )}
+      </div>
+    );
+  }
+  return <div className="text-center p-12 text-slate-400">Nenhuma revisão pendente hoje!</div>;
+}
+
+// ==================================================
+// ABA ADMIN: PROTEGIDA POR PALAVRA-PASSE
+// ==================================================
 function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdital, setCustomSprint, initialEdital }) {
   const [localConfig, setLocalConfig] = useState({
     ...config,
     revBom: config.revBom || 7,
     revFacil: config.revFacil || 15
   });
-  const [saveStatus, setSaveStatus] = useState('');
   
-  // Estados para as Confirmações da Zona de Perigo
+  // LÓGICA DE AUTENTICAÇÃO SIMPLES
+  const [isAuthenticated, setIsAuthenticated] = useState(() => sessionStorage.getItem('admin_auth') === 'true');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  
+  const [saveStatus, setSaveStatus] = useState('');
   const [confirmResetProgress, setConfirmResetProgress] = useState(false);
   const [confirmFactoryReset, setConfirmFactoryReset] = useState(false);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (passwordInput === 'nomeacao2026') {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('admin_auth', 'true');
+      setErrorMsg('');
+    } else {
+      setErrorMsg('Palavra-passe incorreta.');
+      setPasswordInput('');
+    }
+  };
 
   const handleSave = () => {
     setConfig(localConfig);
@@ -312,11 +576,11 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
   const handleExportBackup = () => {
     const backupData = {
       config: localConfig,
-      progress: JSON.parse(localStorage.getItem('pareto_progress_v14') || '{}'),
-      gamification: JSON.parse(localStorage.getItem('pareto_gamification_v14') || '{}'),
-      sprints: JSON.parse(localStorage.getItem('pareto_custom_sprint_v14') || '[]'),
-      edital: JSON.parse(localStorage.getItem('pareto_edital_v14') || '[]'),
-      logs: JSON.parse(localStorage.getItem('pareto_daily_logs_v14') || '{}'),
+      progress: JSON.parse(localStorage.getItem('pareto_progress_v16') || '{}'),
+      gamification: JSON.parse(localStorage.getItem('pareto_gamification_v16') || '{}'),
+      sprints: JSON.parse(localStorage.getItem('pareto_custom_sprint_v16') || '[]'),
+      edital: JSON.parse(localStorage.getItem('pareto_edital_v16') || '[]'),
+      logs: JSON.parse(localStorage.getItem('pareto_daily_logs_v16') || '{}'),
       exportDate: new Date().toISOString()
     };
     
@@ -356,6 +620,38 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
     }
   };
 
+  // Ecrã de bloqueio
+  if (!isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] animate-in fade-in">
+        <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 max-w-sm w-full text-center">
+          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Lock className="w-8 h-8" />
+          </div>
+          <h2 className="text-2xl font-black text-slate-800 dark:text-white mb-2">Acesso Restrito</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-8">Digite a palavra-passe para aceder às configurações do sistema.</p>
+          
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <input 
+                type="password" 
+                placeholder="Palavra-passe..." 
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                className="w-full p-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-colors text-center font-black tracking-widest"
+              />
+              {errorMsg && <p className="text-red-500 text-xs font-bold mt-2">{errorMsg}</p>}
+            </div>
+            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-lg transition-all cursor-pointer">
+              Desbloquear Painel
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // Painel de Controle Normal
   return (
     <div className="space-y-8 animate-in fade-in text-left">
       <header className="border-b border-slate-200 dark:border-slate-800 pb-4 flex justify-between items-end">
@@ -365,9 +661,14 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Personalize o seu sistema, ajuste o algoritmo e faça backups.</p>
         </div>
-        <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all">
-          <Save className="w-5 h-5"/> Salvar Alterações
-        </button>
+        <div className="flex gap-3">
+          <button onClick={() => { setIsAuthenticated(false); sessionStorage.removeItem('admin_auth'); }} className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer dark:bg-slate-800 dark:text-slate-300">
+            <Lock className="w-5 h-5"/> Trancar
+          </button>
+          <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all cursor-pointer">
+            <Save className="w-5 h-5"/> Salvar Alterações
+          </button>
+        </div>
       </header>
 
       {saveStatus && (
@@ -409,7 +710,6 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
                   className="flex-1 p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors text-sm font-mono"
                 />
               </div>
-              <p className="text-[10px] text-slate-400 mt-2">Dica: Use imagens transparentes (PNG) hospedadas em sites como Imgur.</p>
             </div>
           </div>
         </div>
@@ -513,7 +813,7 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
           </div>
           <button 
             onClick={handleExportBackup}
-            className="w-full py-3.5 rounded-xl font-bold text-sm bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-900/50 transition-colors flex items-center justify-center gap-2 border border-purple-200 dark:border-purple-800"
+            className="w-full py-3.5 rounded-xl font-bold text-sm bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-900/50 transition-colors flex items-center justify-center gap-2 border border-purple-200 dark:border-purple-800 cursor-pointer"
           >
             <Download className="w-4 h-4"/> Exportar Meus Dados (.JSON)
           </button>
@@ -533,7 +833,7 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
               </div>
               <button 
                 onClick={handleResetProgress}
-                className={`w-full py-3 rounded-lg font-bold text-sm transition-all ${confirmResetProgress ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' : 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50'}`}
+                className={`w-full py-3 rounded-lg font-bold text-sm transition-all cursor-pointer ${confirmResetProgress ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' : 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50'}`}
               >
                 {confirmResetProgress ? 'Tem certeza? Clique para Limpar' : 'Zerar Progresso e Gamificação'}
               </button>
@@ -546,7 +846,7 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
               </div>
               <button 
                 onClick={handleFactoryReset}
-                className={`w-full py-3 rounded-lg font-bold text-sm transition-all ${confirmFactoryReset ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' : 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50'}`}
+                className={`w-full py-3 rounded-lg font-bold text-sm transition-all cursor-pointer ${confirmFactoryReset ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' : 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50'}`}
               >
                 {confirmFactoryReset ? 'APAGAR TUDO DEFINITIVAMENTE' : 'Restaurar Sistema a Zero'}
               </button>
@@ -554,912 +854,6 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
           </div>
         </div>
 
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// ABA DASHBOARD / COCKPIT
-// ==========================================
-function TabDashboard({ config, progressPerc, gamification, setGamification, dailyLogs, setDailyLogs, userLevel, pendingReviewsCount, setActiveTab, customSprint }) {
-  const [loggedHoursToday, setLoggedHoursToday] = useState('');
-  const today = new Date().toLocaleDateString();
-  const todayHours = dailyLogs[today] || 0;
-  const progressDaily = Math.min((todayHours / config.horasDia) * 100, 100);
-
-  const handleLogHours = (e) => {
-    e.preventDefault();
-    const hours = parseFloat(loggedHoursToday);
-    if (!isNaN(hours) && hours > 0) {
-      setDailyLogs(prev => ({ ...prev, [today]: (prev[today] || 0) + hours }));
-      if ((todayHours + hours) >= config.horasDia && gamification.lastActiveDate !== today) {
-        setGamification(prev => ({ ...prev, streak: prev.streak + 1, lastActiveDate: today }));
-      } else if (gamification.lastActiveDate !== today) {
-        setGamification(prev => ({ ...prev, lastActiveDate: today }));
-      }
-      setLoggedHoursToday('');
-    }
-  };
-
-  return (
-    <div className="space-y-6 animate-in fade-in">
-      <header className="border-b border-slate-200 dark:border-slate-800 pb-4">
-        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">{config.appName} Cockpit</h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Mensure a sua execução diária e visualize as suas métricas de aprovação.</p>
-      </header>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
-          <div className="relative w-32 h-32 shrink-0 flex items-center justify-center">
-            <svg className="w-full h-full transform -rotate-90">
-              <circle cx="64" cy="64" r="56" className="stroke-slate-100 dark:stroke-slate-800" strokeWidth="12" fill="none" />
-              <circle cx="64" cy="64" r="56" className="stroke-blue-500 drop-shadow-md transition-all duration-1000 ease-out" strokeWidth="12" fill="none" strokeDasharray="351.85" strokeDashoffset={351.85 - (351.85 * progressDaily) / 100} strokeLinecap="round" />
-            </svg>
-            <div className="absolute flex flex-col items-center justify-center">
-              <span className="text-3xl font-black text-slate-800 dark:text-white">{todayHours.toFixed(1)}<span className="text-lg text-slate-400">h</span></span>
-              <span className="text-[10px] font-bold uppercase text-slate-400">De {config.horasDia}h Meta</span>
-            </div>
-          </div>
-          <div className="flex-1 w-full z-10 text-left">
-            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-1">Foco de Hoje</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Registe as horas líquidas de estudo focadas no edital.</p>
-            <form onSubmit={handleLogHours} className="flex gap-2">
-              <input type="number" step="0.5" placeholder="Ex: 2.5" value={loggedHoursToday} onChange={(e) => setLoggedHoursToday(e.target.value)} className="w-24 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500 font-bold text-center" />
-              <button type="submit" className="bg-slate-800 hover:bg-slate-900 dark:bg-blue-600 dark:hover:bg-blue-500 text-white px-5 py-3 rounded-xl font-bold transition-colors">Adicionar Horas</button>
-            </form>
-          </div>
-        </div>
-
-        <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl shadow-md p-6 text-white flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-20"><Trophy className="w-24 h-24"/></div>
-          <div className="z-10 text-left">
-            <h3 className="font-bold text-amber-100 flex items-center gap-2 text-sm uppercase tracking-wider mb-4"><Flame className="w-4 h-4"/> Status Atual</h3>
-            <div className="flex items-end gap-2">
-              <span className="text-5xl font-black">{gamification.streak}</span>
-              <span className="text-amber-200 font-medium mb-1">Dias Seguidos</span>
-            </div>
-            {gamification.streak > 0 ? <p className="text-xs text-amber-100 mt-1">Sua ofensiva está em chamas!</p> : <p className="text-xs text-amber-100 mt-1">Estude hoje para acender a chama.</p>}
-          </div>
-          <div className="mt-6 pt-4 border-t border-amber-400/30 z-10 text-left">
-            <div className="flex justify-between items-end mb-2">
-              <span className="font-bold text-lg">Nível {userLevel.nivel}</span>
-              <span className="text-xs font-bold text-amber-200">{gamification.xp} / {userLevel.max} XP</span>
-            </div>
-            <div className="w-full h-2 bg-black/20 rounded-full overflow-hidden">
-              <div className="h-full bg-white transition-all duration-1000" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
-            </div>
-            <p className="text-[10px] uppercase font-black tracking-widest text-amber-200 mt-2">{userLevel.titulo}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-center text-left">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-xl"><TrendingUp className="w-6 h-6 text-blue-600 dark:text-blue-400"/></div>
-            <div>
-              <h3 className="font-bold text-lg text-slate-800 dark:text-white">Domínio da Trilha</h3>
-              <p className="text-xs text-slate-500">Progresso de Consolidação</p>
-            </div>
-          </div>
-          <div className="flex items-end gap-3 mb-2">
-            <span className="text-4xl font-black text-slate-800 dark:text-white">{progressPerc}%</span>
-            <span className="text-sm font-bold text-slate-400 mb-1">Consolidado</span>
-          </div>
-          <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-3">
-            <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${progressPerc}%` }}></div>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Continue a fechar tópicos para consolidar a sua aprovação.</p>
-        </div>
-
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 text-left">
-          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-4">Próximos Passos</h3>
-          <div className="space-y-3">
-            <button onClick={() => setActiveTab('revisoes')} className="w-full flex items-center justify-between p-4 rounded-xl border border-red-100 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors group">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-red-200 dark:bg-red-800 rounded-lg group-hover:scale-110 transition-transform"><BrainCircuit className="w-5 h-5 text-red-700 dark:text-red-300"/></div>
-                <div className="text-left">
-                  <span className="block font-bold text-red-900 dark:text-red-300">Deck de Combate (Anki)</span>
-                  <span className="text-xs text-red-700 dark:text-red-400">Lute contra o esquecimento.</span>
-                </div>
-              </div>
-              <span className="font-black text-xl text-red-600 dark:text-red-400">{pendingReviewsCount}</span>
-            </button>
-
-            <button onClick={() => setActiveTab('planner')} className="w-full flex items-center justify-between p-4 rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50 dark:bg-emerald-900/10 hover:bg-emerald-100 dark:hover:bg-emerald-900/20 transition-colors group">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-200 dark:bg-emerald-800 rounded-lg group-hover:scale-110 transition-transform"><LayoutGrid className="w-5 h-5 text-emerald-700 dark:text-emerald-300"/></div>
-                <div className="text-left">
-                  <span className="block font-bold text-emerald-900 dark:text-emerald-300">Metas da Semana</span>
-                  <span className="text-xs text-emerald-700 dark:text-emerald-400">Gerenciar e criar novas Sprints.</span>
-                </div>
-              </div>
-              <span className="font-black text-xl text-emerald-600 dark:text-emerald-400">{Math.ceil(customSprint.length / 2)} Sprints</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// ABA 1: ARSENAL DE MATÉRIAS
-// ==========================================
-function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprintItem, resetProgress }) {
-  const [expanded, setExpanded] = useState({});
-  const [isEditing, setIsEditing] = useState(false);
-  const [isAllExpanded, setIsAllExpanded] = useState(false);
-  
-  const [newTopic, setNewTopic] = useState({ discId: '', titulo: '', linkTec: '' });
-  const [editingTopicId, setEditingTopicId] = useState(null);
-  const [editTopicData, setEditTopicData] = useState({ titulo: '', linkTec: '', pergunta: '', resposta: '' });
-  
-  const [bulkInput, setBulkInput] = useState({ discId: null, text: '' });
-  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-
-  const toggleNode = (id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
-
-  const toggleExpandAll = () => {
-    if (isAllExpanded) {
-      setExpanded({});
-      setIsAllExpanded(false);
-    } else {
-      const newExpanded = {};
-      edital.forEach(bloco => {
-        newExpanded[bloco.id] = true;
-        bloco.disciplinas.forEach(disc => { newExpanded[disc.id] = true; });
-      });
-      setExpanded(newExpanded);
-      setIsAllExpanded(true);
-    }
-  };
-
-  const dragItem = useRef(null);
-  const dragOverItem = useRef(null);
-
-  const handleDragStart = (e, position, discId) => { dragItem.current = { position, discId }; e.dataTransfer.effectAllowed = "move"; };
-  const handleDragEnter = (e, position, discId) => { e.preventDefault(); dragOverItem.current = { position, discId }; };
-  const handleDrop = (e) => {
-    e.preventDefault();
-    if (!dragItem.current || !dragOverItem.current) return;
-    if (dragItem.current.discId !== dragOverItem.current.discId) return;
-
-    const discId = dragItem.current.discId;
-    const dragIdx = dragItem.current.position;
-    const dropIdx = dragOverItem.current.position;
-    
-    dragItem.current = null;
-    dragOverItem.current = null;
-
-    setEdital(prevEdital => prevEdital.map(bloco => ({
-      ...bloco,
-      disciplinas: bloco.disciplinas.map(disc => {
-        if (disc.id === discId) {
-          const newAssuntos = [...disc.assuntos];
-          const [draggedTopic] = newAssuntos.splice(dragIdx, 1);
-          newAssuntos.splice(dropIdx, 0, draggedTopic);
-          return { ...disc, assuntos: newAssuntos };
-        }
-        return disc;
-      })
-    })));
-  };
-
-  const handleDeleteClick = (discId, assId) => {
-    if (confirmDeleteId === assId) {
-      setEdital(prev => prev.map(b => ({
-        ...b,
-        disciplinas: b.disciplinas.map(d => {
-          if(d.id === discId) return { ...d, assuntos: d.assuntos.filter(a => a.id !== assId) };
-          return d;
-        })
-      })));
-      setConfirmDeleteId(null);
-    } else {
-      setConfirmDeleteId(assId);
-      setTimeout(() => setConfirmDeleteId(null), 3000); 
-    }
-  };
-
-  const handleIndent = (discId, assId, delta) => {
-    setEdital(prev => prev.map(b => ({
-      ...b,
-      disciplinas: b.disciplinas.map(d => {
-        if (d.id === discId) {
-          return {
-            ...d,
-            assuntos: d.assuntos.map(a => {
-              if (a.id === assId) {
-                const currentIndent = a.indent || 0;
-                const newIndent = Math.max(0, Math.min(3, currentIndent + delta));
-                return { ...a, indent: newIndent };
-              }
-              return a;
-            })
-          };
-        }
-        return d;
-      })
-    })));
-  };
-
-  const handleAddTopic = (discId) => {
-    if(!newTopic.titulo) return;
-    const newAssId = `t_${Date.now()}`;
-    setEdital(prev => prev.map(b => ({
-      ...b,
-      disciplinas: b.disciplinas.map(d => {
-        if(d.id === discId) return { ...d, assuntos: [...d.assuntos, { id: newAssId, titulo: newTopic.titulo, temp: '⭐ NOVO', linkTec: newTopic.linkTec, indent: 0, pergunta: '', resposta: '' }] };
-        return d;
-      })
-    })));
-    setNewTopic({ discId: '', titulo: '', linkTec: '' });
-  };
-
-  const handleBulkAdd = (discId) => {
-    if (!bulkInput.text.trim()) return;
-    const lines = bulkInput.text.split('\n').filter(line => line.trim() !== '');
-    if (lines.length === 0) return;
-
-    const newAssuntos = lines.map((line, idx) => ({
-      id: `t_${Date.now()}_${idx}`,
-      titulo: line.trim(),
-      temp: '⭐ NOVO',
-      linkTec: '',
-      indent: 0,
-      pergunta: '',
-      resposta: ''
-    }));
-
-    setEdital(prev => prev.map(b => ({
-      ...b,
-      disciplinas: b.disciplinas.map(d => {
-        if(d.id === discId) {
-          return { ...d, assuntos: [...d.assuntos, ...newAssuntos] };
-        }
-        return d;
-      })
-    })));
-    
-    setBulkInput({ discId: null, text: '' });
-  };
-
-  const startEditTopic = (assunto) => { 
-    setEditingTopicId(assunto.id); 
-    setEditTopicData({ 
-      titulo: assunto.titulo || '', 
-      linkTec: assunto.linkTec || '',
-      pergunta: assunto.pergunta || '',
-      resposta: assunto.resposta || ''
-    }); 
-  };
-  
-  const saveEditTopic = (discId, assId) => {
-    if (!editTopicData.titulo) return;
-    setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => {
-        if (d.id === discId) return { ...d, assuntos: d.assuntos.map(a => a.id === assId ? { ...a, ...editTopicData } : a) };
-        return d;
-      })
-    })));
-    setEditingTopicId(null);
-  };
-
-  const isFullyMastered = (assId) => {
-    const p = progress[assId];
-    return p?.estudado && p?.questoes && p?.revisado;
-  };
-
-  const getMemoryHealth = (assId) => {
-    const p = progress[assId];
-    if (!p?.lastReviewedTimestamp) return null; 
-    
-    const now = new Date().getTime();
-    const diffDays = (now - p.lastReviewedTimestamp) / (1000 * 3600 * 24);
-
-    if (diffDays <= 3) return { color: 'text-emerald-500', bg: 'bg-emerald-100 dark:bg-emerald-900/30', label: 'Memória Fresca' };
-    if (diffDays <= 7) return { color: 'text-amber-500', bg: 'bg-amber-100 dark:bg-amber-900/30', label: 'A Enfraquecer' };
-    return { color: 'text-red-500', bg: 'bg-red-100 dark:bg-red-900/30', label: 'Risco de Esquecimento' };
-  };
-
-  const checkStatus = (assId) => {
-    const p = progress[assId];
-    const count = (p?.estudado ? 1 : 0) + (p?.questoes ? 1 : 0) + (p?.revisado ? 1 : 0);
-    if (count === 3) return <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />;
-    if (count > 0) return <PlayCircle className="w-5 h-5 text-blue-400 shrink-0" />;
-    return <div className="w-5 h-5 rounded-full border-2 border-slate-200 dark:border-slate-600 shrink-0"></div>;
-  };
-
-  return (
-    <div className="space-y-6 animate-in fade-in text-left">
-      <header className="border-b border-slate-200 dark:border-slate-800 pb-4 flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4">
-        <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">Arsenal de Matérias</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-2">A sua Trilha Base. Assuntos 100% dominados ficam riscados.</p>
-        </div>
-        
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
-          <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); }} className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-colors w-full sm:w-auto shadow-sm ${isEditing ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-700'}`}>
-            {isEditing ? <Save className="w-4 h-4"/> : <Edit className="w-4 h-4"/>}
-            {isEditing ? 'Concluir Gestão' : 'Gerenciar Matérias'}
-          </button>
-        </div>
-      </header>
-
-      {isEditing && (
-        <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 p-4 rounded-xl flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-          <div className="text-sm text-amber-800 dark:text-amber-200/80">
-            <strong>Modo Edição Ativo:</strong><br/>
-            Na edição de um tópico, você agora pode preencher o <strong className="text-amber-900 dark:text-amber-400">Flashcard (Frente e Verso)</strong>. Essa será a munição do seu Deck de Combate (Anki) na aba de revisões!
-          </div>
-        </div>
-      )}
-
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-        
-        <div className="flex justify-start mb-4">
-          <button 
-            onClick={toggleExpandAll} 
-            className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/50 dark:hover:bg-blue-900/20 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm"
-          >
-            {isAllExpanded ? <ChevronUp className="w-3.5 h-3.5"/> : <ChevronDown className="w-3.5 h-3.5"/>}
-            {isAllExpanded ? 'Recolher Tudo' : 'Expandir Tudo'}
-          </button>
-        </div>
-
-        <div className="flex flex-col gap-6">
-          {edital.map((bloco) => (
-            <div key={bloco.id} className="border-b border-slate-100 dark:border-slate-800 pb-6 last:border-0 last:pb-0">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 mb-4">
-                <Layers className="w-5 h-5 text-indigo-500"/>
-                <span className="font-black text-xl text-slate-800 dark:text-slate-200 uppercase tracking-tight">{bloco.nome}</span>
-              </div>
-              <div className="space-y-3">
-                {bloco.disciplinas.map((disc) => (
-                  <div key={disc.id}>
-                    <div onClick={() => toggleNode(disc.id)} className="flex items-center gap-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 p-3 rounded-lg select-none border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 transition-colors">
-                      {expanded[disc.id] ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
-                      <FolderOpen className={`w-5 h-5 ${disc.cor?.split(' ')[0] || 'text-slate-500'}`} />
-                      <span className="font-bold text-base text-slate-700 dark:text-slate-300">{disc.nome}</span>
-                    </div>
-
-                    {expanded[disc.id] && (
-                      <div className="mt-2 space-y-2">
-                        {disc.assuntos.map((assunto, index) => {
-                          const isInSprint = customSprint.some(item => item.assId === assunto.id);
-                          const isCurrentlyEditing = editingTopicId === assunto.id;
-                          const mastered = isFullyMastered(assunto.id);
-                          const memoryHealth = getMemoryHealth(assunto.id);
-                          const hasFlashcard = assunto.pergunta || assunto.resposta;
-
-                          return (
-                            <div 
-                              key={assunto.id} 
-                              draggable={isEditing && !isCurrentlyEditing}
-                              onDragStart={(e) => handleDragStart(e, index, disc.id)}
-                              onDragEnter={(e) => handleDragEnter(e, index, disc.id)}
-                              onDragOver={(e) => e.preventDefault()}
-                              onDrop={handleDrop}
-                              style={{ marginLeft: assunto.indent ? `${assunto.indent * 1.5}rem` : '0' }}
-                              className={`flex items-center gap-3 py-3 px-4 rounded-xl border transition-colors bg-white dark:bg-slate-900 shadow-sm ${isEditing && !isCurrentlyEditing ? 'border-dashed border-amber-300 cursor-move hover:bg-amber-50 dark:hover:bg-amber-900/10' : 'border-slate-200 dark:border-slate-800'} ${mastered && !isEditing ? 'opacity-70 bg-slate-50 dark:bg-slate-900/50' : ''}`}
-                            >
-                              {isCurrentlyEditing ? (
-                                <div className="flex-1 flex flex-col gap-4 p-2 animate-in fade-in">
-                                  <div className="grid md:grid-cols-2 gap-3">
-                                    <div>
-                                      <label className="text-[10px] font-bold uppercase text-slate-400 block mb-1">Título do Assunto</label>
-                                      <input type="text" value={editTopicData.titulo} onChange={(e) => setEditTopicData({...editTopicData, titulo: e.target.value})} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" />
-                                    </div>
-                                    <div>
-                                      <label className="text-[10px] font-bold uppercase text-slate-400 block mb-1">Link Caderno TEC</label>
-                                      <input type="text" value={editTopicData.linkTec} onChange={(e) => setEditTopicData({...editTopicData, linkTec: e.target.value})} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="https://..." />
-                                    </div>
-                                  </div>
-
-                                  <div className="bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800/50 p-4 rounded-xl space-y-3">
-                                    <h4 className="text-xs font-black uppercase text-blue-600 dark:text-blue-400 flex items-center gap-2"><BrainCircuit className="w-4 h-4"/> Criar Flashcard (Para Revisão)</h4>
-                                    <div>
-                                      <label className="text-[10px] font-bold uppercase text-slate-500 block mb-1">Frente (A Pergunta)</label>
-                                      <input type="text" value={editTopicData.pergunta} onChange={(e) => setEditTopicData({...editTopicData, pergunta: e.target.value})} placeholder="Ex: Qual a diferença entre Framework Genérico e Guarda-Chuva?" className="w-full p-2 text-sm rounded-lg border border-blue-200 dark:border-blue-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" />
-                                    </div>
-                                    <div>
-                                      <label className="text-[10px] font-bold uppercase text-slate-500 block mb-1">Verso (A Resposta / Pegadinha)</label>
-                                      <textarea rows="2" value={editTopicData.resposta} onChange={(e) => setEditTopicData({...editTopicData, resposta: e.target.value})} placeholder="Ex: Framework é fase de construção. Guarda-chuva é suporte contínuo." className="w-full p-2 text-sm rounded-lg border border-blue-200 dark:border-blue-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none resize-none focus:border-blue-500"></textarea>
-                                    </div>
-                                  </div>
-
-                                  <div className="flex gap-2 mt-1">
-                                    <button onClick={() => saveEditTopic(disc.id, assunto.id)} className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-bold transition-colors">Salvar Alterações</button>
-                                    <button onClick={() => setEditingTopicId(null)} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-5 py-2 rounded-lg text-sm font-bold transition-colors">Cancelar</button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <>
-                                  {isEditing ? (
-                                    <GripVertical className="w-5 h-5 text-slate-300 dark:text-slate-600 cursor-move" />
-                                  ) : (
-                                    mastered ? <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" /> : checkStatus(assunto.id)
-                                  )}
-                                  
-                                  <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-2">
-                                    <span className={`font-bold transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500 decoration-2' : 'text-slate-700 dark:text-slate-300'} ${assunto.indent > 0 ? 'text-sm' : 'text-base'}`}>{assunto.titulo}</span>
-                                    
-                                    <div className="flex gap-2 items-center">
-                                      {!isEditing && memoryHealth && (
-                                        <div className={`flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md font-bold tracking-wider ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória">
-                                          <Thermometer className="w-3 h-3"/> {memoryHealth.label}
-                                        </div>
-                                      )}
-                                      {!isEditing && hasFlashcard && (
-                                        <div className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md font-bold tracking-wider bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400" title="Possui Flashcard Ativo">
-                                          <BrainCircuit className="w-3 h-3"/> Anki
-                                        </div>
-                                      )}
-                                      {isEditing && assunto.linkTec && <span className="text-[10px] text-blue-500 dark:text-blue-400 flex items-center gap-1"><Link className="w-3 h-3"/> Link TEC</span>}
-                                    </div>
-                                  </div>
-                                  
-                                  {!isEditing && (
-                                    <button 
-                                      onClick={() => {
-                                        if (mastered && !isInSprint) resetProgress(assunto.id);
-                                        toggleSprintItem(disc.id, assunto.id, disc.nome, assunto.titulo, assunto.temp, assunto.linkTec);
-                                      }} 
-                                      className={`flex items-center gap-1.5 text-xs font-black uppercase transition-colors px-3 py-1.5 rounded-lg border shadow-sm ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' : 'bg-white text-indigo-600 border-indigo-200 dark:bg-slate-800 dark:text-indigo-400 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40'}`}>
-                                      {isInSprint ? <CheckCircle className="w-4 h-4" /> : (mastered ? <RefreshCcw className="w-4 h-4" /> : <Target className="w-4 h-4" />)}
-                                      <span className="hidden md:inline">{isInSprint ? 'Na Sprint' : (mastered ? 'Refazer Ciclo' : 'Add à Sprint')}</span>
-                                    </button>
-                                  )}
-                                  {isEditing && (
-                                    <div className="flex flex-wrap gap-2">
-                                      <button onClick={() => handleIndent(disc.id, assunto.id, -1)} disabled={!assunto.indent} className="p-2 text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-30" title="Recuar Nível"><ArrowLeft className="w-4 h-4"/></button>
-                                      <button onClick={() => handleIndent(disc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3} className="p-2 text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-30" title="Avançar Nível"><ArrowRight className="w-4 h-4"/></button>
-                                      
-                                      <button onClick={() => startEditTopic(assunto)} className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors" title="Editar"><Pencil className="w-4 h-4"/></button>
-                                      <button 
-                                        onClick={() => handleDeleteClick(disc.id, assunto.id)} 
-                                        className={`p-2 rounded-lg transition-colors font-bold text-xs flex items-center gap-1 ${confirmDeleteId === assunto.id ? 'bg-red-500 text-white' : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'}`}
-                                        title="Excluir"
-                                      >
-                                        <Trash2 className="w-4 h-4"/>
-                                        {confirmDeleteId === assunto.id && "Confirmar"}
-                                      </button>
-                                    </div>
-                                  )}
-                                </>
-                              )}
-                            </div>
-                          );
-                        })}
-
-                        {isEditing && (
-                          <div className="mt-3 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50 rounded-xl flex flex-col gap-4 shadow-inner">
-                            {bulkInput.discId === disc.id ? (
-                              <div className="flex flex-col gap-3 animate-in fade-in">
-                                <h4 className="text-xs font-black uppercase text-amber-700 dark:text-amber-500 flex items-center gap-2"><ListPlus className="w-4 h-4"/> Importação Rápida</h4>
-                                <p className="text-xs text-amber-800/80 dark:text-amber-200/60">Cole a lista de assuntos abaixo (um por linha).</p>
-                                <textarea 
-                                  rows="6"
-                                  placeholder="Exemplo:&#10;Modelagem de Dados&#10;Normalização&#10;Linguagem SQL..."
-                                  value={bulkInput.text}
-                                  onChange={(e) => setBulkInput({ discId: disc.id, text: e.target.value })}
-                                  className="w-full p-3 text-sm rounded-lg border border-amber-300 dark:border-amber-700/50 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500 resize-none"
-                                />
-                                <div className="flex gap-2">
-                                  <button onClick={() => handleBulkAdd(disc.id)} className="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors">Gerar Tópicos</button>
-                                  <button onClick={() => setBulkInput({ discId: null, text: '' })} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-5 py-2.5 rounded-lg text-sm font-bold transition-colors">Cancelar</button>
-                                </div>
-                              </div>
-                            ) : (
-                              <>
-                                <div>
-                                  <h4 className="text-xs font-black uppercase text-amber-700 dark:text-amber-500 flex items-center gap-2 mb-3"><Plus className="w-4 h-4"/> Adicionar Único</h4>
-                                  <div className="flex flex-col md:flex-row gap-2">
-                                    <input type="text" placeholder="Nome do assunto..." value={newTopic.discId === disc.id ? newTopic.titulo : ''} onChange={(e) => setNewTopic({...newTopic, discId: disc.id, titulo: e.target.value})} className="flex-1 p-2.5 text-sm rounded-lg border border-amber-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500" />
-                                    <input type="text" placeholder="Link Caderno TEC (Opcional)" value={newTopic.discId === disc.id ? newTopic.linkTec : ''} onChange={(e) => setNewTopic({...newTopic, discId: disc.id, linkTec: e.target.value})} className="flex-1 p-2.5 text-sm rounded-lg border border-amber-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500 hidden md:block" />
-                                    <button onClick={() => handleAddTopic(disc.id)} className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors">Adicionar</button>
-                                  </div>
-                                </div>
-
-                                <div className="relative flex items-center py-2">
-                                  <div className="flex-grow border-t border-amber-200 dark:border-amber-800/50"></div>
-                                  <span className="flex-shrink-0 mx-4 text-amber-600 dark:text-amber-500 text-xs font-bold uppercase tracking-widest">OU</span>
-                                  <div className="flex-grow border-t border-amber-200 dark:border-amber-800/50"></div>
-                                </div>
-
-                                <button 
-                                  onClick={() => setBulkInput({ discId: disc.id, text: '' })} 
-                                  className="w-full border-2 border-dashed border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-500 bg-amber-50/50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/40 px-4 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors"
-                                >
-                                  <ListPlus className="w-5 h-5"/> Importar Vários (Copiar e Colar Índice)
-                                </button>
-                              </>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// ABA: METAS DA SEMANA
-// ==========================================
-function TabPlanner({ customSprint, sprintsCompleted, setActiveTab }) {
-  const sprintGroups = [];
-  for (let i = 0; i < customSprint.length; i += 2) sprintGroups.push(customSprint.slice(i, i + 2));
-
-  const activeSprint = sprintGroups.length > 0 ? sprintGroups[0] : null;
-  const backlogSprints = sprintGroups.length > 1 ? sprintGroups.slice(1) : [];
-
-  return (
-    <div className="space-y-6 animate-in fade-in text-left">
-      <header className="border-b border-slate-200 dark:border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-        <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">Metas da Semana</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">A sua visão estratégica. O que for agendado aqui será executado na Sprint Diária.</p>
-        </div>
-      </header>
-
-      <div className="flex flex-col lg:flex-row gap-6 items-start">
-        
-        {/* Coluna 1: Backlog (Fila) */}
-        <div className="w-full lg:w-1/3 bg-slate-100 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 min-h-[500px]">
-          <h3 className="font-black text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2"><ListPlus className="w-5 h-5"/> Fila de Sprints ({backlogSprints.length})</h3>
-          <div className="space-y-4">
-            {backlogSprints.map((group, idx) => (
-              <div key={idx} className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition-colors opacity-90">
-                 <div className="text-[10px] font-bold text-slate-400 mb-3 uppercase flex justify-between">
-                   <span>Sprint {sprintsCompleted + idx + 2}</span>
-                 </div>
-                 {group.map(item => (
-                   <div key={item.assId} className="mb-3 last:mb-0 pl-2 border-l-2 border-slate-200 dark:border-slate-700">
-                     <span className="block text-[9px] font-bold text-slate-400 uppercase truncate">{item.discNome}</span>
-                     <span className="block text-sm font-bold text-slate-700 dark:text-slate-300 leading-tight">{item.assTitulo}</span>
-                   </div>
-                 ))}
-              </div>
-            ))}
-            {backlogSprints.length === 0 && (
-              <div className="text-sm text-slate-400 p-6 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl flex flex-col items-center gap-3">
-                <p>O seu Backlog está vazio.</p>
-                <p className="text-xs">Vá ao Arsenal de Matérias para organizar a sua semana.</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Coluna 2: Em Andamento */}
-        <div className="w-full lg:w-1/3 bg-blue-50 dark:bg-blue-900/10 rounded-2xl p-4 border border-blue-200 dark:border-blue-900/30 min-h-[500px]">
-           <h3 className="font-black text-blue-700 dark:text-blue-400 uppercase tracking-wider mb-4 flex items-center gap-2"><PlayCircle className="w-5 h-5"/> Em Curso (Hoje)</h3>
-           {activeSprint ? (
-             <div className="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-md border-2 border-blue-400 dark:border-blue-500">
-                 <div className="text-[10px] font-bold text-blue-500 mb-4 uppercase">Sprint {sprintsCompleted + 1}</div>
-                 {activeSprint.map(item => (
-                   <div key={item.assId} className="mb-4 last:mb-0">
-                     <span className="block text-[9px] font-bold text-blue-500 uppercase truncate">{item.discNome}</span>
-                     <span className="block text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight mb-2">{item.assTitulo}</span>
-                   </div>
-                 ))}
-                 <button onClick={() => setActiveTab('cronograma')} className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 rounded-lg transition-colors">
-                   Ir para Execução
-                 </button>
-              </div>
-           ) : (
-             <div className="text-sm text-blue-400 p-6 border-2 border-dashed border-blue-300 dark:border-blue-800 rounded-xl flex items-center justify-center">Nenhuma Sprint ativada hoje.</div>
-           )}
-        </div>
-
-        {/* Coluna 3: Concluídas */}
-        <div className="w-full lg:w-1/3 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-4 border border-emerald-200 dark:border-emerald-900/30 min-h-[500px]">
-           <h3 className="font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-4 flex items-center gap-2"><CheckCircle className="w-5 h-5"/> Vitórias</h3>
-           <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-emerald-200 dark:border-emerald-800 flex flex-col items-center justify-center h-48">
-             <Trophy className="w-12 h-12 text-emerald-500 mb-3" />
-             <span className="text-4xl font-black text-emerald-600 dark:text-emerald-400">{sprintsCompleted}</span>
-             <span className="text-xs font-bold text-slate-500 uppercase mt-1">Sprints Fechadas</span>
-           </div>
-        </div>
-
-      </div>
-    </div>
-  );
-}
-
-// ==========================================
-// ABA 4: SPRINTS DE ESTUDO DIÁRIA
-// ==========================================
-function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, addXP }) {
-  const [showConfirm, setShowConfirm] = useState(false);
-
-  const sprintGroups = [];
-  for (let i = 0; i < customSprint.length; i += 2) sprintGroups.push(customSprint.slice(i, i + 2));
-
-  const handleCompleteSprint = () => {
-    if (!showConfirm) {
-      setShowConfirm(true);
-      setTimeout(() => setShowConfirm(false), 3000); 
-      return;
-    }
-    setSprintsCompleted(prev => prev + 1);
-    setCustomSprint(prev => prev.slice(2)); 
-    addXP(50); 
-    setShowConfirm(false);
-  };
-
-  return (
-    <div className="space-y-6 animate-in fade-in text-left">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200 dark:border-slate-800 pb-4 gap-4">
-        <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">Sprints de Estudo</h2>
-          <p className="text-slate-500 mt-1">Marque os passos. Bater a Sprint rende <strong className="text-blue-500">+50 XP</strong>.</p>
-        </div>
-        <div className="flex gap-3 items-center w-full md:w-auto">
-          <button disabled={sprintGroups.length === 0} onClick={handleCompleteSprint} className={`w-full md:w-auto px-6 py-3 rounded-xl font-black flex items-center justify-center gap-2 transition-all ${showConfirm ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white disabled:opacity-50'}`}>
-            <CheckCircle className="w-5 h-5" /> {showConfirm ? 'Confirmar Fecho (+50 XP)' : 'Concluir Sprint'}
-          </button>
-        </div>
-      </header>
-
-      {sprintGroups.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-12 flex flex-col items-center justify-center">
-          <ShoppingCart className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-4" />
-          <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">Fila Vazia!</h3>
-          <p className="text-slate-500 mb-6 text-center">Planeje a sua semana adicionando matérias.</p>
-          <div className="flex gap-4">
-            <button onClick={() => setActiveTab('disciplinas')} className="bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-6 py-3 rounded-xl font-bold">
-              Ir para o Arsenal de Matérias
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className="grid gap-6 mt-6">
-          {sprintGroups.map((group, idx) => {
-            const sprintNum = sprintsCompleted + idx + 1;
-            const isActive = idx === 0;
-
-            return (
-              <div key={sprintNum} className={`bg-white dark:bg-slate-900 rounded-2xl p-0 overflow-hidden flex flex-col md:flex-row border-2 transition-all ${isActive ? 'border-blue-400 shadow-lg ring-4 ring-blue-50 dark:ring-blue-900/20 scale-[1.01]' : 'border-slate-200 dark:border-slate-800 opacity-80'}`}>
-                <div className={`p-5 w-full md:w-32 flex flex-col items-center justify-center font-black border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 ${isActive ? 'bg-blue-500 text-white' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-400'}`}>
-                  <span className="text-xs uppercase tracking-widest">Sprint</span><span className="text-4xl mt-1">{sprintNum}</span>
-                  {isActive && <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded mt-2">EM CURSO</span>}
-                </div>
-                
-                <div className="p-5 flex-1 grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {group.map(item => {
-                    const isEstudado = progress[item.assId]?.estudado || false;
-                    const isQuestoes = progress[item.assId]?.questoes || false;
-                    const isRevisado = progress[item.assId]?.revisado || false;
-
-                    return (
-                      <div key={item.assId} className={`rounded-xl p-5 border flex flex-col relative ${isActive ? 'bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'}`}>
-                        <button onClick={() => setCustomSprint(p => p.filter(i => i.assId !== item.assId))} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors" title="Remover"><Trash2 className="w-4 h-4"/></button>
-                        
-                        <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-1 pr-6">{item.discNome}</span>
-                        <p className="font-bold text-lg text-slate-800 dark:text-slate-200 mb-4">{item.assTitulo}</p>
-                        
-                        <div className="mt-auto space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700/50">
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isEstudado ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
-                            <input type="checkbox" checked={isEstudado} onChange={() => toggleProgress(item.assId, 'estudado')} disabled={!isActive} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0" />
-                            <span className="font-bold text-sm uppercase tracking-wide">1. Teoria</span>
-                          </label>
-
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isQuestoes ? 'text-purple-600 dark:text-purple-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
-                            <input type="checkbox" checked={isQuestoes} onChange={() => toggleProgress(item.assId, 'questoes')} disabled={!isActive || !isEstudado} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0" />
-                            <span className="font-bold text-sm uppercase tracking-wide">2. Questões</span>
-                          </label>
-
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isRevisado ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
-                            <input type="checkbox" checked={isRevisado} onChange={() => toggleProgress(item.assId, 'revisado')} disabled={!isActive || !isQuestoes} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0" />
-                            <span className="font-bold text-sm uppercase tracking-wide">3. Revisão (Agenda Auto)</span>
-                          </label>
-                          
-                          {item.linkTec && isActive && (
-                            <a href={item.linkTec} target="_blank" rel="noopener noreferrer" className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-all shadow-sm">
-                              <ExternalLink className="w-4 h-4" /> Resolver no TEC
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    )
-                  })}
-                  {/* Placeholder */}
-                  {group.length === 1 && (
-                    <div className="rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 opacity-60 p-5">
-                      <Target className="w-8 h-8 mb-2" />
-                      <p className="text-sm font-bold uppercase tracking-wider">Espaço Vazio</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ==========================================
-// ABA 5: DECK DE COMBATE (ANKI NATIVO)
-// ==========================================
-function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds }) {
-  const [isReviewing, setIsReviewing] = useState(false);
-  const [isFlipped, setIsFlipped] = useState(false);
-
-  let todosAssuntos = [];
-  edital.forEach(b => b.disciplinas.forEach(d => {
-    d.assuntos.forEach(a => todosAssuntos.push({...a, discNome: d.nome}))
-  }));
-
-  const now = new Date().getTime();
-
-  const revisoesPendentes = todosAssuntos.filter(a => {
-    if (!activeSubjectIds.has(a.id)) return false;
-    const p = progress[a.id];
-    if (!p?.estudado) return false;
-    if (p.revisado && p.nextReviewTimestamp && p.nextReviewTimestamp <= now) return true;
-    if (!p.revisado) return true;
-    return false;
-  });
-
-  const revisoesConcluidas = todosAssuntos.filter(a => {
-    if (!activeSubjectIds.has(a.id)) return false;
-    const p = progress[a.id];
-    return p?.estudado && p?.revisado && p?.nextReviewTimestamp && p.nextReviewTimestamp > now;
-  });
-
-  const getDaysUntil = (timestamp) => {
-    const diff = Math.ceil((timestamp - now) / (1000 * 3600 * 24));
-    if (diff === 1) return 'Amanhã';
-    return `em ${diff} dias`;
-  };
-
-  const handleFeedbackClick = (assId, type) => {
-    handleReviewFeedback(assId, type);
-    setIsFlipped(false); 
-    if (revisoesPendentes.length <= 1) {
-      setIsReviewing(false); 
-    }
-  };
-
-  if (isReviewing && revisoesPendentes.length > 0) {
-    const activeCard = revisoesPendentes[0]; 
-    const questionText = activeCard.pergunta ? activeCard.pergunta : `Explique em voz alta os pontos principais e as pegadinhas sobre:\n\n${activeCard.titulo}`;
-    const answerText = activeCard.resposta ? activeCard.resposta : `(Você não registrou um resumo neste tópico). \n\nAvalie abaixo a sua retenção mental com base na Teoria e Questões que resolveu.`;
-
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[70vh] animate-in fade-in zoom-in-95 duration-300">
-        <div className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden text-left">
-          
-          <div className="bg-slate-100 dark:bg-slate-800 p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-            <span className="text-xs font-black uppercase text-blue-500 tracking-widest">{activeCard.discNome}</span>
-            <span className="text-xs font-bold text-slate-400 bg-white dark:bg-slate-900 px-3 py-1 rounded-full shadow-sm">{revisoesPendentes.length} restantes</span>
-          </div>
-
-          <div className="p-8 md:p-12 min-h-[200px] flex items-center justify-center bg-white dark:bg-slate-900">
-            <h3 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 leading-snug whitespace-pre-wrap">{questionText}</h3>
-          </div>
-
-          {isFlipped ? (
-            <div className="border-t border-slate-100 dark:border-slate-800 bg-blue-50/30 dark:bg-blue-900/10 animate-in slide-in-from-bottom-4">
-              <div className="p-8 min-h-[150px] flex items-center justify-center">
-                <p className="text-lg md:text-xl font-medium text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{answerText}</p>
-              </div>
-              
-              <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700">
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mb-4 uppercase tracking-widest text-center">Avalie a sua retenção</p>
-                <div className="flex gap-3">
-                  <button onClick={() => handleFeedbackClick(activeCard.id, 'dificil')} className="flex-1 bg-white hover:bg-red-500 text-red-600 hover:text-white dark:bg-slate-800 dark:hover:bg-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 p-4 rounded-xl font-black transition-all shadow-sm hover:shadow-lg flex flex-col items-center gap-1 group">
-                    <span className="text-base uppercase tracking-wider">Difícil</span>
-                    <span className="text-[10px] opacity-70 group-hover:text-red-200 font-medium">Rever Amanhã</span>
-                  </button>
-                  <button onClick={() => handleFeedbackClick(activeCard.id, 'bom')} className="flex-1 bg-white hover:bg-amber-500 text-amber-600 hover:text-white dark:bg-slate-800 dark:hover:bg-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50 p-4 rounded-xl font-black transition-all shadow-sm hover:shadow-lg flex flex-col items-center gap-1 group">
-                    <span className="text-base uppercase tracking-wider">Bom</span>
-                    <span className="text-[10px] opacity-70 group-hover:text-amber-200 font-medium">Rever em 7 Dias</span>
-                  </button>
-                  <button onClick={() => handleFeedbackClick(activeCard.id, 'facil')} className="flex-1 bg-white hover:bg-emerald-500 text-emerald-600 hover:text-white dark:bg-slate-800 dark:hover:bg-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 p-4 rounded-xl font-black transition-all shadow-sm hover:shadow-lg flex flex-col items-center gap-1 group">
-                    <span className="text-base uppercase tracking-wider">Fácil</span>
-                    <span className="text-[10px] opacity-70 group-hover:text-emerald-200 font-medium">Rever em 15 Dias</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="p-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex justify-center">
-              <button onClick={() => setIsFlipped(true)} className="w-full md:w-auto px-12 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl shadow-lg hover:shadow-blue-500/20 transition-all flex items-center justify-center gap-2 text-lg">
-                <Eye className="w-5 h-5"/> Revelar Resposta
-              </button>
-            </div>
-          )}
-        </div>
-        <button onClick={() => setIsReviewing(false)} className="mt-6 text-sm font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">Voltar ao Resumo</button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-6 animate-in fade-in text-left">
-      <header className="border-b border-slate-200 dark:border-slate-800 pb-4">
-        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
-          <BrainCircuit className="w-8 h-8 text-blue-500" /> Deck de Combate
-        </h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Retenção ativa. A sua memória não terá espaço para falhar.</p>
-        
-        {revisoesPendentes.length > 0 && (
-          <div className="mt-4">
-            <button onClick={() => setIsReviewing(true)} className="w-full md:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
-              <Zap className="w-5 h-5"/> Iniciar Revisão ({revisoesPendentes.length})
-            </button>
-          </div>
-        )}
-      </header>
-
-      <div className="grid md:grid-cols-2 gap-8 mt-6">
-        <div>
-          <h3 className="text-lg font-bold text-red-600 dark:text-red-400 flex items-center gap-2 mb-4 border-b border-red-100 dark:border-red-900/30 pb-2">
-            <AlertTriangle className="w-5 h-5"/> Cartas na Fila (Hoje)
-          </h3>
-          <div className="space-y-3">
-            {revisoesPendentes.length === 0 ? (
-              <div className="text-sm font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center">
-                <CheckCircle className="w-10 h-10 text-emerald-400 mb-3 opacity-50"/>
-                <p>A sua memória está em dia!</p>
-                <p>Nenhuma carta para hoje.</p>
-              </div>
-            ) : (
-              revisoesPendentes.map((data) => (
-                <div key={data.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-sm flex items-center justify-between border-l-4 border-l-red-500">
-                  <div className="truncate pr-4">
-                    <span className="text-[9px] uppercase font-black text-slate-400 block mb-0.5">{data.discNome}</span>
-                    <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm truncate">{data.titulo}</h4>
-                  </div>
-                  {(data.pergunta || data.resposta) && <BrainCircuit className="w-4 h-4 text-blue-400 shrink-0" title="Possui Flashcard Customizado"/>}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2 mb-4 border-b border-emerald-100 dark:border-emerald-900/30 pb-2">
-            <Calendar className="w-5 h-5"/> Agendadas (Futuro)
-          </h3>
-          <div className="space-y-3">
-            {revisoesConcluidas.length === 0 ? (
-              <div className="text-sm font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center">
-                Quando classificar as cartas, elas aparecerão aqui.
-              </div>
-            ) : (
-              revisoesConcluidas
-                .sort((a, b) => progress[a.id].nextReviewTimestamp - progress[b.id].nextReviewTimestamp)
-                .map((data) => {
-                  const p = progress[data.id];
-                  return (
-                    <div key={data.id} className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-xl flex justify-between items-center opacity-70">
-                      <div className="truncate pr-4">
-                        <span className="block text-[8px] uppercase font-black text-slate-400 mb-0.5">{data.discNome}</span>
-                        <h4 className="font-bold text-slate-600 dark:text-slate-400 text-xs truncate">{data.titulo}</h4>
-                      </div>
-                      <div className="text-right shrink-0">
-                        <span className="block text-xs font-black text-emerald-500 dark:text-emerald-400">{getDaysUntil(p.nextReviewTimestamp)}</span>
-                      </div>
-                    </div>
-                  );
-                })
-            )}
-          </div>
-        </div>
       </div>
     </div>
   );
