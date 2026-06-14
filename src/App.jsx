@@ -5,7 +5,7 @@ import {
   RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Link, Pencil, Settings,
   Edit, AlertTriangle, ChevronUp, Flame, Trophy, TrendingUp, Activity, Award, ListPlus, ArrowRight, ArrowLeft, BarChart2,
   Thermometer, CalendarDays, LayoutGrid, BrainCircuit, Eye, Zap, Image as ImageIcon, ShieldAlert, Download, Sliders, Lock,
-  UnfoldVertical, FoldVertical, FilePlus, Upload, Filter
+  UnfoldVertical, FoldVertical, FilePlus, Upload, Filter, Play, Pause, Coffee
 } from 'lucide-react';
 
 // --- HELPERS LOCAL STORAGE ---
@@ -105,6 +105,57 @@ export default function App() {
   }, []);
 
   const addXP = (amount) => { setGamification(prev => ({ ...prev, xp: prev.xp + amount })); };
+
+  // AUTO-LOG DO POMODORO
+  const handleAutoLog = (hoursToAdd) => {
+    const today = new Date().toLocaleDateString();
+    const currentHours = dailyLogs[today] || 0;
+    
+    setDailyLogs(prev => ({ ...prev, [today]: currentHours + hoursToAdd }));
+
+    if ((currentHours + hoursToAdd) >= projectConfig.horasDia && gamification.lastActiveDate !== today) {
+      setGamification(prev => ({ ...prev, streak: prev.streak + 1, lastActiveDate: today }));
+    } else if (gamification.lastActiveDate !== today) {
+      setGamification(prev => ({ ...prev, lastActiveDate: today }));
+    }
+  };
+
+  // --- ESTADOS GLOBAIS DO POMODORO ---
+  const FOCUS_TIME = 50 * 60; 
+  const BREAK_TIME = 10 * 60; 
+  const [pomodoroTime, setPomodoroTime] = useState(FOCUS_TIME);
+  const [isPomodoroActive, setIsPomodoroActive] = useState(false);
+  const [isPomodoroBreak, setIsPomodoroBreak] = useState(false);
+
+  useEffect(() => {
+    let interval = null;
+    if (isPomodoroActive && pomodoroTime > 0) {
+      interval = setInterval(() => {
+        setPomodoroTime((time) => time - 1);
+      }, 1000);
+    } else if (isPomodoroActive && pomodoroTime === 0) {
+      if (!isPomodoroBreak) {
+         handleAutoLog(50 / 60); 
+         addXP(20);
+         setIsPomodoroBreak(true);
+         setPomodoroTime(BREAK_TIME);
+         alert("🍅 Pomodoro concluído! +50 minutos registados e +20 XP. Hora de relaxar!");
+      } else {
+         setIsPomodoroBreak(false);
+         setPomodoroTime(FOCUS_TIME);
+         setIsPomodoroActive(false);
+         alert("⏰ Fim da pausa! Pronto para voltar ao foco?");
+      }
+    }
+    return () => clearInterval(interval);
+  }, [isPomodoroActive, pomodoroTime, isPomodoroBreak]);
+
+  const togglePomodoro = () => setIsPomodoroActive(!isPomodoroActive);
+  const resetPomodoro = () => {
+    setIsPomodoroActive(false);
+    setIsPomodoroBreak(false);
+    setPomodoroTime(FOCUS_TIME);
+  };
 
   const toggleProgress = (assId, type) => {
     setUserProgress(prev => {
@@ -271,7 +322,7 @@ export default function App() {
             {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} userProgress={userProgress} edital={edital} activeSubjectIds={activeSubjectIds} />}
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} />}
             {activeTab === 'planner' && <TabPlanner customSprint={customSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} />}
-            {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} />}
+            {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} pomodoroTime={pomodoroTime} isPomodoroActive={isPomodoroActive} isPomodoroBreak={isPomodoroBreak} togglePomodoro={togglePomodoro} resetPomodoro={resetPomodoro} />}
             {activeTab === 'revisoes' && <TabDeckAnki progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} />}
             {activeTab === 'admin' && <TabAdmin config={projectConfig} setConfig={setProjectConfig} setUserProgress={setUserProgress} setGamification={setGamification} setEdital={setEdital} setCustomSprint={setCustomSprint} initialEdital={initialEdital} />}
           </div>
@@ -322,6 +373,28 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
     const percDisc = Math.round((completedDisc / (totalDisc * 3)) * 100);
     radarData.push({ id: d.id, nome: d.nome, perc: percDisc, cor: d.cor });
   }));
+
+  // GERADOR DO HEATMAP DE CONSTÂNCIA
+  const todayObj = new Date();
+  todayObj.setHours(23, 59, 59, 999);
+  const currentDayOfWeek = todayObj.getDay();
+  const daysToLookBack = (16 * 7) + currentDayOfWeek; // 16 semanas + dias da semana atual
+  const heatmapDays = [];
+  
+  for (let i = daysToLookBack; i >= 0; i--) {
+    const d = new Date(todayObj);
+    d.setDate(todayObj.getDate() - i);
+    const dateStr = d.toLocaleDateString();
+    const hours = dailyLogs[dateStr] || 0;
+    
+    let colorClass = 'bg-slate-100 dark:bg-slate-800'; 
+    if (hours > 0 && hours < config.horasDia * 0.5) colorClass = 'bg-emerald-200 dark:bg-emerald-900/40';
+    else if (hours >= config.horasDia * 0.5 && hours < config.horasDia) colorClass = 'bg-emerald-300 dark:bg-emerald-700/60';
+    else if (hours >= config.horasDia && hours < config.horasDia * 1.5) colorClass = 'bg-emerald-500 dark:bg-emerald-500';
+    else if (hours >= config.horasDia * 1.5) colorClass = 'bg-emerald-700 dark:bg-emerald-400 shadow-[0_0_5px_rgba(16,185,129,0.5)] scale-[1.05] z-10'; 
+
+    heatmapDays.push({ date: dateStr, hours, colorClass });
+  }
 
   const handleLogHours = (e) => {
     e.preventDefault();
@@ -387,6 +460,51 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
               <div className="h-full bg-white transition-all duration-1000" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
             </div>
             <p className="text-[10px] uppercase font-black tracking-widest text-amber-200 mt-2">{userLevel.titulo}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* MAPA DE CONSTÂNCIA (HEATMAP) */}
+      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8 mt-6">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+          <div>
+            <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2">
+              <CalendarDays className="w-5 h-5 text-emerald-500"/> Mapa de Constância
+            </h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">O seu histórico de disciplina nos últimos 3 meses.</p>
+          </div>
+          <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-400">
+            <span>Menos</span>
+            <div className="w-3 h-3 rounded-sm bg-slate-100 dark:bg-slate-800"></div>
+            <div className="w-3 h-3 rounded-sm bg-emerald-200 dark:bg-emerald-900/40"></div>
+            <div className="w-3 h-3 rounded-sm bg-emerald-300 dark:bg-emerald-700/60"></div>
+            <div className="w-3 h-3 rounded-sm bg-emerald-500 dark:bg-emerald-500"></div>
+            <div className="w-3 h-3 rounded-sm bg-emerald-700 dark:bg-emerald-400"></div>
+            <span>Mais</span>
+          </div>
+        </div>
+        
+        <div className="overflow-x-auto custom-scrollbar pb-2">
+          <div className="min-w-max flex gap-2">
+            <div className="grid grid-rows-7 gap-1 text-[9px] font-bold text-slate-400 pr-2 text-right">
+              <div className="h-3.5 flex items-center justify-end">D</div>
+              <div className="h-3.5 flex items-center justify-end">S</div>
+              <div className="h-3.5 flex items-center justify-end">T</div>
+              <div className="h-3.5 flex items-center justify-end">Q</div>
+              <div className="h-3.5 flex items-center justify-end">Q</div>
+              <div className="h-3.5 flex items-center justify-end">S</div>
+              <div className="h-3.5 flex items-center justify-end">S</div>
+            </div>
+            
+            <div className="grid grid-rows-7 grid-flow-col gap-1.5">
+              {heatmapDays.map((day, idx) => (
+                <div 
+                  key={idx} 
+                  title={`${day.date}: ${day.hours.toFixed(1)}h estudadas`}
+                  className={`w-3.5 h-3.5 rounded-sm transition-all hover:scale-125 cursor-pointer relative ${day.colorClass}`}
+                ></div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -1226,11 +1344,17 @@ function TabPlanner({ customSprint, sprintsCompleted, setActiveTab }) {
 // ==========================================
 // ABA 4: SPRINTS DE ESTUDO DIÁRIA
 // ==========================================
-function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, addXP }) {
+function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, addXP, pomodoroTime, isPomodoroActive, isPomodoroBreak, togglePomodoro, resetPomodoro }) {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const sprintGroups = [];
   for (let i = 0; i < customSprint.length; i += 2) sprintGroups.push(customSprint.slice(i, i + 2));
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
 
   const handleCompleteSprint = () => {
     if (!showConfirm) {
@@ -1258,8 +1382,39 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
         </div>
       </header>
 
+      {/* NOVO: WIDGET POMODORO */}
+      <div className={`p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between transition-all duration-500 shadow-lg border-2 ${isPomodoroActive && !isPomodoroBreak ? 'bg-indigo-600 border-indigo-500 text-white scale-[1.01]' : isPomodoroBreak ? 'bg-emerald-500 border-emerald-400 text-white scale-[1.01]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
+        <div className="flex items-center gap-4 mb-4 md:mb-0">
+          <div className={`p-3 rounded-full ${isPomodoroActive ? 'bg-white/20' : 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'}`}>
+            {isPomodoroBreak ? <Coffee className="w-8 h-8" /> : <Clock className="w-8 h-8" />}
+          </div>
+          <div>
+            <h3 className={`font-black text-xl ${!isPomodoroActive ? 'text-slate-800 dark:text-white' : ''}`}>
+              {isPomodoroBreak ? 'Pausa Merecida' : 'Modo Imersão (Pomodoro)'}
+            </h3>
+            <p className={`text-sm font-medium ${!isPomodoroActive ? 'text-slate-500 dark:text-slate-400' : 'opacity-80'}`}>
+              {isPomodoroBreak ? 'Relaxe a mente por 10 minutos.' : 'Foque na Sprint por 50 min. Registo automático!'}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-6">
+          <span className="font-mono text-5xl font-black tracking-tighter">
+            {formatTime(pomodoroTime)}
+          </span>
+          <div className="flex flex-col gap-2">
+            <button onClick={togglePomodoro} className={`p-3 rounded-xl transition-all hover:scale-105 shadow-sm cursor-pointer ${isPomodoroActive ? 'bg-white text-slate-900' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}>
+              {isPomodoroActive ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
+            </button>
+            <button onClick={resetPomodoro} className={`p-2 rounded-xl transition-all hover:scale-105 cursor-pointer ${isPomodoroActive ? 'bg-white/20 hover:bg-white/30 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200'}`}>
+              <RefreshCcw className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
       {sprintGroups.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-12 flex flex-col items-center justify-center">
+        <div className="bg-white dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-12 flex flex-col items-center justify-center mt-6">
           <ShoppingCart className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-4" />
           <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">Fila Vazia!</h3>
           <p className="text-slate-500 mb-6 text-center">Planeje a sua semana adicionando matérias.</p>
