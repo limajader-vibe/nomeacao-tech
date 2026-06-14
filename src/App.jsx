@@ -5,7 +5,7 @@ import {
   RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Link, Pencil, Settings,
   Edit, AlertTriangle, ChevronUp, Flame, Trophy, TrendingUp, Activity, Award, ListPlus, ArrowRight, ArrowLeft, BarChart2,
   Thermometer, CalendarDays, LayoutGrid, BrainCircuit, Eye, Zap, Image as ImageIcon, ShieldAlert, Download, Sliders, Lock,
-  UnfoldVertical, FoldVertical, FilePlus, Upload, Filter, Play, Pause, Coffee
+  UnfoldVertical, FoldVertical, FilePlus, Upload, Filter, Play, Pause, Coffee, PartyPopper
 } from 'lucide-react';
 
 // --- HELPERS LOCAL STORAGE ---
@@ -61,9 +61,101 @@ const initialEdital = [
   }
 ];
 
+// ==========================================
+// COMPONENTES VISUAIS (DOPAMINA)
+// ==========================================
+const ConfettiOverlay = ({ fire }) => {
+  const [particles, setParticles] = useState([]);
+  useEffect(() => {
+    if (fire > 0) {
+      const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+      const newParticles = Array.from({ length: 100 }).map((_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        delay: Math.random() * 0.5,
+        duration: 1.5 + Math.random() * 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        size: 6 + Math.random() * 10,
+        tilt: Math.random() * 360
+      }));
+      setParticles(newParticles);
+      const timer = setTimeout(() => setParticles([]), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [fire]);
+
+  if (particles.length === 0) return null;
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
+      <style>{`
+        @keyframes confetti-fall {
+          0% { transform: translateY(-10vh) rotate(0deg) skewX(0deg); opacity: 1; }
+          100% { transform: translateY(110vh) rotate(720deg) skewX(45deg); opacity: 0; }
+        }
+      `}</style>
+      {particles.map(p => (
+        <div
+          key={p.id}
+          style={{
+            position: 'absolute',
+            left: `${p.left}%`,
+            top: '-10%',
+            width: `${p.size}px`,
+            height: `${p.size * 1.5}px`,
+            backgroundColor: p.color,
+            animation: `confetti-fall ${p.duration}s cubic-bezier(.37,0,.63,1) forwards ${p.delay}s`,
+            transform: `rotate(${p.tilt}deg)`
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
+const LevelUpModal = ({ data, onClose }) => {
+  if (!data) return null;
+  return (
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300 px-4">
+      <div className="bg-gradient-to-b from-amber-100 to-white dark:from-amber-900/60 dark:to-slate-900 p-8 md:p-10 rounded-[2rem] shadow-2xl border-4 border-amber-300 dark:border-amber-700 max-w-sm w-full text-center transform transition-all animate-in zoom-in-90 duration-500 relative overflow-hidden">
+        
+        {/* Raios de luz de fundo */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-30 animate-spin-slow pointer-events-none" style={{ animationDuration: '15s' }}>
+           <div className="w-[150%] h-4 bg-amber-400 absolute rotate-0"></div>
+           <div className="w-[150%] h-4 bg-amber-400 absolute rotate-45"></div>
+           <div className="w-[150%] h-4 bg-amber-400 absolute rotate-90"></div>
+           <div className="w-[150%] h-4 bg-amber-400 absolute -rotate-45"></div>
+        </div>
+
+        <div className="relative z-10">
+          <div className="w-28 h-28 bg-gradient-to-br from-amber-300 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(245,158,11,0.6)]">
+            <Award className="w-14 h-14 text-white" />
+          </div>
+          <h2 className="text-4xl font-black text-amber-600 dark:text-amber-500 mb-2 drop-shadow-sm">Nível {data.nivel}!</h2>
+          <p className="text-slate-600 dark:text-slate-300 mb-6 font-medium">A sua persistência foi recompensada.</p>
+          
+          <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm p-4 rounded-xl border border-amber-200 dark:border-amber-800/50 mb-8 shadow-inner">
+            <span className="block text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-500 mb-1">Nova Patente Adquirida</span>
+            <span className="text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight">{data.titulo}</span>
+          </div>
+          
+          <button onClick={onClose} className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white rounded-xl font-black transition-all shadow-lg hover:shadow-orange-500/40 text-lg flex items-center justify-center gap-2 cursor-pointer">
+            <PartyPopper className="w-5 h-5"/> Continuar a Missão
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => getStorage('pareto_theme_v22', false));
   const [activeTab, setActiveTab] = useState('dashboard'); 
+
+  // ESTADOS DE DOPAMINA / EFEITOS
+  const [confettiFire, setConfettiFire] = useState(0);
+  const [levelUpData, setLevelUpData] = useState(null);
 
   const [projectConfig, setProjectConfig] = useState(() => {
     const saved = getStorage('pareto_config_v22', initialConfig);
@@ -77,6 +169,20 @@ export default function App() {
   
   const [gamification, setGamification] = useState(() => getStorage('pareto_gamification_v22', { xp: 0, streak: 0, lastActiveDate: '' }));
   const [dailyLogs, setDailyLogs] = useState(() => getStorage('pareto_daily_logs_v22', {}));
+
+  // CÁLCULO DE NÍVEL
+  const calculateLevel = (xp) => {
+    if (xp < 100) return { nivel: 1, titulo: 'Sobrevivente', max: 100 };
+    if (xp < 300) return { nivel: 2, titulo: 'Aspirante a TI', max: 300 };
+    if (xp < 600) return { nivel: 3, titulo: 'Fundação Sólida', max: 600 };
+    if (xp < 1000) return { nivel: 4, titulo: 'Caçador de Bancas', max: 1000 };
+    if (xp < 2000) return { nivel: 5, titulo: 'Mestre da Base', max: 2000 };
+    if (xp < 4000) return { nivel: 6, titulo: 'Estrategista', max: 4000 };
+    return { nivel: 7, titulo: 'Futuro Nomeado', max: 10000 };
+  };
+
+  const userLevel = calculateLevel(gamification.xp);
+  const prevLevelRef = useRef(userLevel.nivel);
 
   // PERSISTÊNCIA
   useEffect(() => { setStorage('pareto_theme_v22', isDarkMode); }, [isDarkMode]);
@@ -104,7 +210,23 @@ export default function App() {
     }
   }, []);
 
-  const addXP = (amount) => { setGamification(prev => ({ ...prev, xp: prev.xp + amount })); };
+  const triggerConfetti = () => setConfettiFire(f => f + 1);
+
+  const addXP = (amount) => { 
+    setGamification(prev => {
+      const newXp = prev.xp + amount;
+      const newLevelData = calculateLevel(newXp);
+      
+      // Deteta subida de nível
+      if (newLevelData.nivel > prevLevelRef.current) {
+        setLevelUpData(newLevelData);
+        triggerConfetti(); // Confetes massivos
+        prevLevelRef.current = newLevelData.nivel;
+      }
+      
+      return { ...prev, xp: newXp };
+    });
+  };
 
   // AUTO-LOG DO POMODORO
   const handleAutoLog = (hoursToAdd) => {
@@ -137,14 +259,13 @@ export default function App() {
       if (!isPomodoroBreak) {
          handleAutoLog(50 / 60); 
          addXP(20);
+         triggerConfetti(); // Substitui o Alert com Confetes!
          setIsPomodoroBreak(true);
          setPomodoroTime(BREAK_TIME);
-         alert("🍅 Pomodoro concluído! +50 minutos registados e +20 XP. Hora de relaxar!");
       } else {
          setIsPomodoroBreak(false);
          setPomodoroTime(FOCUS_TIME);
          setIsPomodoroActive(false);
-         alert("⏰ Fim da pausa! Pronto para voltar ao foco?");
       }
     }
     return () => clearInterval(interval);
@@ -185,7 +306,7 @@ export default function App() {
     setUserProgress(prev => {
       const current = prev[assId] || {};
       const now = new Date().getTime();
-      let daysToAdd = 1; // Difícil -> 1 dia
+      let daysToAdd = 1; 
       if (feedbackType === 'bom') daysToAdd = projectConfig.revBom || 7;
       if (feedbackType === 'facil') daysToAdd = projectConfig.revFacil || 15;
       const next = now + (1000 * 60 * 60 * 24 * daysToAdd);
@@ -228,16 +349,6 @@ export default function App() {
   }, 0);
   const progressPerc = totalCheckboxes === 0 ? 0 : Math.round((completedCheckboxes / totalCheckboxes) * 100);
 
-  const calculateLevel = (xp) => {
-    if (xp < 100) return { nivel: 1, titulo: 'Sobrevivente', max: 100 };
-    if (xp < 300) return { nivel: 2, titulo: 'Aspirante a TI', max: 300 };
-    if (xp < 600) return { nivel: 3, titulo: 'Fundação Sólida', max: 600 };
-    if (xp < 1000) return { nivel: 4, titulo: 'Caçador de Bancas', max: 1000 };
-    if (xp < 2000) return { nivel: 5, titulo: 'Mestre da Base', max: 2000 };
-    return { nivel: 6, titulo: 'Futuro Nomeado', max: 5000 };
-  };
-  const userLevel = calculateLevel(gamification.xp);
-
   const navPhases = [
     { phase: 'Cockpit', items: [{ id: 'dashboard', icon: Activity, label: 'Visão Geral' }] },
     { phase: 'Planejamento', id: 'planejamento', items: [
@@ -257,6 +368,10 @@ export default function App() {
     <div className={isDarkMode ? 'dark' : ''}>
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 flex flex-col md:flex-row font-sans transition-colors duration-300">
         
+        {/* COMPONENTES DE DOPAMINA INJETADOS AQUI */}
+        <ConfettiOverlay fire={confettiFire} />
+        <LevelUpModal data={levelUpData} onClose={() => setLevelUpData(null)} />
+
         <aside className="w-full md:w-72 bg-white dark:bg-slate-900 shadow-xl flex flex-col z-10 shrink-0 border-r border-slate-200 dark:border-slate-800">
           <div className="p-6 bg-gradient-to-br from-blue-700 to-indigo-900 dark:from-slate-800 dark:to-slate-950 text-white relative">
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer">
@@ -322,7 +437,7 @@ export default function App() {
             {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} userProgress={userProgress} edital={edital} activeSubjectIds={activeSubjectIds} />}
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} />}
             {activeTab === 'planner' && <TabPlanner customSprint={customSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} />}
-            {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} pomodoroTime={pomodoroTime} isPomodoroActive={isPomodoroActive} isPomodoroBreak={isPomodoroBreak} togglePomodoro={togglePomodoro} resetPomodoro={resetPomodoro} />}
+            {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} pomodoroTime={pomodoroTime} isPomodoroActive={isPomodoroActive} isPomodoroBreak={isPomodoroBreak} togglePomodoro={togglePomodoro} resetPomodoro={resetPomodoro} triggerConfetti={triggerConfetti} />}
             {activeTab === 'revisoes' && <TabDeckAnki progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} />}
             {activeTab === 'admin' && <TabAdmin config={projectConfig} setConfig={setProjectConfig} setUserProgress={setUserProgress} setGamification={setGamification} setEdital={setEdital} setCustomSprint={setCustomSprint} initialEdital={initialEdital} setSprintsCompleted={setSprintsCompleted} setDailyLogs={setDailyLogs} />}
           </div>
@@ -378,7 +493,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
   const todayObj = new Date();
   todayObj.setHours(23, 59, 59, 999);
   const currentDayOfWeek = todayObj.getDay();
-  const daysToLookBack = (16 * 7) + currentDayOfWeek; // 16 semanas + dias da semana atual
+  const daysToLookBack = (16 * 7) + currentDayOfWeek; 
   const heatmapDays = [];
   
   for (let i = daysToLookBack; i >= 0; i--) {
@@ -1263,77 +1378,63 @@ function TabPlanner({ customSprint, sprintsCompleted, setActiveTab }) {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
         
-        {/* Coluna 1: Fila de Sprints (Cinza, Tracejada) */}
-        <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 flex flex-col min-h-[450px]">
-          <h3 className="text-sm font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-            <ListPlus className="w-5 h-5"/> Fila de Sprints ({backlogSprints.length})
-          </h3>
-          
-          {backlogSprints.length > 0 ? (
-            <div className="space-y-4 flex-1 overflow-y-auto pr-2">
-              {backlogSprints.map((group, idx) => (
-                <div key={idx} className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700">
-                  <div className="text-[10px] font-bold text-slate-400 mb-2 uppercase">Sprint {sprintsCompleted + idx + 2}</div>
-                  {group.map(item => (
-                    <div key={item.assId} className="mb-2 last:mb-0 pl-2 border-l-2 border-slate-200 dark:border-slate-600">
-                      <span className="block text-[9px] font-bold text-slate-400 uppercase truncate">{item.discNome}</span>
-                      <span className="block text-sm font-bold text-slate-700 dark:text-slate-300 leading-tight">{item.assTitulo}</span>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-6 text-center bg-transparent">
-              <p className="text-slate-400 dark:text-slate-500 text-sm mb-2">O seu Backlog está vazio.</p>
-              <p className="text-slate-400 dark:text-slate-500 text-xs">Vá ao Arsenal de Matérias para organizar a sua semana.</p>
-            </div>
-          )}
-        </div>
-
-        {/* Coluna 2: Em Curso (Azul, Tracejada) */}
-        <div className="bg-blue-50 dark:bg-blue-900/10 rounded-2xl p-6 border border-blue-100 dark:border-blue-900/30 flex flex-col min-h-[450px]">
-          <h3 className="text-sm font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-            <PlayCircle className="w-5 h-5"/> Em Curso (Hoje)
-          </h3>
-          
-          {activeSprint ? (
-            <div className="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-blue-200 dark:border-blue-700 flex-1 flex flex-col justify-between overflow-y-auto">
-              <div>
-                <div className="text-[10px] font-bold text-blue-500 mb-4 uppercase tracking-wider">Sprint {sprintsCompleted + 1}</div>
-                <div className="space-y-4">
-                  {activeSprint.map(item => (
-                    <div key={item.assId} className="last:mb-0">
-                      <span className="block text-[9px] font-bold text-blue-400 uppercase truncate">{item.discNome}</span>
-                      <span className="block text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">{item.assTitulo}</span>
-                    </div>
-                  ))}
-                </div>
+        {/* Coluna 1: Backlog (Fila) */}
+        <div className="w-full lg:w-1/3 bg-slate-100 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 min-h-[500px]">
+          <h3 className="font-black text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2"><ListPlus className="w-5 h-5"/> Fila de Sprints ({backlogSprints.length})</h3>
+          <div className="space-y-4">
+            {backlogSprints.map((group, idx) => (
+              <div key={idx} className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition-colors opacity-90">
+                 <div className="text-[10px] font-bold text-slate-400 mb-3 uppercase flex justify-between">
+                   <span>Sprint {sprintsCompleted + idx + 2}</span>
+                 </div>
+                 {group.map(item => (
+                   <div key={item.assId} className="mb-3 last:mb-0 pl-2 border-l-2 border-slate-200 dark:border-slate-700">
+                     <span className="block text-[9px] font-bold text-slate-400 uppercase truncate">{item.discNome}</span>
+                     <span className="block text-sm font-bold text-slate-700 dark:text-slate-300 leading-tight">{item.assTitulo}</span>
+                   </div>
+                 ))}
               </div>
-              <button onClick={() => setActiveTab && setActiveTab('cronograma')} className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3 rounded-xl transition-colors shadow-sm cursor-pointer">
-                Ir para Execução
-              </button>
-            </div>
-          ) : (
-            <div className="flex-1 flex items-center justify-center border-2 border-dashed border-blue-300 dark:border-blue-800/50 rounded-xl p-6 text-center bg-transparent">
-              <p className="text-blue-400 dark:text-blue-500 text-sm">Nenhuma Sprint ativada hoje.</p>
-            </div>
-          )}
+            ))}
+            {backlogSprints.length === 0 && (
+              <div className="text-sm text-slate-400 p-6 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl flex flex-col items-center gap-3">
+                <p>O seu Backlog está vazio.</p>
+                <p className="text-xs">Vá ao Arsenal de Matérias para organizar a sua semana.</p>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Coluna 3: Vitórias (Verde, Sólida) */}
-        <div className="bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-6 border border-emerald-100 dark:border-emerald-900/30 flex flex-col min-h-[450px]">
-          <h3 className="text-sm font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest mb-4 flex items-center gap-2">
-            <CheckCircle className="w-5 h-5"/> Vitórias
-          </h3>
-          
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-emerald-200 dark:border-emerald-700/50 flex flex-col items-center justify-center flex-1">
-            <Trophy className="w-16 h-16 text-emerald-500 mb-4" />
-            <span className="text-6xl font-black text-emerald-600 dark:text-emerald-400 mb-2">{sprintsCompleted}</span>
-            <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Sprints Fechadas</span>
-          </div>
+        {/* Coluna 2: Em Andamento */}
+        <div className="w-full lg:w-1/3 bg-blue-50 dark:bg-blue-900/10 rounded-2xl p-4 border border-blue-200 dark:border-blue-900/30 min-h-[500px]">
+           <h3 className="font-black text-blue-700 dark:text-blue-400 uppercase tracking-wider mb-4 flex items-center gap-2"><PlayCircle className="w-5 h-5"/> Em Curso (Hoje)</h3>
+           {activeSprint ? (
+             <div className="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-md border-2 border-blue-400 dark:border-blue-500">
+                 <div className="text-[10px] font-bold text-blue-500 mb-4 uppercase">Sprint {sprintsCompleted + 1}</div>
+                 {activeSprint.map(item => (
+                   <div key={item.assId} className="mb-4 last:mb-0">
+                     <span className="block text-[9px] font-bold text-blue-500 uppercase truncate">{item.discNome}</span>
+                     <span className="block text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight mb-2">{item.assTitulo}</span>
+                   </div>
+                 ))}
+                 <button onClick={() => setActiveTab('cronograma')} className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 rounded-lg transition-colors cursor-pointer">
+                   Ir para Execução
+                 </button>
+              </div>
+           ) : (
+             <div className="text-sm text-blue-400 p-6 border-2 border-dashed border-blue-300 dark:border-blue-800 rounded-xl flex items-center justify-center">Nenhuma Sprint ativada hoje.</div>
+           )}
+        </div>
+
+        {/* Coluna 3: Concluídas */}
+        <div className="w-full lg:w-1/3 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-4 border border-emerald-200 dark:border-emerald-900/30 min-h-[500px]">
+           <h3 className="font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-4 flex items-center gap-2"><CheckCircle className="w-5 h-5"/> Vitórias</h3>
+           <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-emerald-200 dark:border-emerald-800 flex flex-col items-center justify-center h-48">
+             <Trophy className="w-12 h-12 text-emerald-500 mb-3" />
+             <span className="text-4xl font-black text-emerald-600 dark:text-emerald-400">{sprintsCompleted}</span>
+             <span className="text-xs font-bold text-slate-500 uppercase mt-1">Sprints Fechadas</span>
+           </div>
         </div>
 
       </div>
@@ -1344,7 +1445,7 @@ function TabPlanner({ customSprint, sprintsCompleted, setActiveTab }) {
 // ==========================================
 // ABA 4: SPRINTS DE ESTUDO DIÁRIA
 // ==========================================
-function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, addXP, pomodoroTime, isPomodoroActive, isPomodoroBreak, togglePomodoro, resetPomodoro }) {
+function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, addXP, pomodoroTime, isPomodoroActive, isPomodoroBreak, togglePomodoro, resetPomodoro, triggerConfetti }) {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const sprintGroups = [];
@@ -1365,6 +1466,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
     setSprintsCompleted(prev => prev + 1);
     setCustomSprint(prev => prev.slice(2)); 
     addXP(50); 
+    triggerConfetti(); // 🎊 Celebração Visual de Fecho!
     setShowConfirm(false);
   };
 
@@ -1382,7 +1484,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
         </div>
       </header>
 
-      {/* NOVO: WIDGET POMODORO */}
+      {/* WIDGET POMODORO */}
       <div className={`p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between transition-all duration-500 shadow-lg border-2 ${isPomodoroActive && !isPomodoroBreak ? 'bg-indigo-600 border-indigo-500 text-white scale-[1.01]' : isPomodoroBreak ? 'bg-emerald-500 border-emerald-400 text-white scale-[1.01]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
         <div className="flex items-center gap-4 mb-4 md:mb-0">
           <div className={`p-3 rounded-full ${isPomodoroActive ? 'bg-white/20' : 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'}`}>
@@ -1393,7 +1495,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
               {isPomodoroBreak ? 'Pausa Merecida' : 'Modo Imersão (Pomodoro)'}
             </h3>
             <p className={`text-sm font-medium ${!isPomodoroActive ? 'text-slate-500 dark:text-slate-400' : 'opacity-80'}`}>
-              {isPomodoroBreak ? 'Relaxe a mente por 10 minutos.' : 'Foque na Sprint por 50 min. Registo automático!'}
+              {isPomodoroBreak ? 'O tempo foi registado! Relaxe a mente por 10 minutos.' : 'Foque na Sprint por 50 min. Registo automático!'}
             </p>
           </div>
         </div>
@@ -1466,16 +1568,10 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                             <span className="font-bold text-sm uppercase tracking-wide">3. Revisão (Agenda Auto)</span>
                           </label>
                           
-                          {isActive && (
-                            item.linkTec ? (
-                              <a href={item.linkTec} target="_blank" rel="noopener noreferrer" className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-all shadow-sm">
-                                <ExternalLink className="w-4 h-4" /> Resolver no TEC
-                              </a>
-                            ) : (
-                              <button disabled className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold rounded-lg bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-600 cursor-not-allowed transition-all border border-slate-200 dark:border-slate-800">
-                                <ExternalLink className="w-4 h-4 opacity-50" /> Resolver no TEC (Em breve)
-                              </button>
-                            )
+                          {item.linkTec && isActive && (
+                            <a href={item.linkTec} target="_blank" rel="noopener noreferrer" className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-all shadow-sm cursor-pointer">
+                              <ExternalLink className="w-4 h-4" /> Resolver no TEC
+                            </a>
                           )}
                         </div>
                       </div>
@@ -1499,7 +1595,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
 }
 
 // ==========================================
-// ABA 5: REVISÃO ESPAÇADA
+// ABA 5: DECK DE COMBATE (ANKI NATIVO)
 // ==========================================
 function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds }) {
   const [isReviewing, setIsReviewing] = useState(false);
@@ -1544,7 +1640,7 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
   if (isReviewing && revisoesPendentes.length > 0) {
     const activeCard = revisoesPendentes[0]; 
     const questionText = activeCard.pergunta ? activeCard.pergunta : `Explique em voz alta os pontos principais e as pegadinhas sobre:\n\n${activeCard.titulo}`;
-    const answerText = activeCard.resposta ? activeCard.resposta : `(Você não registrou um conceito-chave para este tópico). \n\nAvalie abaixo a sua retenção mental com base na Teoria e Questões que resolveu.`;
+    const answerText = activeCard.resposta ? activeCard.resposta : `(Você não registrou um resumo neste tópico). \n\nAvalie abaixo a sua retenção mental com base na Teoria e Questões que resolveu.`;
 
     return (
       <div className="flex flex-col items-center justify-center min-h-[70vh] animate-in fade-in zoom-in-95 duration-300">
@@ -1571,19 +1667,19 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
               </div>
               
               <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700">
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mb-4 uppercase tracking-widest text-center">Nível de Retenção Neural</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mb-4 uppercase tracking-widest text-center">Avalie a sua retenção</p>
                 <div className="flex gap-3">
                   <button onClick={() => handleFeedbackClick(activeCard.id, 'dificil')} className="flex-1 bg-white hover:bg-red-500 text-red-600 hover:text-white dark:bg-slate-800 dark:hover:bg-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 p-4 rounded-xl font-black transition-all shadow-sm hover:shadow-lg flex flex-col items-center gap-1 group cursor-pointer">
                     <span className="text-base uppercase tracking-wider">Difícil</span>
-                    <span className="text-[10px] opacity-70 group-hover:text-red-200 font-medium">Revisar Amanhã</span>
+                    <span className="text-[10px] opacity-70 group-hover:text-red-200 font-medium">Rever Amanhã</span>
                   </button>
                   <button onClick={() => handleFeedbackClick(activeCard.id, 'bom')} className="flex-1 bg-white hover:bg-amber-500 text-amber-600 hover:text-white dark:bg-slate-800 dark:hover:bg-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50 p-4 rounded-xl font-black transition-all shadow-sm hover:shadow-lg flex flex-col items-center gap-1 group cursor-pointer">
                     <span className="text-base uppercase tracking-wider">Bom</span>
-                    <span className="text-[10px] opacity-70 group-hover:text-amber-200 font-medium">Revisar em 7 Dias</span>
+                    <span className="text-[10px] opacity-70 group-hover:text-amber-200 font-medium">Rever em 7 Dias</span>
                   </button>
                   <button onClick={() => handleFeedbackClick(activeCard.id, 'facil')} className="flex-1 bg-white hover:bg-emerald-500 text-emerald-600 hover:text-white dark:bg-slate-800 dark:hover:bg-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 p-4 rounded-xl font-black transition-all shadow-sm hover:shadow-lg flex flex-col items-center gap-1 group cursor-pointer">
                     <span className="text-base uppercase tracking-wider">Fácil</span>
-                    <span className="text-[10px] opacity-70 group-hover:text-emerald-200 font-medium">Revisar em 15 Dias</span>
+                    <span className="text-[10px] opacity-70 group-hover:text-emerald-200 font-medium">Rever em 15 Dias</span>
                   </button>
                 </div>
               </div>
@@ -1591,12 +1687,12 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
           ) : (
             <div className="p-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex justify-center">
               <button onClick={() => setIsFlipped(true)} className="w-full md:w-auto px-12 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl shadow-lg hover:shadow-blue-500/20 transition-all flex items-center justify-center gap-2 text-lg cursor-pointer">
-                <Eye className="w-5 h-5"/> Revelar Conceito-Chave
+                <Eye className="w-5 h-5"/> Revelar Resposta
               </button>
             </div>
           )}
         </div>
-        <button onClick={() => setIsReviewing(false)} className="mt-6 text-sm font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer">Voltar ao Painel</button>
+        <button onClick={() => setIsReviewing(false)} className="mt-6 text-sm font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer">Voltar ao Resumo</button>
       </div>
     );
   }
@@ -1605,14 +1701,14 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
     <div className="space-y-6 animate-in fade-in text-left">
       <header className="border-b border-slate-200 dark:border-slate-800 pb-4">
         <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
-          <BrainCircuit className="w-8 h-8 text-blue-500" /> Revisão Espaçada
+          <BrainCircuit className="w-8 h-8 text-blue-500" /> Deck de Combate
         </h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Retenção ativa. O seu algoritmo inteligente de memorização (Leitner).</p>
+        <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Retenção ativa. A sua memória não terá espaço para falhar.</p>
         
         {revisoesPendentes.length > 0 && (
           <div className="mt-4">
             <button onClick={() => setIsReviewing(true)} className="w-full md:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
-              <Zap className="w-5 h-5"/> Iniciar Ciclo de Revisão ({revisoesPendentes.length})
+              <Zap className="w-5 h-5"/> Iniciar Revisão ({revisoesPendentes.length})
             </button>
           </div>
         )}
@@ -1621,14 +1717,14 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
       <div className="grid md:grid-cols-2 gap-8 mt-6">
         <div>
           <h3 className="text-lg font-bold text-red-600 dark:text-red-400 flex items-center gap-2 mb-4 border-b border-red-100 dark:border-red-900/30 pb-2">
-            <AlertTriangle className="w-5 h-5"/> Tópicos na Fila (Hoje)
+            <AlertTriangle className="w-5 h-5"/> Cartas na Fila (Hoje)
           </h3>
           <div className="space-y-3">
             {revisoesPendentes.length === 0 ? (
               <div className="text-sm font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center">
                 <CheckCircle className="w-10 h-10 text-emerald-400 mb-3 opacity-50"/>
                 <p>A sua memória está em dia!</p>
-                <p>Nenhum tópico agendado para hoje.</p>
+                <p>Nenhuma carta para hoje.</p>
               </div>
             ) : (
               revisoesPendentes.map((data) => (
@@ -1637,7 +1733,7 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
                     <span className="text-[9px] uppercase font-black text-slate-400 block mb-0.5">{data.discNome}</span>
                     <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm truncate">{data.titulo}</h4>
                   </div>
-                  {(data.pergunta || data.resposta) && <BrainCircuit className="w-4 h-4 text-blue-400 shrink-0" title="Possui Gatilho Customizado"/>}
+                  {(data.pergunta || data.resposta) && <BrainCircuit className="w-4 h-4 text-blue-400 shrink-0" title="Possui Flashcard Customizado"/>}
                 </div>
               ))
             )}
@@ -1646,12 +1742,12 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
 
         <div>
           <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2 mb-4 border-b border-emerald-100 dark:border-emerald-900/30 pb-2">
-            <Calendar className="w-5 h-5"/> Próximas Revisões (Agendadas)
+            <Calendar className="w-5 h-5"/> Agendadas (Futuro)
           </h3>
           <div className="space-y-3">
             {revisoesConcluidas.length === 0 ? (
-              <div className="text-sm font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center text-center">
-                Quando concluir as suas avaliações, os tópicos aparecerão aqui.
+              <div className="text-sm font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center">
+                Quando classificar as cartas, elas aparecerão aqui.
               </div>
             ) : (
               revisoesConcluidas
@@ -1679,7 +1775,7 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
 }
 
 // ==========================================
-// ABA ADMIN
+// ABA NOVA: PAINEL DE CONTROLE (ADMINISTRAÇÃO)
 // ==========================================
 function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdital, setCustomSprint, initialEdital, setSprintsCompleted, setDailyLogs }) {
   const [localConfig, setLocalConfig] = useState({
