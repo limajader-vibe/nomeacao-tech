@@ -5,7 +5,7 @@ import {
   RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Link, Pencil, Settings,
   Edit, AlertTriangle, ChevronUp, Flame, Trophy, TrendingUp, Activity, Award, ListPlus, ArrowRight, ArrowLeft, BarChart2,
   Thermometer, CalendarDays, LayoutGrid, BrainCircuit, Eye, Zap, Image as ImageIcon, ShieldAlert, Download, Sliders, Lock,
-  UnfoldVertical, FoldVertical, FilePlus, Upload, Filter, Play, Pause, Coffee, PartyPopper
+  UnfoldVertical, FoldVertical, FilePlus, Upload, Filter, Play, Pause, Coffee, PartyPopper, X
 } from 'lucide-react';
 
 // --- HELPERS LOCAL STORAGE ---
@@ -22,6 +22,8 @@ const setStorage = (key, value) => { try { localStorage.setItem(key, JSON.string
 const initialConfig = { 
   appName: 'Nomeação.Tech',
   logoUrl: 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png',
+  userName: 'Futuro Nomeado',
+  levelSound: 'chimes',
   concurso: 'Base de TI (Iniciantes)', 
   cargo: 'Núcleo Duro - Qualquer Cargo', 
   banca: 'Principais (CEBRASPE, FCC, FGV)', 
@@ -61,8 +63,19 @@ const initialEdital = [
   }
 ];
 
+// --- MAPA DE NÍVEIS (JORNADA DO CONCURSEIRO) ---
+export const LEVELS_MAP = [
+  { nivel: 1, titulo: 'Sobrevivente', min: 0, max: 100 },
+  { nivel: 2, titulo: 'Aspirante a TI', min: 100, max: 300 },
+  { nivel: 3, titulo: 'Fundação Sólida', min: 300, max: 600 },
+  { nivel: 4, titulo: 'Caçador de Bancas', min: 600, max: 1000 },
+  { nivel: 5, titulo: 'Mestre da Base', min: 1000, max: 2000 },
+  { nivel: 6, titulo: 'Estrategista', min: 2000, max: 4000 },
+  { nivel: 7, titulo: 'Futuro Nomeado', min: 4000, max: 10000 }
+];
+
 // ==========================================
-// COMPONENTES VISUAIS (DOPAMINA)
+// COMPONENTES VISUAIS (DOPAMINA & MAPAS)
 // ==========================================
 const ConfettiOverlay = ({ fire }) => {
   const [particles, setParticles] = useState([]);
@@ -148,6 +161,40 @@ const LevelUpModal = ({ data, onClose }) => {
   );
 };
 
+const LevelMapModal = ({ onClose, currentXp }) => {
+  return (
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300 px-4">
+      <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 max-w-md w-full relative">
+        <button onClick={onClose} className="absolute top-4 right-4 p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full cursor-pointer transition-colors"><X className="w-5 h-5"/></button>
+        
+        <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2 flex items-center gap-2">
+          <Trophy className="text-amber-500"/> Jornada de Aprovação
+        </h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Acompanhe os níveis e a experiência (XP) necessária para evoluir.</p>
+
+        <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+          {LEVELS_MAP.map(lvl => {
+            const isCurrent = currentXp >= lvl.min && currentXp < lvl.max;
+            const isPast = currentXp >= lvl.max;
+            
+            return (
+              <div key={lvl.nivel} className={`flex items-center gap-4 p-3 rounded-xl border transition-all ${isCurrent ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700/50 scale-[1.02] shadow-sm' : isPast ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/30 opacity-70' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 opacity-50'}`}>
+                <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-black ${isCurrent ? 'bg-amber-500 text-white' : isPast ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
+                  {isPast ? <CheckCircle className="w-5 h-5"/> : lvl.nivel}
+                </div>
+                <div className="flex-1">
+                  <h4 className={`font-bold ${isCurrent ? 'text-amber-700 dark:text-amber-400' : isPast ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400'}`}>{lvl.titulo}</h4>
+                  <p className="text-[10px] uppercase font-bold text-slate-400">{lvl.min} a {lvl.max} XP</p>
+                </div>
+                {isCurrent && <div className="text-[10px] font-black uppercase text-amber-500 bg-amber-100 dark:bg-amber-900/40 px-2 py-1 rounded-md">Atual</div>}
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function App() {
   const [isDarkMode, setIsDarkMode] = useState(() => getStorage('pareto_theme_v22', false));
@@ -156,6 +203,7 @@ export default function App() {
   // ESTADOS DE DOPAMINA / EFEITOS
   const [confettiFire, setConfettiFire] = useState(0);
   const [levelUpData, setLevelUpData] = useState(null);
+  const [showLevelMap, setShowLevelMap] = useState(false);
 
   const [projectConfig, setProjectConfig] = useState(() => {
     const saved = getStorage('pareto_config_v22', initialConfig);
@@ -172,17 +220,40 @@ export default function App() {
 
   // CÁLCULO DE NÍVEL
   const calculateLevel = (xp) => {
-    if (xp < 100) return { nivel: 1, titulo: 'Sobrevivente', max: 100 };
-    if (xp < 300) return { nivel: 2, titulo: 'Aspirante a TI', max: 300 };
-    if (xp < 600) return { nivel: 3, titulo: 'Fundação Sólida', max: 600 };
-    if (xp < 1000) return { nivel: 4, titulo: 'Caçador de Bancas', max: 1000 };
-    if (xp < 2000) return { nivel: 5, titulo: 'Mestre da Base', max: 2000 };
-    if (xp < 4000) return { nivel: 6, titulo: 'Estrategista', max: 4000 };
-    return { nivel: 7, titulo: 'Futuro Nomeado', max: 10000 };
+    const levelFound = LEVELS_MAP.find(l => xp >= l.min && xp < l.max);
+    if (levelFound) return levelFound;
+    return LEVELS_MAP[LEVELS_MAP.length - 1]; // Top level
   };
 
   const userLevel = calculateLevel(gamification.xp);
   const prevLevelRef = useRef(userLevel.nivel);
+
+  // CORREÇÃO: DETETAR MUDANÇA DE NÍVEL DE FORMA SEGURA (Para disparar áudio e efeitos sem bugar no React Strict Mode)
+  useEffect(() => {
+    const currentLevel = userLevel.nivel;
+
+    if (gamification.xp === 0) {
+      prevLevelRef.current = 1; // Reseta no padrão de fábrica
+    } else if (currentLevel > prevLevelRef.current) {
+      // GANHOU NÍVEL!
+      setLevelUpData(userLevel);
+      setConfettiFire(f => f + 1);
+
+      // Tocar Som Selecionado no Painel
+      try {
+        let audioUrl = 'https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3'; // chimes
+        if (projectConfig.levelSound === 'arcade') audioUrl = 'https://assets.mixkit.co/sfx/preview/mixkit-game-level-completed-2059.mp3';
+        if (projectConfig.levelSound === 'modern') audioUrl = 'https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3';
+        if (projectConfig.levelSound === 'epic') audioUrl = 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3';
+
+        const audio = new Audio(audioUrl);
+        audio.volume = projectConfig.levelSound === 'epic' ? 1.0 : 0.6;
+        audio.play().catch(e => console.warn('Áudio bloqueado pelo navegador:', e));
+      } catch (e) {}
+
+      prevLevelRef.current = currentLevel;
+    }
+  }, [gamification.xp, userLevel, projectConfig.levelSound]);
 
   // PERSISTÊNCIA
   useEffect(() => { setStorage('pareto_theme_v22', isDarkMode); }, [isDarkMode]);
@@ -212,20 +283,9 @@ export default function App() {
 
   const triggerConfetti = () => setConfettiFire(f => f + 1);
 
+  // A função addXP agora foca estritamente em somar os pontos. O useEffect acima toma conta das celebrações!
   const addXP = (amount) => { 
-    setGamification(prev => {
-      const newXp = prev.xp + amount;
-      const newLevelData = calculateLevel(newXp);
-      
-      // Deteta subida de nível
-      if (newLevelData.nivel > prevLevelRef.current) {
-        setLevelUpData(newLevelData);
-        triggerConfetti(); // Confetes massivos
-        prevLevelRef.current = newLevelData.nivel;
-      }
-      
-      return { ...prev, xp: newXp };
-    });
+    setGamification(prev => ({ ...prev, xp: prev.xp + amount }));
   };
 
   // AUTO-LOG DO POMODORO
@@ -259,7 +319,7 @@ export default function App() {
       if (!isPomodoroBreak) {
          handleAutoLog(50 / 60); 
          addXP(20);
-         triggerConfetti(); // Substitui o Alert com Confetes!
+         triggerConfetti(); 
          setIsPomodoroBreak(true);
          setPomodoroTime(BREAK_TIME);
       } else {
@@ -371,6 +431,7 @@ export default function App() {
         {/* COMPONENTES DE DOPAMINA INJETADOS AQUI */}
         <ConfettiOverlay fire={confettiFire} />
         <LevelUpModal data={levelUpData} onClose={() => setLevelUpData(null)} />
+        {showLevelMap && <LevelMapModal currentXp={gamification.xp} onClose={() => setShowLevelMap(false)} />}
 
         <aside className="w-full md:w-72 bg-white dark:bg-slate-900 shadow-xl flex flex-col z-10 shrink-0 border-r border-slate-200 dark:border-slate-800">
           <div className="p-6 bg-gradient-to-br from-blue-700 to-indigo-900 dark:from-slate-800 dark:to-slate-950 text-white relative">
@@ -399,11 +460,14 @@ export default function App() {
                   <span className="bg-blue-900/60 px-2 py-1 rounded border border-white/10">Meta: {projectConfig.horasDia}h/dia</span>
                 </div>
                 
-                <div className="mt-4 pt-4 border-t border-white/20 flex items-center gap-3">
-                  <div className="bg-blue-800 p-2 rounded-lg"><Award className="w-5 h-5 text-amber-300"/></div>
+                {/* BOTÃO DA JORNADA DE APROVAÇÃO */}
+                <div onClick={() => setShowLevelMap(true)} className="mt-4 pt-4 border-t border-white/20 flex items-center gap-3 cursor-pointer hover:bg-white/10 p-2 -mx-2 rounded-xl transition-colors group">
+                  <div className="bg-blue-800 p-2 rounded-lg group-hover:scale-110 transition-transform"><Award className="w-5 h-5 text-amber-300"/></div>
                   <div>
                     <p className="text-xs font-bold text-white">Lvl {userLevel.nivel}: {userLevel.titulo}</p>
+                    <p className="text-[10px] text-amber-300 uppercase font-black tracking-wider mb-1 mt-0.5 truncate">{projectConfig.userName}</p>
                     <p className="text-[10px] text-blue-200">{gamification.xp} / {userLevel.max} XP</p>
+                    <p className="text-[9px] text-blue-300 font-bold uppercase mt-0.5 tracking-wider">👉 Ver Jornada</p>
                   </div>
                 </div>
               </div>
@@ -434,7 +498,7 @@ export default function App() {
 
         <main className="flex-1 p-6 md:p-8 overflow-y-auto pb-24 text-left">
           <div className="max-w-5xl mx-auto">
-            {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} userProgress={userProgress} edital={edital} activeSubjectIds={activeSubjectIds} />}
+            {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} userProgress={userProgress} edital={edital} activeSubjectIds={activeSubjectIds} onShowLevelMap={() => setShowLevelMap(true)} />}
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} />}
             {activeTab === 'planner' && <TabPlanner customSprint={customSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} />}
             {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} pomodoroTime={pomodoroTime} isPomodoroActive={isPomodoroActive} isPomodoroBreak={isPomodoroBreak} togglePomodoro={togglePomodoro} resetPomodoro={resetPomodoro} triggerConfetti={triggerConfetti} />}
@@ -450,7 +514,7 @@ export default function App() {
 // ==========================================
 // ABA DASHBOARD / COCKPIT
 // ==========================================
-function TabDashboard({ config, progressPerc, gamification, setGamification, dailyLogs, setDailyLogs, userLevel, pendingReviewsCount, setActiveTab, customSprint, userProgress, edital, activeSubjectIds }) {
+function TabDashboard({ config, progressPerc, gamification, setGamification, dailyLogs, setDailyLogs, userLevel, pendingReviewsCount, setActiveTab, customSprint, userProgress, edital, activeSubjectIds, onShowLevelMap }) {
   const [loggedHoursToday, setLoggedHoursToday] = useState('');
   const today = new Date().toLocaleDateString();
   const todayHours = dailyLogs[today] || 0;
@@ -556,10 +620,14 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl shadow-md p-6 text-white flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-20"><Trophy className="w-24 h-24"/></div>
+        <div 
+          onClick={onShowLevelMap}
+          className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl shadow-md p-6 text-white flex flex-col justify-between relative overflow-hidden cursor-pointer hover:shadow-orange-500/30 hover:scale-[1.02] transition-all group"
+          title="Clique para ver a Jornada de Aprovação"
+        >
+          <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-40 transition-opacity"><Trophy className="w-24 h-24"/></div>
           <div className="z-10 text-left">
-            <h3 className="font-bold text-amber-100 flex items-center gap-2 text-sm uppercase tracking-wider mb-4"><Flame className="w-4 h-4"/> Status Atual</h3>
+            <h3 className="font-bold text-amber-100 flex items-center gap-2 text-sm uppercase tracking-wider mb-4"><Flame className="w-4 h-4"/> Olá, {config.userName}</h3>
             <div className="flex items-end gap-2">
               <span className="text-5xl font-black">{gamification.streak}</span>
               <span className="text-amber-200 font-medium mb-1">Dias Seguidos</span>
@@ -568,7 +636,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
           </div>
           <div className="mt-6 pt-4 border-t border-amber-400/30 z-10 text-left">
             <div className="flex justify-between items-end mb-2">
-              <span className="font-bold text-lg">Nível {userLevel.nivel}</span>
+              <span className="font-bold text-lg flex items-center gap-2">Nível {userLevel.nivel} <span className="text-[9px] bg-amber-900/40 px-2 py-0.5 rounded uppercase group-hover:bg-amber-800/60 transition-colors">Tabela</span></span>
               <span className="text-xs font-bold text-amber-200">{gamification.xp} / {userLevel.max} XP</span>
             </div>
             <div className="w-full h-2 bg-black/20 rounded-full overflow-hidden">
@@ -1692,7 +1760,7 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
             </div>
           )}
         </div>
-        <button onClick={() => setIsReviewing(false)} className="mt-6 text-sm font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer">Voltar ao Resumo</button>
+        <button onClick={() => setIsReviewing(false)} className="mt-6 text-sm font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer">Voltar ao Painel</button>
       </div>
     );
   }
@@ -1746,7 +1814,7 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
           </h3>
           <div className="space-y-3">
             {revisoesConcluidas.length === 0 ? (
-              <div className="text-sm font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center">
+              <div className="text-sm font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center text-center">
                 Quando classificar as cartas, elas aparecerão aqui.
               </div>
             ) : (
@@ -1924,6 +1992,32 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
           </h3>
           
           <div className="space-y-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Seu Nome / Apelido</label>
+                <input 
+                  type="text" 
+                  value={localConfig.userName || ''} 
+                  onChange={e => setLocalConfig({...localConfig, userName: e.target.value})}
+                  className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Som de Subida de Nível</label>
+                <select 
+                  value={localConfig.levelSound || 'chimes'} 
+                  onChange={e => setLocalConfig({...localConfig, levelSound: e.target.value})}
+                  className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors cursor-pointer"
+                >
+                  <option value="chimes">Sinos Mágicos (Suave)</option>
+                  <option value="arcade">Arcade 8-bits (Retro)</option>
+                  <option value="modern">Notificação Moderna (Limpa)</option>
+                  <option value="epic">Trombetas de Vitória (Épico)</option>
+                </select>
+              </div>
+            </div>
+
             <div>
               <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Nome do App / Sistema</label>
               <input 
