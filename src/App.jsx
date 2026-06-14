@@ -302,7 +302,7 @@ const LevelMapModal = ({ onClose, currentXp }) => {
 };
 
 export default function App() {
-  const [isDarkMode, setIsDarkMode] = useState(() => getStorage('pareto_theme_v23', false));
+  const [isDarkMode, setIsDarkMode] = useState(() => getStorage('nomeacao_prod_theme', false));
   const [activeTab, setActiveTab] = useState('dashboard'); 
 
   // ESTADOS DE DOPAMINA / EFEITOS
@@ -311,20 +311,20 @@ export default function App() {
   const [showLevelMap, setShowLevelMap] = useState(false);
 
   const [projectConfig, setProjectConfig] = useState(() => {
-    const saved = getStorage('pareto_config_v23', initialConfig);
+    const saved = getStorage('nomeacao_prod_config', initialConfig);
     return { ...initialConfig, ...saved };
   });
   
   // APLICAÇÃO DO TEMA ATUAL
   const themeColors = THEMES[projectConfig.appTheme] || THEMES.default;
 
-  const [edital, setEdital] = useState(() => getStorage('pareto_edital_v23', initialEdital));
-  const [userProgress, setUserProgress] = useState(() => getStorage('pareto_progress_v23', {}));
-  const [customSprint, setCustomSprint] = useState(() => getStorage('pareto_custom_sprint_v23', []));
-  const [sprintsCompleted, setSprintsCompleted] = useState(() => getStorage('pareto_sprints_completed_v23', 0));
+  const [edital, setEdital] = useState(() => getStorage('nomeacao_prod_edital', initialEdital));
+  const [userProgress, setUserProgress] = useState(() => getStorage('nomeacao_prod_progress', {}));
+  const [customSprint, setCustomSprint] = useState(() => getStorage('nomeacao_prod_sprint', []));
+  const [sprintsCompleted, setSprintsCompleted] = useState(() => getStorage('nomeacao_prod_sprints_completed', 0));
   
-  const [gamification, setGamification] = useState(() => getStorage('pareto_gamification_v23', { xp: 0, streak: 0, lastActiveDate: '' }));
-  const [dailyLogs, setDailyLogs] = useState(() => getStorage('pareto_daily_logs_v23', {}));
+  const [gamification, setGamification] = useState(() => getStorage('nomeacao_prod_gamification', { xp: 0, streak: 0, lastActiveDate: '' }));
+  const [dailyLogs, setDailyLogs] = useState(() => getStorage('nomeacao_prod_daily_logs', {}));
 
   // CÁLCULO DE NÍVEL
   const calculateLevel = (xp) => {
@@ -354,15 +354,15 @@ export default function App() {
     }
   }, [gamification.xp, userLevel, projectConfig.levelSound]);
 
-  // PERSISTÊNCIA
-  useEffect(() => { setStorage('pareto_theme_v23', isDarkMode); }, [isDarkMode]);
-  useEffect(() => { setStorage('pareto_config_v23', projectConfig); }, [projectConfig]);
-  useEffect(() => { setStorage('pareto_edital_v23', edital); }, [edital]);
-  useEffect(() => { setStorage('pareto_progress_v23', userProgress); }, [userProgress]);
-  useEffect(() => { setStorage('pareto_custom_sprint_v23', customSprint); }, [customSprint]);
-  useEffect(() => { setStorage('pareto_sprints_completed_v23', sprintsCompleted); }, [sprintsCompleted]);
-  useEffect(() => { setStorage('pareto_gamification_v23', gamification); }, [gamification]);
-  useEffect(() => { setStorage('pareto_daily_logs_v23', dailyLogs); }, [dailyLogs]);
+  // PERSISTÊNCIA (Agora fixadas em Produção)
+  useEffect(() => { setStorage('nomeacao_prod_theme', isDarkMode); }, [isDarkMode]);
+  useEffect(() => { setStorage('nomeacao_prod_config', projectConfig); }, [projectConfig]);
+  useEffect(() => { setStorage('nomeacao_prod_edital', edital); }, [edital]);
+  useEffect(() => { setStorage('nomeacao_prod_progress', userProgress); }, [userProgress]);
+  useEffect(() => { setStorage('nomeacao_prod_sprint', customSprint); }, [customSprint]);
+  useEffect(() => { setStorage('nomeacao_prod_sprints_completed', sprintsCompleted); }, [sprintsCompleted]);
+  useEffect(() => { setStorage('nomeacao_prod_gamification', gamification); }, [gamification]);
+  useEffect(() => { setStorage('nomeacao_prod_daily_logs', dailyLogs); }, [dailyLogs]);
 
   // STREAK
   useEffect(() => {
@@ -515,7 +515,7 @@ export default function App() {
     ]},
     { phase: 'Execução', id: 'acao', items: [
       { id: 'cronograma', icon: Calendar, label: 'Sprints Diárias' }, 
-      { id: 'revisoes', icon: BrainCircuit, label: 'Deck de Combate', badge: pendingReviewsCount }
+      { id: 'revisoes', icon: BrainCircuit, label: 'Revisão Inteligente', badge: pendingReviewsCount }
     ]},
     { phase: 'Sistema', id: 'sistema', items: [
       { id: 'admin', icon: Settings, label: 'Painel de Controle' }
@@ -600,8 +600,8 @@ export default function App() {
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} />}
             {activeTab === 'planner' && <TabPlanner customSprint={customSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} />}
             {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} pomodoroTime={pomodoroTime} isPomodoroActive={isPomodoroActive} isPomodoroBreak={isPomodoroBreak} togglePomodoro={togglePomodoro} resetPomodoro={resetPomodoro} triggerConfetti={triggerConfetti} themeColors={themeColors} appTheme={projectConfig.appTheme} />}
-            {activeTab === 'revisoes' && <TabDeckAnki progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} />}
-            {activeTab === 'admin' && <TabAdmin config={projectConfig} setConfig={setProjectConfig} setUserProgress={setUserProgress} setGamification={setGamification} setEdital={setEdital} setCustomSprint={setCustomSprint} initialEdital={initialEdital} setSprintsCompleted={setSprintsCompleted} setDailyLogs={setDailyLogs} themeColors={themeColors} playLevelUpSound={playLevelUpSound} />}
+            {activeTab === 'revisoes' && <TabRevisaoInteligente progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} />}
+            {activeTab === 'admin' && <TabAdmin config={projectConfig} setConfig={setProjectConfig} userProgress={userProgress} setUserProgress={setUserProgress} gamification={gamification} setGamification={setGamification} edital={edital} setEdital={setEdital} customSprint={customSprint} setCustomSprint={setCustomSprint} initialEdital={initialEdital} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} themeColors={themeColors} playLevelUpSound={playLevelUpSound} />}
           </div>
         </main>
       </div>
@@ -817,7 +817,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-red-200 dark:bg-red-800 rounded-lg group-hover:scale-110 transition-transform"><BrainCircuit className="w-5 h-5 text-red-700 dark:text-red-300"/></div>
                 <div className="text-left">
-                  <span className="block font-bold text-red-900 dark:text-red-300">Revisão Espaçada</span>
+                  <span className="block font-bold text-red-900 dark:text-red-300">Revisão Inteligente</span>
                   <span className="text-xs text-red-700 dark:text-red-400">Lute contra o esquecimento.</span>
                 </div>
               </div>
@@ -1229,7 +1229,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
           <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
           <div className="text-sm text-amber-800 dark:text-amber-200/80">
             <strong>Modo Edição Ativo:</strong><br/>
-            Na edição de um tópico, você agora pode preencher o <strong className="text-amber-900 dark:text-amber-400">Gatilho (Pergunta) e Conceito (Resposta)</strong>. Essa será a sua munição de Revisão Espaçada na respectiva aba!
+            Arraste os itens para reordenar, clique no lápis para renomear ou gerencie as suas disciplinas clicando nos botões abaixo.
           </div>
         </div>
       )}
@@ -1374,18 +1374,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                                         <div>
                                           <label className="text-[10px] font-bold uppercase text-slate-400 block mb-1">Link Caderno TEC</label>
                                           <input type="text" value={editTopicData.linkTec} onChange={(e) => setEditTopicData({...editTopicData, linkTec: e.target.value})} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="https://..." />
-                                        </div>
-                                      </div>
-
-                                      <div className="bg-blue-50/50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800/50 p-4 rounded-xl space-y-3">
-                                        <h4 className="text-xs font-black uppercase text-blue-600 dark:text-blue-400 flex items-center gap-2"><BrainCircuit className="w-4 h-4"/> Configurar Revisão Espaçada</h4>
-                                        <div>
-                                          <label className="text-[10px] font-bold uppercase text-slate-500 block mb-1">Gatilho Mental (A Pergunta)</label>
-                                          <input type="text" value={editTopicData.pergunta} onChange={(e) => setEditTopicData({...editTopicData, pergunta: e.target.value})} placeholder="Ex: Qual a diferença entre Framework Genérico e Guarda-Chuva?" className="w-full p-2 text-sm rounded-lg border border-blue-200 dark:border-blue-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" />
-                                        </div>
-                                        <div>
-                                          <label className="text-[10px] font-bold uppercase text-slate-500 block mb-1">Conceito Chave (A Resposta / Pegadinha)</label>
-                                          <textarea rows="2" value={editTopicData.resposta} onChange={(e) => setEditTopicData({...editTopicData, resposta: e.target.value})} placeholder="Ex: Framework é fase de construção. Guarda-chuva é suporte contínuo." className="w-full p-2 text-sm rounded-lg border border-blue-200 dark:border-blue-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none resize-none focus:border-blue-500"></textarea>
                                         </div>
                                       </div>
 
@@ -1761,12 +1749,9 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
 }
 
 // ==========================================
-// ABA 5: DECK DE COMBATE (ANKI NATIVO)
+// ABA 5: REVISÃO INTELIGENTE (ESPAÇADA)
 // ==========================================
-function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds, themeColors }) {
-  const [isReviewing, setIsReviewing] = useState(false);
-  const [isFlipped, setIsFlipped] = useState(false);
-
+function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeSubjectIds, themeColors }) {
   let todosAssuntos = [];
   edital.forEach(b => b.disciplinas.forEach(d => {
     d.assuntos.forEach(a => todosAssuntos.push({...a, discNome: d.nome}))
@@ -1795,111 +1780,54 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds,
     return `em ${diff} dias`;
   };
 
-  const handleFeedbackClick = (assId, type) => {
-    handleReviewFeedback(assId, type);
-    setIsFlipped(false); 
-    if (revisoesPendentes.length <= 1) {
-      setIsReviewing(false); 
-    }
-  };
-
-  if (isReviewing && revisoesPendentes.length > 0) {
-    const activeCard = revisoesPendentes[0]; 
-    const questionText = activeCard.pergunta ? activeCard.pergunta : `Explique em voz alta os pontos principais e as pegadinhas sobre:\n\n${activeCard.titulo}`;
-    const answerText = activeCard.resposta ? activeCard.resposta : `(Você não registrou um resumo neste tópico). \n\nAvalie abaixo a sua retenção mental com base na Teoria e Questões que resolveu.`;
-
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[70vh] animate-in fade-in zoom-in-95 duration-300">
-        <div className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden text-left">
-          
-          <div className="bg-slate-100 dark:bg-slate-800 p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center relative">
-            <span className={`text-xs font-black uppercase ${themeColors.text.split(' ')[0]} tracking-widest`}>{activeCard.discNome}</span>
-            <span className="text-xs font-bold text-slate-400 bg-white dark:bg-slate-900 px-3 py-1 rounded-full shadow-sm">{revisoesPendentes.length} restantes</span>
-            {activeCard.linkTec && (
-              <a href={activeCard.linkTec} target="_blank" rel="noreferrer" title="Abrir Caderno TEC" className={`absolute top-3 right-3 p-1.5 rounded-lg ${themeColors.lightBg} ${themeColors.text} hover:scale-110 transition-transform cursor-pointer`}>
-                <ExternalLink className="w-4 h-4" />
-              </a>
-            )}
-          </div>
-
-          <div className="p-8 md:p-12 min-h-[200px] flex items-center justify-center bg-white dark:bg-slate-900">
-            <h3 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-slate-100 leading-snug whitespace-pre-wrap">{questionText}</h3>
-          </div>
-
-          {isFlipped ? (
-            <div className={`border-t border-slate-100 dark:border-slate-800 ${themeColors.lightBg} animate-in slide-in-from-bottom-4`}>
-              <div className="p-8 min-h-[150px] flex items-center justify-center">
-                <p className="text-lg md:text-xl font-medium text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{answerText}</p>
-              </div>
-              
-              <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-200 dark:border-slate-700">
-                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mb-4 uppercase tracking-widest text-center">Avalie a sua retenção</p>
-                <div className="flex gap-3">
-                  <button onClick={() => handleFeedbackClick(activeCard.id, 'dificil')} className="flex-1 bg-white hover:bg-red-500 text-red-600 hover:text-white dark:bg-slate-800 dark:hover:bg-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 p-4 rounded-xl font-black transition-all shadow-sm hover:shadow-lg flex flex-col items-center gap-1 group cursor-pointer">
-                    <span className="text-base uppercase tracking-wider">Difícil</span>
-                    <span className="text-[10px] opacity-70 group-hover:text-red-200 font-medium">Rever Amanhã</span>
-                  </button>
-                  <button onClick={() => handleFeedbackClick(activeCard.id, 'bom')} className="flex-1 bg-white hover:bg-amber-500 text-amber-600 hover:text-white dark:bg-slate-800 dark:hover:bg-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-900/50 p-4 rounded-xl font-black transition-all shadow-sm hover:shadow-lg flex flex-col items-center gap-1 group cursor-pointer">
-                    <span className="text-base uppercase tracking-wider">Bom</span>
-                    <span className="text-[10px] opacity-70 group-hover:text-amber-200 font-medium">Rever em 7 Dias</span>
-                  </button>
-                  <button onClick={() => handleFeedbackClick(activeCard.id, 'facil')} className="flex-1 bg-white hover:bg-emerald-500 text-emerald-600 hover:text-white dark:bg-slate-800 dark:hover:bg-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900/50 p-4 rounded-xl font-black transition-all shadow-sm hover:shadow-lg flex flex-col items-center gap-1 group cursor-pointer">
-                    <span className="text-base uppercase tracking-wider">Fácil</span>
-                    <span className="text-[10px] opacity-70 group-hover:text-emerald-200 font-medium">Rever em 15 Dias</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="p-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex justify-center">
-              <button onClick={() => setIsFlipped(true)} className={`w-full md:w-auto px-12 py-4 ${themeColors.button} font-black rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-lg cursor-pointer`}>
-                <Eye className="w-5 h-5"/> Revelar Resposta
-              </button>
-            </div>
-          )}
-        </div>
-        <button onClick={() => setIsReviewing(false)} className="mt-6 text-sm font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer">Voltar ao Painel</button>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6 animate-in fade-in text-left">
       <header className="border-b border-slate-200 dark:border-slate-800 pb-4">
         <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
-          <BrainCircuit className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Deck de Combate
+          <BrainCircuit className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Revisão Inteligente
         </h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Retenção ativa. A sua memória não terá espaço para falhar.</p>
-        
-        {revisoesPendentes.length > 0 && (
-          <div className="mt-4">
-            <button onClick={() => setIsReviewing(true)} className={`w-full md:w-auto px-8 py-3 ${themeColors.button} font-black rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer`}>
-              <Zap className="w-5 h-5"/> Iniciar Revisão ({revisoesPendentes.length})
-            </button>
-          </div>
-        )}
+        <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Retenção ativa guiada por espaçamento ótimo. Faça um esforço mental para lembrar os conceitos e avalie os tópicos abaixo.</p>
       </header>
 
       <div className="grid md:grid-cols-2 gap-8 mt-6">
         <div>
           <h3 className="text-lg font-bold text-red-600 dark:text-red-400 flex items-center gap-2 mb-4 border-b border-red-100 dark:border-red-900/30 pb-2">
-            <AlertTriangle className="w-5 h-5"/> Cartas na Fila (Hoje)
+            <AlertTriangle className="w-5 h-5"/> Tópicos a Revisar (Hoje)
           </h3>
           <div className="space-y-3">
             {revisoesPendentes.length === 0 ? (
-              <div className="text-sm font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center">
+              <div className="text-sm font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-center">
                 <CheckCircle className="w-10 h-10 text-emerald-400 mb-3 opacity-50"/>
                 <p>A sua memória está em dia!</p>
-                <p>Nenhuma carta para hoje.</p>
+                <p className="text-xs font-normal mt-1">Nenhum tópico pendente para hoje.</p>
               </div>
             ) : (
               revisoesPendentes.map((data) => (
-                <div key={data.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-sm flex items-center justify-between border-l-4 border-l-red-500">
-                  <div className="truncate pr-4">
-                    <span className="text-[9px] uppercase font-black text-slate-400 block mb-0.5">{data.discNome}</span>
-                    <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm truncate">{data.titulo}</h4>
+                <div key={data.id} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-4 rounded-xl shadow-sm flex flex-col gap-3 border-l-4 border-l-red-500 transition-all hover:shadow-md">
+                  <div className="flex justify-between items-start">
+                    <div className="pr-4">
+                      <span className="text-[9px] uppercase font-black text-slate-400 block mb-0.5">{data.discNome}</span>
+                      <h4 className="font-bold text-slate-800 dark:text-slate-200 text-base leading-tight">{data.titulo}</h4>
+                    </div>
+                    {data.linkTec && (
+                      <a href={data.linkTec} target="_blank" rel="noreferrer" title="Abrir Caderno TEC" className={`p-2 rounded-lg ${themeColors.lightBg} ${themeColors.text} hover:scale-110 transition-transform cursor-pointer shrink-0`}>
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    )}
                   </div>
-                  {(data.pergunta || data.resposta) && <BrainCircuit className={`w-4 h-4 ${themeColors.text.split(' ')[0]} shrink-0`} title="Possui Flashcard Customizado"/>}
+                  
+                  {/* BOTÕES INLINE DE REVISÃO */}
+                  <div className="grid grid-cols-3 gap-2 mt-1 pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <button onClick={() => handleReviewFeedback(data.id, 'dificil')} className="py-2.5 px-1 bg-red-50 hover:bg-red-500 text-red-600 hover:text-white dark:bg-red-900/10 dark:hover:bg-red-600 dark:text-red-400 rounded-lg text-[11px] font-black uppercase tracking-wide transition-colors flex flex-col items-center gap-0.5 cursor-pointer">
+                      <span>Difícil</span><span className="text-[8px] font-bold opacity-70">Amanhã</span>
+                    </button>
+                    <button onClick={() => handleReviewFeedback(data.id, 'bom')} className="py-2.5 px-1 bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white dark:bg-amber-900/10 dark:hover:bg-amber-600 dark:text-amber-400 rounded-lg text-[11px] font-black uppercase tracking-wide transition-colors flex flex-col items-center gap-0.5 cursor-pointer">
+                      <span>Bom</span><span className="text-[8px] font-bold opacity-70">7 Dias</span>
+                    </button>
+                    <button onClick={() => handleReviewFeedback(data.id, 'facil')} className="py-2.5 px-1 bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white dark:bg-emerald-900/10 dark:hover:bg-emerald-600 dark:text-emerald-400 rounded-lg text-[11px] font-black uppercase tracking-wide transition-colors flex flex-col items-center gap-0.5 cursor-pointer">
+                      <span>Fácil</span><span className="text-[8px] font-bold opacity-70">15 Dias</span>
+                    </button>
+                  </div>
                 </div>
               ))
             )}
@@ -1908,12 +1836,12 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds,
 
         <div>
           <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2 mb-4 border-b border-emerald-100 dark:border-emerald-900/30 pb-2">
-            <Calendar className="w-5 h-5"/> Agendadas (Futuro)
+            <Calendar className="w-5 h-5"/> Memória de Longo Prazo (Agendados)
           </h3>
           <div className="space-y-3">
             {revisoesConcluidas.length === 0 ? (
               <div className="text-sm font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center text-center">
-                Quando classificar as cartas, elas aparecerão aqui.
+                Quando classificar as suas revisões, elas aparecerão aqui.
               </div>
             ) : (
               revisoesConcluidas
@@ -1943,7 +1871,7 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds,
 // ==========================================
 // ABA NOVA: PAINEL DE CONTROLE (ADMINISTRAÇÃO)
 // ==========================================
-function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdital, setCustomSprint, initialEdital, setSprintsCompleted, setDailyLogs, themeColors, playLevelUpSound }) {
+function TabAdmin({ config, setConfig, userProgress, setUserProgress, gamification, setGamification, edital, setEdital, customSprint, setCustomSprint, initialEdital, sprintsCompleted, setSprintsCompleted, dailyLogs, setDailyLogs, themeColors, playLevelUpSound }) {
   const [localConfig, setLocalConfig] = useState({
     ...config,
     revBom: config.revBom || 7,
@@ -1979,11 +1907,11 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
   const handleExportBackup = () => {
     const backupData = {
       config: localConfig,
-      progress: JSON.parse(localStorage.getItem('pareto_progress_v23') || '{}'),
-      gamification: JSON.parse(localStorage.getItem('pareto_gamification_v23') || '{}'),
-      sprints: JSON.parse(localStorage.getItem('pareto_custom_sprint_v23') || '[]'),
-      edital: JSON.parse(localStorage.getItem('pareto_edital_v23') || '[]'),
-      logs: JSON.parse(localStorage.getItem('pareto_daily_logs_v23') || '{}'),
+      progress: userProgress,
+      gamification: gamification,
+      sprints: customSprint,
+      edital: edital,
+      logs: dailyLogs,
       exportDate: new Date().toISOString()
     };
     
@@ -1994,6 +1922,34 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
     document.body.appendChild(downloadAnchorNode);
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
+  };
+
+  const handleImportBackup = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (data.config) {
+          setConfig(data.config);
+          setLocalConfig(data.config);
+        }
+        if (data.progress) setUserProgress(data.progress);
+        if (data.gamification) setGamification(data.gamification);
+        if (data.sprints) setCustomSprint(data.sprints);
+        if (data.edital) setEdital(data.edital);
+        if (data.logs) setDailyLogs(data.logs);
+        
+        alert('🎉 Dados restaurados com sucesso! O seu progresso está a salvo.');
+      } catch (err) {
+        alert('❌ Erro ao ler o arquivo. Certifique-se de que é um arquivo de backup válido (.json).');
+      }
+    };
+    reader.readAsText(file);
+    // Limpa o input para permitir importar o mesmo ficheiro seguidamente se necessário
+    e.target.value = null; 
   };
 
   const handleResetProgress = () => {
@@ -2267,12 +2223,20 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 mt-3">Exporte todo o seu progresso, arsenal de matérias e níveis de XP para um arquivo de segurança no seu dispositivo.</p>
           </div>
-          <button 
-            onClick={handleExportBackup}
-            className="w-full py-3.5 rounded-xl font-bold text-sm bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-900/50 transition-colors flex items-center justify-center gap-2 border border-purple-200 dark:border-purple-800 cursor-pointer"
-          >
-            <Download className="w-4 h-4"/> Exportar Meus Dados (.JSON)
-          </button>
+          
+          <div className="flex flex-col gap-3">
+            <button 
+              onClick={handleExportBackup}
+              className="w-full py-3.5 rounded-xl font-bold text-sm bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-900/50 transition-colors flex items-center justify-center gap-2 border border-purple-200 dark:border-purple-800 cursor-pointer"
+            >
+              <Download className="w-4 h-4"/> Exportar Meus Dados (.JSON)
+            </button>
+            
+            <label className={`w-full py-3.5 rounded-xl font-bold text-sm ${themeColors.lightBg} ${themeColors.text} hover:scale-[1.01] transition-all flex items-center justify-center gap-2 border ${themeColors.border} cursor-pointer`}>
+              <Upload className="w-4 h-4"/> Restaurar Backup Antigo (.JSON)
+              <input type="file" accept=".json" className="hidden" onChange={handleImportBackup} />
+            </label>
+          </div>
         </div>
 
         {/* BLOCO 5: ZONA DE PERIGO (DANGER ZONE) */}
