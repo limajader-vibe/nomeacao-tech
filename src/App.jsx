@@ -44,6 +44,15 @@ const appIdStr = typeof __app_id !== 'undefined' ? String(__app_id) : 'nomeacao-
 const safeAppId = encodeURIComponent(appIdStr).replace(/\./g, '_'); 
 
 // --- CONFIGURAÇÃO INICIAL E TEMAS ---
+const getStorage = (key, defaultValue) => {
+  try { 
+    const item = localStorage.getItem(key);
+    if (item === null) return defaultValue;
+    return JSON.parse(item);
+  } catch (e) { return defaultValue; }
+};
+const setStorage = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} };
+
 const initialConfig = { 
   appName: 'Nomeação.Tech',
   logoUrl: 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png',
@@ -266,7 +275,7 @@ const AuthScreen = ({ auth }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [accessCode, setAccessCode] = useState(''); // NOVO: Estado do Código de Convite
+  const [accessCode, setAccessCode] = useState(''); 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -275,7 +284,6 @@ const AuthScreen = ({ auth }) => {
     setError('');
     setLoading(true);
     
-    // NOVO: Barreira de Segurança para Novos Registos
     if (!isLogin && accessCode !== 'APROVADO2026') {
       setError('Código de convite inválido. Acesso restrito ao Comandante.');
       setLoading(false);
@@ -378,7 +386,7 @@ export default function App() {
   const [levelUpData, setLevelUpData] = useState(null);
   const [showLevelMap, setShowLevelMap] = useState(false);
 
-  // ESTADOS DE DADOS
+  // ESTADOS DE DADOS E MÉTRICAS
   const [projectConfig, setProjectConfig] = useState(initialConfig);
   const [edital, setEdital] = useState(initialEdital);
   const [userProgress, setUserProgress] = useState({});
@@ -386,24 +394,22 @@ export default function App() {
   const [sprintsCompleted, setSprintsCompleted] = useState(0);
   const [gamification, setGamification] = useState({ xp: 0, streak: 0, lastActiveDate: '' });
   const [dailyLogs, setDailyLogs] = useState({});
+  const [reviewStats, setReviewStats] = useState(() => getStorage('nomeacao_prod_review_stats', { facil: 0, bom: 0, dificil: 0 }));
 
   const themeColors = THEMES[projectConfig.appTheme] || THEMES.default;
 
-  // 1. INICIALIZAÇÃO DO FIREBASE AUTH (Monitoramento Real-Time)
+  // 1. INICIALIZAÇÃO DO FIREBASE AUTH
   useEffect(() => {
     if (!auth) {
-      setIsCloudReady(true); // Se não configurou as chaves, passa reto para usar local
+      setIsCloudReady(true);
       return;
     }
-    
-    // Tratamento para preview no Canvas
     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
       signInWithCustomToken(auth, __initial_auth_token).catch(e => console.error(e));
     }
-
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      if (!currentUser) setIsCloudReady(true); // Se não há user logado, para o loader para mostrar a tela de login
+      if (!currentUser) setIsCloudReady(true);
     });
     return () => unsubscribe();
   }, []);
@@ -423,6 +429,7 @@ export default function App() {
           if (data.sprintsCompleted !== undefined) setSprintsCompleted(data.sprintsCompleted);
           if (data.gamification) setGamification(data.gamification);
           if (data.dailyLogs) setDailyLogs(data.dailyLogs);
+          if (data.reviewStats) setReviewStats(data.reviewStats);
           if (data.isDarkMode !== undefined) setIsDarkMode(data.isDarkMode);
         }
         setIsCloudReady(true);
@@ -453,7 +460,10 @@ export default function App() {
   useEffect(() => { saveToCloud('sprintsCompleted', sprintsCompleted); }, [sprintsCompleted, isCloudReady]);
   useEffect(() => { saveToCloud('gamification', gamification); }, [gamification, isCloudReady]);
   useEffect(() => { saveToCloud('dailyLogs', dailyLogs); }, [dailyLogs, isCloudReady]);
-
+  useEffect(() => { 
+    setStorage('nomeacao_prod_review_stats', reviewStats);
+    saveToCloud('reviewStats', reviewStats); 
+  }, [reviewStats, isCloudReady]);
 
   const calculateLevel = (xp) => {
     const levelFound = LEVELS_MAP.find(l => xp >= l.min && xp < l.max);
@@ -554,6 +564,7 @@ export default function App() {
   };
 
   const handleReviewFeedback = (assId, feedbackType) => {
+    setReviewStats(prev => ({ ...prev, [feedbackType]: (prev[feedbackType] || 0) + 1 }));
     setUserProgress(prev => {
       const current = prev[assId] || {};
       const now = new Date().getTime();
@@ -596,7 +607,9 @@ export default function App() {
   const progressPerc = totalCheckboxes === 0 ? 0 : Math.round((completedCheckboxes / totalCheckboxes) * 100);
 
   const navPhases = [
-    { phase: 'Cockpit', items: [{ id: 'dashboard', icon: Activity, label: 'Visão Geral' }] },
+    { phase: 'Cockpit', items: [
+      { id: 'dashboard', icon: Activity, label: 'Painel Geral' }
+    ]},
     { phase: 'Planejamento', id: 'planejamento', items: [
       { id: 'disciplinas', icon: Folder, label: 'Arsenal de Matérias' },
       { id: 'planner', icon: LayoutGrid, label: 'Metas da Semana' }
@@ -610,7 +623,6 @@ export default function App() {
     ]}
   ];
 
-  // BLOQUEIO SE NÃO ESTIVER LOGADO (SE O FIREBASE ESTIVER ATIVO)
   if (!isCloudReady) {
     return (
       <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white">
@@ -620,22 +632,18 @@ export default function App() {
     );
   }
 
-  // SE FIREBASE ESTIVER PRONTO E NÃO HOUVER USER -> TELA DE LOGIN
   if (auth && !user) {
     return <AuthScreen auth={auth} />;
   }
 
-  // ITENS DA BOTTOM NAVIGATION BAR (Exclusivo para Mobile)
   const mobileNavItems = [
     { id: 'dashboard', icon: Activity, label: 'Painel' },
     { id: 'disciplinas', icon: Folder, label: 'Arsenal' },
     { id: 'planner', icon: LayoutGrid, label: 'Metas' },
     { id: 'cronograma', icon: Calendar, label: 'Sprints', badge: customSprint.length > 0 ? customSprint.length : 0 },
-    { id: 'revisoes', icon: BrainCircuit, label: 'Revisões', badge: pendingReviewsCount },
-    { id: 'admin', icon: Settings, label: 'Admin' }
+    { id: 'revisoes', icon: BrainCircuit, label: 'Revisões', badge: pendingReviewsCount }
   ];
 
-  // SE PASSOU POR TUDO, RENDERIZA O APP NORMAL
   return (
     <div className={isDarkMode ? 'dark' : ''}>
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 flex flex-col md:flex-row font-sans transition-colors duration-300 relative">
@@ -643,9 +651,7 @@ export default function App() {
         <LevelUpModal data={levelUpData} onClose={() => setLevelUpData(null)} />
         {showLevelMap && <LevelMapModal currentXp={gamification.xp} onClose={() => setShowLevelMap(false)} />}
 
-        {/* ======================================================== */}
-        {/* MOBILE TOP HEADER (Visível apenas em ecrãs pequenos) */}
-        {/* ======================================================== */}
+        {/* MOBILE TOP HEADER */}
         <div className={`md:hidden flex items-center justify-between p-4 bg-gradient-to-br ${themeColors.sidebar} text-white shadow-md z-20 sticky top-0`}>
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center overflow-hidden shrink-0 border border-white/30 backdrop-blur-sm shadow-inner">
@@ -653,27 +659,23 @@ export default function App() {
             </div>
             <div className="flex flex-col">
               <h2 className="font-bold text-base leading-tight tracking-tight shadow-sm truncate max-w-[150px]">{projectConfig.appName}</h2>
-              <p className="text-[10px] text-amber-300 font-bold uppercase tracking-wider flex items-center gap-1 mt-0.5">Lvl {userLevel.nivel} <Award className="w-3 h-3"/></p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <p className="text-[10px] text-amber-300 font-bold uppercase tracking-wider flex items-center gap-1">Lvl {userLevel.nivel} <Award className="w-3 h-3"/></p>
+                <span className="text-[10px] text-orange-400 font-black flex items-center gap-0.5 border-l border-white/20 pl-2"><Flame className="w-3 h-3"/> {gamification.streak}</span>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer">
               {isDarkMode ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-white" />}
             </button>
-            {user && (
-              <button 
-                onClick={() => { if(window.confirm('Tem certeza que deseja trancar o sistema e sair?')) { auth && signOut(auth); } }} 
-                className="p-2.5 bg-red-500/80 hover:bg-red-500 rounded-full transition-colors cursor-pointer"
-              >
-                <LogOut className="w-4 h-4 text-white" />
-              </button>
-            )}
+            <button onClick={() => setActiveTab('admin')} className="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer">
+              <Settings className="w-4 h-4 text-white" />
+            </button>
           </div>
         </div>
 
-        {/* ======================================================== */}
-        {/* SIDEBAR DESKTOP (Escondida no mobile, fixa à esquerda no PC) */}
-        {/* ======================================================== */}
+        {/* SIDEBAR DESKTOP */}
         <aside className="hidden md:flex w-72 bg-white dark:bg-slate-900 shadow-xl flex-col z-10 shrink-0 border-r border-slate-200 dark:border-slate-800 sticky top-0 h-screen overflow-hidden">
           <div className={`p-6 bg-gradient-to-br ${themeColors.sidebar} text-white relative transition-colors duration-500 shrink-0`}>
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer">
@@ -693,13 +695,19 @@ export default function App() {
                   <span className="bg-black/30 px-2 py-1 rounded border border-white/10">{projectConfig.banca}</span>
                   <span className="bg-black/30 px-2 py-1 rounded border border-white/10">Meta: {projectConfig.horasDia}h/dia</span>
                 </div>
-                <div onClick={() => setShowLevelMap(true)} className="mt-4 pt-4 border-t border-white/20 flex items-center gap-3 cursor-pointer hover:bg-white/10 p-2 -mx-2 rounded-xl transition-colors group">
-                  <div className="bg-black/40 p-2 rounded-lg group-hover:scale-110 transition-transform"><Award className="w-5 h-5 text-amber-300"/></div>
-                  <div>
-                    <p className="text-xs font-bold text-white">Lvl {userLevel.nivel}: {userLevel.titulo}</p>
-                    <p className="text-[10px] text-amber-300 uppercase font-black tracking-wider mb-1 mt-0.5 truncate">{String(projectConfig.userName).split(' ')[0]}</p>
-                    <p className="text-[10px] text-white/80">{gamification.xp} / {userLevel.max} XP</p>
-                    <p className="text-[9px] text-white font-bold uppercase mt-0.5 tracking-wider group-hover:text-amber-300 transition-colors">👉 Ver Jornada</p>
+                
+                {/* BLOCÃO DE NÍVEL E STREAK NA SIDEBAR */}
+                <div onClick={() => setShowLevelMap(true)} className="mt-4 pt-4 border-t border-white/20 flex items-center justify-between gap-2 cursor-pointer hover:bg-white/10 p-2 -mx-2 rounded-xl transition-colors group">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-black/40 p-2 rounded-lg group-hover:scale-110 transition-transform"><Award className="w-5 h-5 text-amber-300"/></div>
+                    <div>
+                      <p className="text-xs font-bold text-white">Lvl {userLevel.nivel}</p>
+                      <p className="text-[9px] text-white/80">{gamification.xp} / {userLevel.max} XP</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="flex items-center gap-1 text-amber-400 font-black text-lg"><Flame className="w-4 h-4"/> {gamification.streak}</span>
+                    <span className="text-[8px] uppercase font-bold text-white/70 tracking-widest">Dias</span>
                   </div>
                 </div>
               </div>
@@ -726,40 +734,28 @@ export default function App() {
             ))}
           </nav>
 
-          {/* BOTÃO DE SAIR NA BARRA LATERAL (Apenas Desktop) */}
           {user && (
             <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 mt-auto shrink-0">
-              <button 
-                onClick={() => {
-                  if(window.confirm('Tem certeza que deseja sair do sistema?')) {
-                    auth && signOut(auth);
-                  }
-                }} 
-                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors font-bold text-sm cursor-pointer"
-              >
+              <button onClick={() => { if(window.confirm('Tem certeza que deseja sair do sistema?')) { auth && signOut(auth); } }} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors font-bold text-sm cursor-pointer">
                 <LogOut className="w-4 h-4" /> Sair do Sistema
               </button>
             </div>
           )}
         </aside>
 
-        {/* ======================================================== */}
-        {/* ÁREA DE CONTEÚDO PRINCIPAL */}
-        {/* ======================================================== */}
+        {/* CONTENT AREA */}
         <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-28 md:pb-8 text-left">
           <div className="max-w-5xl mx-auto">
-            {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} userProgress={userProgress} edital={edital} activeSubjectIds={activeSubjectIds} onShowLevelMap={() => setShowLevelMap(true)} themeColors={themeColors} />}
+            {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} userProgress={userProgress} edital={edital} activeSubjectIds={activeSubjectIds} onShowLevelMap={() => setShowLevelMap(true)} themeColors={themeColors} reviewStats={reviewStats} />}
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} />}
             {activeTab === 'planner' && <TabPlanner customSprint={customSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} />}
             {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} pomodoroTime={pomodoroTime} isPomodoroActive={isPomodoroActive} isPomodoroBreak={isPomodoroBreak} togglePomodoro={togglePomodoro} resetPomodoro={resetPomodoro} triggerConfetti={triggerConfetti} themeColors={themeColors} appTheme={projectConfig.appTheme} />}
             {activeTab === 'revisoes' && <TabRevisaoInteligente progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} />}
-            {activeTab === 'admin' && <TabAdmin auth={auth} config={projectConfig} setConfig={setProjectConfig} userProgress={userProgress} setUserProgress={setUserProgress} gamification={gamification} setGamification={setGamification} edital={edital} setEdital={setEdital} customSprint={customSprint} setCustomSprint={setCustomSprint} initialEdital={initialEdital} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} themeColors={themeColors} playLevelUpSound={playLevelUpSound} />}
+            {activeTab === 'admin' && <TabAdmin auth={auth} config={projectConfig} setConfig={setProjectConfig} userProgress={userProgress} setUserProgress={setUserProgress} gamification={gamification} setGamification={setGamification} edital={edital} setEdital={setEdital} customSprint={customSprint} setCustomSprint={setCustomSprint} initialEdital={initialEdital} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} reviewStats={reviewStats} themeColors={themeColors} playLevelUpSound={playLevelUpSound} />}
           </div>
         </main>
 
-        {/* ======================================================== */}
-        {/* MOBILE BOTTOM NAVIGATION BAR (Visível apenas em telemóveis) */}
-        {/* ======================================================== */}
+        {/* MOBILE BOTTOM NAVIGATION BAR */}
         <nav className="md:hidden fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-between items-end px-2 py-2 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-50">
           {mobileNavItems.map(item => {
             const IconComponent = item.icon;
@@ -776,8 +772,6 @@ export default function App() {
                 <span className={`text-[9px] font-bold tracking-tight transition-all duration-300 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 h-0 overflow-hidden translate-y-2'}`}>
                   {item.label}
                 </span>
-                
-                {/* Badge Notificação Mobile */}
                 {item.badge > 0 && (
                   <span className="absolute top-0 right-1/4 translate-x-1/2 -translate-y-1/4 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full border-2 border-white dark:border-slate-900 shadow-sm">
                     {item.badge > 9 ? '9+' : item.badge}
@@ -794,21 +788,14 @@ export default function App() {
 }
 
 // ==========================================
-// ABA DASHBOARD / COCKPIT
+// ABA DASHBOARD / SUPER COCKPIT DE COMANDO
 // ==========================================
-function TabDashboard({ config, progressPerc, gamification, setGamification, dailyLogs, setDailyLogs, userLevel, pendingReviewsCount, setActiveTab, customSprint, userProgress, edital, activeSubjectIds, onShowLevelMap, themeColors }) {
+function TabDashboard({ config, progressPerc, gamification, setGamification, dailyLogs, setDailyLogs, userLevel, themeColors, reviewStats, edital, activeSubjectIds, userProgress }) {
   const [loggedHoursToday, setLoggedHoursToday] = useState('');
   const today = new Date().toLocaleDateString();
   const todayHours = dailyLogs[today] || 0;
-  const progressDaily = Math.min((todayHours / config.horasDia) * 100, 100);
 
-  const totalAssuntos = activeSubjectIds.size;
-  let countTeoria = 0, countQuestoes = 0, countRevisao = 0;
-  activeSubjectIds.forEach(id => { const p = userProgress[id]; if (p?.estudado) countTeoria++; if (p?.questoes) countQuestoes++; if (p?.revisado) countRevisao++; });
-  const percTeoria = totalAssuntos === 0 ? 0 : Math.round((countTeoria / totalAssuntos) * 100);
-  const percQuestoes = totalAssuntos === 0 ? 0 : Math.round((countQuestoes / totalAssuntos) * 100);
-  const percRevisao = totalAssuntos === 0 ? 0 : Math.round((countRevisao / totalAssuntos) * 100);
-
+  // Radar Data
   const radarData = [];
   edital.forEach(b => b.disciplinas.forEach(d => {
     const totalDisc = d.assuntos.length; if (totalDisc === 0) return;
@@ -818,6 +805,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
     radarData.push({ id: d.id, nome: d.nome, perc: percDisc, cor: d.cor });
   }));
 
+  // Heatmap (Últimos 3 Meses)
   const todayObj = new Date(); todayObj.setHours(23, 59, 59, 999);
   const currentDayOfWeek = todayObj.getDay();
   const daysToLookBack = (16 * 7) + currentDayOfWeek; 
@@ -833,6 +821,22 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
     heatmapDays.push({ date: dateStr, hours, colorClass });
   }
 
+  // Gráfico de Barras (Últimos 14 dias)
+  const last14Days = Array.from({length: 14}).map((_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (13 - i));
+    return { dateObj: d, dateStr: d.toLocaleDateString(), dayLabel: d.toLocaleDateString('pt-BR', { weekday: 'short' }).charAt(0).toUpperCase() };
+  });
+  const maxHours = Math.max(...last14Days.map(d => dailyLogs[d.dateStr] || 0), 2); 
+  const totalHours14Days = last14Days.reduce((acc, curr) => acc + (dailyLogs[curr.dateStr] || 0), 0);
+  const avgHours = (totalHours14Days / 14).toFixed(1);
+
+  // Gráfico Donut (Retenção)
+  const totalReviews = reviewStats?.facil + reviewStats?.bom + reviewStats?.dificil || 0;
+  const facilPerc = totalReviews > 0 ? Math.round((reviewStats.facil / totalReviews) * 100) : 0;
+  const bomPerc = totalReviews > 0 ? Math.round((reviewStats.bom / totalReviews) * 100) : 0;
+  const dificilPerc = totalReviews > 0 ? Math.round((reviewStats.dificil / totalReviews) * 100) : 0;
+  const successRate = totalReviews > 0 ? (((reviewStats.facil + reviewStats.bom) / totalReviews) * 100).toFixed(1) : 0;
+
   const handleLogHours = (e) => {
     e.preventDefault(); const hours = parseFloat(loggedHoursToday);
     if (!isNaN(hours) && hours > 0) {
@@ -847,95 +851,135 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in">
+    <div className="space-y-6 animate-in fade-in pb-10">
       <header className="border-b border-slate-200 dark:border-slate-800 pb-4">
-        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">{config.appName} Cockpit</h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Mensure a sua execução diária e visualize as suas métricas de aprovação.</p>
+        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
+          <Activity className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Painel Geral
+        </h2>
+        <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Central de comando. Zero distrações, máximo desempenho.</p>
       </header>
 
+      {/* LINHA 1: OS 3 INDICADORES VITAIS (KPIs) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="md:col-span-2 bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
-          <div className={`absolute top-0 right-0 w-32 h-32 ${themeColors.bg.split(' ')[0]} opacity-10 rounded-full -mr-10 -mt-10 blur-2xl`}></div>
-          <div className="relative w-32 h-32 shrink-0 flex items-center justify-center">
-            <svg className="w-full h-full transform -rotate-90"><circle cx="64" cy="64" r="56" className="stroke-slate-100 dark:stroke-slate-800" strokeWidth="12" fill="none" /><circle cx="64" cy="64" r="56" className={`${themeColors.text.split(' ')[0].replace('text-', 'stroke-')} drop-shadow-md transition-all duration-1000 ease-out`} strokeWidth="12" fill="none" strokeDasharray="351.85" strokeDashoffset={351.85 - (351.85 * progressDaily) / 100} strokeLinecap="round" /></svg>
-            <div className="absolute flex flex-col items-center justify-center"><span className="text-3xl font-black text-slate-800 dark:text-white">{todayHours.toFixed(1)}<span className="text-lg text-slate-400">h</span></span><span className="text-[10px] font-bold uppercase text-slate-400">De {config.horasDia}h Meta</span></div>
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-center items-center text-center">
+          <div className={`p-3 ${themeColors.lightBg.split(' ')[0]} rounded-full mb-3`}><TrendingUp className={`w-6 h-6 ${themeColors.text.split(' ')[0]}`}/></div>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Domínio da Trilha</p>
+          <span className="text-4xl font-black text-slate-800 dark:text-white mt-1 mb-2">{progressPerc}%</span>
+          <div className="w-full max-w-[150px] h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div className={`h-full transition-all duration-1000 ${themeColors.bg.split(' ')[0]}`} style={{ width: `${progressPerc}%` }}></div>
           </div>
-          <div className="flex-1 w-full z-10 text-left">
-            <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-1">Foco de Hoje</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Registe as horas líquidas de estudo focadas no edital.</p>
-            <form onSubmit={handleLogHours} className="flex gap-2">
-              <input type="number" step="0.5" placeholder="Ex: 2.5" value={loggedHoursToday} onChange={(e) => setLoggedHoursToday(e.target.value)} className="w-24 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 font-bold text-center" />
-              <button type="submit" className={`${themeColors.button} px-5 py-3 rounded-xl font-bold transition-colors cursor-pointer`}>Adicionar Horas</button>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-center items-center text-center">
+          <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-full mb-3"><Clock className="w-6 h-6 text-blue-500"/></div>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Horas de Hoje</p>
+          <div className="flex items-end gap-1 mt-1 mb-2">
+            <span className="text-4xl font-black text-slate-800 dark:text-white">{todayHours.toFixed(1)}</span>
+            <span className="text-sm font-bold text-slate-400 mb-1">/ {config.horasDia}h</span>
+          </div>
+          <div className="w-full max-w-[150px] h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${Math.min((todayHours / config.horasDia) * 100, 100)}%` }}></div>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl p-6 shadow-md text-white flex flex-col justify-center items-center text-center relative overflow-hidden">
+          <div className="absolute -right-4 -top-4 opacity-20"><Trophy className="w-24 h-24"/></div>
+          <div className="p-3 bg-white/20 rounded-full mb-3 z-10"><Award className="w-6 h-6 text-amber-200"/></div>
+          <p className="text-xs font-bold text-amber-200 uppercase tracking-widest z-10">XP Acumulado</p>
+          <span className="text-4xl font-black text-white mt-1 mb-2 z-10">{gamification.xp.toLocaleString()}</span>
+          <p className="text-[10px] uppercase font-bold text-amber-200 z-10">Nível {userLevel.nivel} • {userLevel.titulo}</p>
+        </div>
+      </div>
+
+      {/* LINHA 2: GRÁFICOS DE MÉTRICAS */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        {/* Gráfico de Barras com Input Minimalista */}
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-full min-h-[350px]">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><BarChart2 className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Esforço Diário</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Média: <strong className="text-slate-700 dark:text-slate-300">{avgHours}h/dia</strong></p>
+            </div>
+            
+            {/* INPUT MINIMALISTA DE HORAS */}
+            <form onSubmit={handleLogHours} className="flex gap-1.5 bg-slate-50 dark:bg-slate-800 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+              <input type="number" step="0.5" placeholder="+ Hrs" value={loggedHoursToday} onChange={(e) => setLoggedHoursToday(e.target.value)} className="w-16 p-2 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none text-xs font-bold text-center border border-slate-200 dark:border-slate-700 focus:border-blue-500 transition-colors" />
+              <button type="submit" className={`${themeColors.bg.split(' ')[0]} hover:opacity-80 text-white px-3 py-2 rounded-lg font-bold transition-colors text-xs flex items-center justify-center cursor-pointer`} title="Adicionar Horas"><Plus className="w-4 h-4"/></button>
             </form>
           </div>
+          
+          <div className="flex-1 flex items-end justify-between gap-1 md:gap-2 mt-auto pt-4 relative">
+            <div className="absolute w-full border-t border-dashed border-emerald-500/50 flex items-center justify-end pr-1" style={{ bottom: `${(config.horasDia / maxHours) * 100}%` }}>
+              <span className="text-[9px] font-bold text-emerald-500 bg-white dark:bg-slate-900 px-1 -translate-y-1/2">Meta: {config.horasDia}h</span>
+            </div>
+            {last14Days.map((day, i) => {
+              const hours = dailyLogs[day.dateStr] || 0;
+              const heightPerc = (hours / maxHours) * 100;
+              const isToday = i === 13;
+              return (
+                <div key={i} className="flex flex-col items-center flex-1 group">
+                  <div className="w-full h-40 flex items-end justify-center relative">
+                    <div className={`w-full max-w-[24px] rounded-t-md transition-all duration-700 ease-out hover:opacity-80 ${isToday ? themeColors.bg.split(' ')[0] : 'bg-slate-200 dark:bg-slate-700'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '4px' : '0' }}>
+                      <span className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded pointer-events-none transition-opacity z-10">{hours > 0 ? `${hours}h` : '0h'}</span>
+                    </div>
+                  </div>
+                  <span className={`text-[9px] font-bold mt-2 uppercase ${isToday ? themeColors.text.split(' ')[0] : 'text-slate-400'}`}>{day.dayLabel}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
-        <div onClick={onShowLevelMap} className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl shadow-md p-6 text-white flex flex-col justify-between relative overflow-hidden cursor-pointer hover:shadow-orange-500/30 hover:scale-[1.02] transition-all group" title="Clique para ver a Jornada de Aprovação">
-          <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-40 transition-opacity"><Trophy className="w-24 h-24"/></div>
-          <div className="z-10 text-left">
-            <h3 className="font-bold text-amber-100 flex items-center gap-2 text-sm uppercase tracking-wider mb-4"><Flame className="w-4 h-4"/> Olá, {String(config.userName).split(' ')[0]}</h3>
-            <div className="flex items-end gap-2"><span className="text-5xl font-black">{gamification.streak}</span><span className="text-amber-200 font-medium mb-1">Dias Seguidos</span></div>
-            {gamification.streak > 0 ? <p className="text-xs text-amber-100 mt-1">Sua ofensiva está em chamas!</p> : <p className="text-xs text-amber-100 mt-1">Estude hoje para acender a chama.</p>}
-          </div>
-          <div className="mt-6 pt-4 border-t border-amber-400/30 z-10 text-left">
-            <div className="flex justify-between items-end mb-2"><span className="font-bold text-lg flex items-center gap-2">Nível {userLevel.nivel} <span className="text-[9px] bg-amber-900/40 px-2 py-0.5 rounded uppercase group-hover:bg-amber-800/60 transition-colors">Tabela</span></span><span className="text-xs font-bold text-amber-200">{gamification.xp} / {userLevel.max} XP</span></div>
-            <div className="w-full h-2 bg-black/20 rounded-full overflow-hidden"><div className="h-full bg-white transition-all duration-1000" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div></div>
-            <p className="text-[10px] uppercase font-black tracking-widest text-amber-200 mt-2">{userLevel.titulo}</p>
-          </div>
+
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-full min-h-[350px]">
+          <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2 mb-2"><BrainCircuit className="w-5 h-5 text-emerald-500"/> Retenção de Memória</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-8">Precisão do seu cérebro no Deck de Combate (Anki).</p>
+          {totalReviews === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-sm">
+              <PieChart className="w-12 h-12 mb-3 opacity-30"/>
+              <p>Faça revisões para gerar o seu gráfico mental.</p>
+            </div>
+          ) : (
+            <div className="flex flex-col md:flex-row items-center justify-center gap-8 flex-1">
+              <div className="relative w-40 h-40 shrink-0">
+                <div className="w-full h-full rounded-full shadow-inner" style={{ background: `conic-gradient(#10b981 0% ${facilPerc}%, #f59e0b ${facilPerc}% ${facilPerc + bomPerc}%, #ef4444 ${facilPerc + bomPerc}% 100%)` }}></div>
+                <div className="absolute inset-0 m-auto w-28 h-28 bg-white dark:bg-slate-900 rounded-full flex flex-col items-center justify-center shadow-[inset_0_0_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]">
+                  <span className="text-2xl font-black text-slate-800 dark:text-white">{successRate}%</span>
+                  <span className="text-[9px] uppercase font-bold text-slate-400">De Acerto</span>
+                </div>
+              </div>
+              <div className="space-y-4 w-full md:w-auto">
+                <div className="flex items-center justify-between gap-6"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm"></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300">Fácil</span></div><span className="font-black text-slate-800 dark:text-white">{facilPerc}%</span></div>
+                <div className="flex items-center justify-between gap-6"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-amber-500 shadow-sm"></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300">Bom</span></div><span className="font-black text-slate-800 dark:text-white">{bomPerc}%</span></div>
+                <div className="flex items-center justify-between gap-6"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-red-500 shadow-sm"></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300">Difícil</span></div><span className="font-black text-slate-800 dark:text-white">{dificilPerc}%</span></div>
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 mt-2"><p className="text-[10px] uppercase font-bold text-slate-400 text-center">Total de Revisões Realizadas: <strong className="text-indigo-500">{totalReviews}</strong></p></div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8 mt-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
-          <div>
-            <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><CalendarDays className="w-5 h-5 text-emerald-500"/> Mapa de Constância</h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">O seu histórico de disciplina nos últimos 3 meses.</p>
-          </div>
-          <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-400">
-            <span>Menos</span><div className="w-3 h-3 rounded-sm bg-slate-100 dark:bg-slate-800"></div><div className="w-3 h-3 rounded-sm bg-emerald-200 dark:bg-emerald-900/40"></div><div className="w-3 h-3 rounded-sm bg-emerald-300 dark:bg-emerald-700/60"></div><div className="w-3 h-3 rounded-sm bg-emerald-500 dark:bg-emerald-500"></div><div className="w-3 h-3 rounded-sm bg-emerald-700 dark:bg-emerald-400"></div><span>Mais</span>
-          </div>
-        </div>
-        <div className="overflow-x-auto custom-scrollbar pb-2">
-          <div className="min-w-max flex gap-2">
-            <div className="grid grid-rows-7 gap-1 text-[9px] font-bold text-slate-400 pr-2 text-right"><div className="h-3.5 flex items-center justify-end">D</div><div className="h-3.5 flex items-center justify-end">S</div><div className="h-3.5 flex items-center justify-end">T</div><div className="h-3.5 flex items-center justify-end">Q</div><div className="h-3.5 flex items-center justify-end">Q</div><div className="h-3.5 flex items-center justify-end">S</div><div className="h-3.5 flex items-center justify-end">S</div></div>
-            <div className="grid grid-rows-7 grid-flow-col gap-1.5">{heatmapDays.map((day, idx) => (<div key={idx} title={`${day.date}: ${day.hours.toFixed(1)}h estudadas`} className={`w-3.5 h-3.5 rounded-sm transition-all hover:scale-125 cursor-pointer relative ${day.colorClass}`}></div>))}</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-center text-left">
-          <div className="flex items-center gap-3 mb-4"><div className={`p-3 ${themeColors.lightBg.split(' ')[0]} rounded-xl`}><TrendingUp className={`w-6 h-6 ${themeColors.text.split(' ')[0]}`}/></div><div><h3 className="font-bold text-lg text-slate-800 dark:text-white">Domínio da Trilha</h3><p className="text-xs text-slate-500">Progresso de Consolidação</p></div></div>
-          <div className="flex items-end gap-3 mb-2"><span className="text-4xl font-black text-slate-800 dark:text-white">{progressPerc}%</span><span className="text-sm font-bold text-slate-400 mb-1">Consolidado</span></div>
-          <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-3"><div className={`h-full transition-all duration-1000 ${themeColors.bg.split(' ')[0]}`} style={{ width: `${progressPerc}%` }}></div></div>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Continue a fechar tópicos para consolidar a sua aprovação.</p>
-        </div>
-
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 text-left">
-          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-4">Próximos Passos</h3>
-          <div className="space-y-3">
-            <button onClick={() => setActiveTab('revisoes')} className="w-full flex items-center justify-between p-4 rounded-xl border border-red-100 dark:border-red-900/30 bg-red-50 dark:bg-red-900/10 hover:bg-red-100 dark:hover:bg-red-900/20 transition-colors group cursor-pointer">
-              <div className="flex items-center gap-3"><div className="p-2 bg-red-200 dark:bg-red-800 rounded-lg group-hover:scale-110 transition-transform"><BrainCircuit className="w-5 h-5 text-red-700 dark:text-red-300"/></div><div className="text-left"><span className="block font-bold text-red-900 dark:text-red-300">Revisão Inteligente</span><span className="text-xs text-red-700 dark:text-red-400">Lute contra o esquecimento.</span></div></div>
-              <span className="font-black text-xl text-red-600 dark:text-red-400">{pendingReviewsCount}</span>
-            </button>
-            <button onClick={() => setActiveTab('planner')} className="w-full flex items-center justify-between p-4 rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50 dark:bg-emerald-900/10 hover:bg-emerald-100 dark:hover:bg-emerald-900/20 transition-colors group cursor-pointer">
-              <div className="flex items-center gap-3"><div className="p-2 bg-emerald-200 dark:bg-emerald-800 rounded-lg group-hover:scale-110 transition-transform"><LayoutGrid className="w-5 h-5 text-emerald-700 dark:text-emerald-300"/></div><div className="text-left"><span className="block font-bold text-emerald-900 dark:text-emerald-300">Metas da Semana</span><span className="text-xs text-emerald-700 dark:text-emerald-400">Gerenciar e criar novas Sprints.</span></div></div>
-              <span className="font-black text-xl text-emerald-600 dark:text-emerald-400">{Math.ceil(customSprint.length / 2)} Sprints</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
+      {/* LINHA 3: MAPA E RADAR */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 items-stretch">
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8 flex flex-col h-full min-h-[400px]">
-          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-8 flex items-center gap-2 shrink-0"><Filter className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> O Funil da Aprovação</h3>
-          <div className="flex-1 flex flex-col justify-center space-y-8 w-full">
-            <div className="w-full group"><div className="flex justify-between items-end mb-3"><div className="flex items-center gap-3"><div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl text-blue-600 dark:text-blue-400"><BookOpen className="w-5 h-5" /></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">1. Teoria</span></div><div className="text-right"><span className="text-xl font-black text-slate-800 dark:text-white">{percTeoria}%</span><span className="text-[10px] text-slate-500 block uppercase font-bold tracking-widest">{countTeoria}/{totalAssuntos} Feitos</span></div></div><div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-blue-500 transition-all duration-1000 rounded-full" style={{width: `${percTeoria}%`}}></div></div></div>
-            <div className="w-full group"><div className="flex justify-between items-end mb-3"><div className="flex items-center gap-3"><div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl text-purple-600 dark:text-purple-400"><Target className="w-5 h-5" /></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">2. Questões</span></div><div className="text-right"><span className="text-xl font-black text-slate-800 dark:text-white">{percQuestoes}%</span><span className="text-[10px] text-slate-500 block uppercase font-bold tracking-widest">{countQuestoes}/{totalAssuntos} Feitos</span></div></div><div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-purple-500 transition-all duration-1000 rounded-full" style={{width: `${percQuestoes}%`}}></div></div></div>
-            <div className="w-full group"><div className="flex justify-between items-end mb-3"><div className="flex items-center gap-3"><div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl text-emerald-600 dark:text-emerald-400"><RefreshCcw className="w-5 h-5" /></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">3. Revisões</span></div><div className="text-right"><span className="text-xl font-black text-slate-800 dark:text-white">{percRevisao}%</span><span className="text-[10px] text-slate-500 block uppercase font-bold tracking-widest">{countRevisao}/{totalAssuntos} Feitos</span></div></div><div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-emerald-500 transition-all duration-1000 rounded-full" style={{width: `${percRevisao}%`}}></div></div></div>
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8 mt-0">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+            <div>
+              <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><CalendarDays className="w-5 h-5 text-emerald-500"/> Mapa de Constância</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">O seu histórico nos últimos 3 meses.</p>
+            </div>
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-400">
+              <span>Menos</span><div className="w-3 h-3 rounded-sm bg-slate-100 dark:bg-slate-800"></div><div className="w-3 h-3 rounded-sm bg-emerald-200 dark:bg-emerald-900/40"></div><div className="w-3 h-3 rounded-sm bg-emerald-300 dark:bg-emerald-700/60"></div><div className="w-3 h-3 rounded-sm bg-emerald-500 dark:bg-emerald-500"></div><div className="w-3 h-3 rounded-sm bg-emerald-700 dark:bg-emerald-400"></div><span>Mais</span>
+            </div>
+          </div>
+          <div className="overflow-x-auto custom-scrollbar pb-2">
+            <div className="min-w-max flex gap-2">
+              <div className="grid grid-rows-7 gap-1 text-[9px] font-bold text-slate-400 pr-2 text-right"><div className="h-3.5 flex items-center justify-end">D</div><div className="h-3.5 flex items-center justify-end">S</div><div className="h-3.5 flex items-center justify-end">T</div><div className="h-3.5 flex items-center justify-end">Q</div><div className="h-3.5 flex items-center justify-end">Q</div><div className="h-3.5 flex items-center justify-end">S</div><div className="h-3.5 flex items-center justify-end">S</div></div>
+              <div className="grid grid-rows-7 grid-flow-col gap-1.5">{heatmapDays.map((day, idx) => (<div key={idx} title={`${day.date}: ${day.hours.toFixed(1)}h estudadas`} className={`w-3.5 h-3.5 rounded-sm transition-all hover:scale-125 cursor-pointer relative ${day.colorClass}`}></div>))}</div>
+            </div>
           </div>
         </div>
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8 flex flex-col h-full min-h-[400px] max-h-[500px]">
-          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-6 flex items-center gap-2 shrink-0"><Activity className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Raio-X por Disciplina</h3>
+
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8 flex flex-col h-full min-h-[350px] max-h-[450px]">
+          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-6 flex items-center gap-2 shrink-0"><Filter className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Raio-X por Disciplina</h3>
           <div className="space-y-6 flex-1 overflow-y-auto pr-4 custom-scrollbar">
             {radarData.length === 0 ? <div className="text-sm text-slate-400 flex items-center justify-center h-full">Nenhuma disciplina cadastrada.</div> : radarData.map(disc => (<div key={disc.id} className="group"><div className="flex justify-between items-end mb-2"><span className={`text-sm font-bold text-slate-700 dark:text-slate-300 truncate pr-2 hover:${themeColors.text.split(' ')[0]} transition-colors`}>{disc.nome}</span><span className="text-sm font-black text-slate-800 dark:text-white shrink-0">{disc.perc}%</span></div><div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div className={`h-full transition-all duration-1000 rounded-full ${disc.perc === 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : themeColors.bg.split(' ')[0]}`} style={{width: `${disc.perc}%`}}></div></div></div>))}
           </div>
@@ -1346,28 +1390,31 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
         </div>
       </header>
 
-      <div className={`p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between transition-all duration-500 shadow-lg border-2 ${isPomodoroActive && !isPomodoroBreak ? `${themeColors.bg.split(' ')[0]} border-transparent ${themeColors.solidText.split(' ')[0]} scale-[1.01]` : isPomodoroBreak ? 'bg-emerald-500 border-emerald-400 text-white scale-[1.01]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
-        <div className="flex items-center gap-4 mb-4 md:mb-0">
-          <div className={`p-3 rounded-full ${isPomodoroActive ? 'bg-white/20' : `${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]}`}`}>
-            {isPomodoroBreak ? <Coffee className="w-8 h-8" /> : <Clock className="w-8 h-8" />}
-          </div>
-          <div>
-            <h3 className={`font-black text-xl ${!isPomodoroActive ? 'text-slate-800 dark:text-white' : ''}`}>{isPomodoroBreak ? 'Pausa Merecida' : 'Modo Imersão (Pomodoro)'}</h3>
-            <p className={`text-sm font-medium ${!isPomodoroActive ? 'text-slate-500 dark:text-slate-400' : 'opacity-80'}`}>{isPomodoroBreak ? 'O tempo foi registado! Relaxe a mente por 10 minutos.' : 'Foque na Sprint por 50 min. Registo automático!'}</p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-6">
-          <span className="font-mono text-5xl font-black tracking-tighter">{formatTime(pomodoroTime)}</span>
-          <div className="flex flex-col gap-2">
-            <button onClick={togglePomodoro} className={`p-3 rounded-xl transition-all hover:scale-105 shadow-sm cursor-pointer ${isPomodoroActive ? `bg-white ${appTheme === 'caveira' ? 'text-amber-600' : 'text-slate-900'}` : themeColors.button}`}>
-              {isPomodoroActive ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
-            </button>
-            <button onClick={resetPomodoro} className={`p-2 rounded-xl transition-all hover:scale-105 cursor-pointer ${isPomodoroActive ? 'bg-white/20 hover:bg-white/30 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200'}`}>
-              <RefreshCcw className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+      {/* NOVO WIDGET POMODORO (SLIM & MINIMALISTA) */}
+      <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl shadow-sm mb-6">
+         <div className="flex items-center gap-3">
+           <div className={`p-2 rounded-xl transition-colors duration-500 ${isPomodoroActive && !isPomodoroBreak ? `${themeColors.bg.split(' ')[0]} text-white animate-pulse shadow-md` : isPomodoroBreak ? 'bg-emerald-500 text-white animate-pulse shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
+             {isPomodoroBreak ? <Coffee className="w-5 h-5" /> : <Clock className="w-5 h-5" />}
+           </div>
+           <div className="hidden sm:block">
+             <h3 className="font-bold text-sm text-slate-800 dark:text-white leading-none">{isPomodoroBreak ? 'Pausa' : 'Modo Foco'}</h3>
+             <span className="text-[10px] text-slate-500 font-medium">50min Estudo / 10min Pausa</span>
+           </div>
+         </div>
+         
+         <div className="flex items-center gap-4 pr-1">
+           <span className={`font-mono text-3xl font-black tracking-tighter w-24 text-center transition-colors duration-500 ${isPomodoroActive && !isPomodoroBreak ? themeColors.text.split(' ')[0] : isPomodoroBreak ? 'text-emerald-500' : 'text-slate-800 dark:text-white'}`}>
+             {formatTime(pomodoroTime)}
+           </span>
+           <div className="flex gap-2">
+             <button onClick={togglePomodoro} className={`p-2.5 rounded-xl shadow-sm transition-transform hover:scale-105 cursor-pointer ${isPomodoroActive ? 'bg-slate-800 text-white dark:bg-slate-700' : themeColors.button}`}>
+               {isPomodoroActive ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
+             </button>
+             <button onClick={resetPomodoro} className="p-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl transition-transform hover:scale-105 cursor-pointer" title="Reiniciar">
+               <RefreshCcw className="w-4 h-4" />
+             </button>
+           </div>
+         </div>
       </div>
 
       {sprintGroups.length === 0 ? (
@@ -1432,6 +1479,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                       </div>
                     )
                   })}
+                  {/* Placeholder */}
                   {group.length === 1 && (
                     <div className="rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 opacity-60 p-5">
                       <Target className="w-8 h-8 mb-2" />
@@ -1481,7 +1529,7 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in text-left">
+    <div className="space-y-6 animate-in fade-in text-left pb-10">
       <header className="border-b border-slate-200 dark:border-slate-800 pb-4">
         <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
           <BrainCircuit className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Revisão Inteligente
@@ -1515,6 +1563,8 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
                       </a>
                     )}
                   </div>
+                  
+                  {/* BOTÕES INLINE DE REVISÃO */}
                   <div className="grid grid-cols-3 gap-2 mt-1 pt-3 border-t border-slate-100 dark:border-slate-800">
                     <button onClick={() => handleReviewFeedback(data.id, 'dificil')} className="py-2.5 px-1 bg-red-50 hover:bg-red-500 text-red-600 hover:text-white dark:bg-red-900/10 dark:hover:bg-red-600 dark:text-red-400 rounded-lg text-[11px] font-black uppercase tracking-wide transition-colors flex flex-col items-center gap-0.5 cursor-pointer">
                       <span>Difícil</span><span className="text-[8px] font-bold opacity-70">Amanhã</span>
@@ -1569,7 +1619,7 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
 // ==========================================
 // ABA NOVA: PAINEL DE CONTROLE (ADMINISTRAÇÃO)
 // ==========================================
-function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gamification, setGamification, edital, setEdital, customSprint, setCustomSprint, initialEdital, sprintsCompleted, setSprintsCompleted, dailyLogs, setDailyLogs, themeColors, playLevelUpSound }) {
+function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gamification, setGamification, edital, setEdital, customSprint, setCustomSprint, initialEdital, sprintsCompleted, setSprintsCompleted, dailyLogs, setDailyLogs, reviewStats, themeColors, playLevelUpSound }) {
   const [localConfig, setLocalConfig] = useState({
     ...config,
     revBom: config.revBom || 7,
@@ -1594,6 +1644,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
       sprints: customSprint,
       edital: edital,
       logs: dailyLogs,
+      reviewStats: reviewStats,
       exportDate: new Date().toISOString()
     };
     
@@ -1661,17 +1712,16 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in text-left">
-      <header className="border-b border-slate-200 dark:border-slate-800 pb-4 flex justify-between items-end">
+    <div className="space-y-8 animate-in fade-in text-left pb-10">
+      <header className="border-b border-slate-200 dark:border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
           <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
             <Settings className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Painel de Controle
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Personalize o seu sistema, ajuste o algoritmo e faça backups.</p>
         </div>
-        <div className="flex gap-3">
-          {/* Botão de Sair removido daqui e passado para a Sidebar */}
-          <button onClick={handleSave} className={`${themeColors.button} px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all cursor-pointer`}>
+        <div className="flex gap-3 w-full md:w-auto">
+          <button onClick={handleSave} className={`w-full md:w-auto ${themeColors.button} px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer`}>
             <Save className="w-5 h-5"/> Salvar Alterações
           </button>
         </div>
@@ -1838,7 +1888,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                   min="1"
                   value={localConfig.revBom} 
                   onChange={e => setLocalConfig({...localConfig, revBom: parseInt(e.target.value)})}
-                  className="w-20 p-3 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/10 text-amber-800 dark:text-amber-200 outline-none focus:border-amber-500 transition-colors font-black text-center"
+                  className="w-full p-3 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/10 text-amber-800 dark:text-amber-200 outline-none focus:border-amber-500 transition-colors font-black text-center"
                 />
                 <span className="text-sm font-bold text-slate-400">Dias</span>
               </div>
@@ -1852,7 +1902,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                   min="2"
                   value={localConfig.revFacil} 
                   onChange={e => setLocalConfig({...localConfig, revFacil: parseInt(e.target.value)})}
-                  className="w-20 p-3 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-900/10 text-emerald-800 dark:text-emerald-200 outline-none focus:border-emerald-500 transition-colors font-black text-center"
+                  className="w-full p-3 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-900/10 text-emerald-800 dark:text-emerald-200 outline-none focus:border-emerald-500 transition-colors font-black text-center"
                 />
                 <span className="text-sm font-bold text-slate-400">Dias</span>
               </div>
