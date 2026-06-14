@@ -440,63 +440,100 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
       </div>
 
       {/* LINHA 3: FUNIL DA APROVAÇÃO E RADAR DE DISCIPLINAS */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 items-stretch">
+        
         {/* Funil da Aprovação */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col">
-          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8 flex flex-col h-full min-h-[400px]">
+          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-8 flex items-center gap-2 shrink-0">
             <Filter className="w-5 h-5 text-blue-500"/> O Funil da Aprovação
           </h3>
-          <div className="flex-1 flex flex-col justify-center space-y-6 w-full max-w-md mx-auto">
-            {/* Teoria */}
-            <div className="w-full">
-              <div className="flex justify-between text-xs font-black uppercase tracking-wider mb-2">
-                <span className="text-blue-600 dark:text-blue-400">1. Teoria</span>
-                <span className="text-slate-500">{countTeoria}/{totalAssuntos} ({percTeoria}%)</span>
+          <div className="flex-1 flex flex-col justify-center space-y-8 w-full">
+            
+            {/* 1. Teoria */}
+            <div className="w-full group">
+              <div className="flex justify-between items-end mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-xl text-blue-600 dark:text-blue-400">
+                    <BookOpen className="w-5 h-5" />
+                  </div>
+                  <span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">1. Teoria</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-xl font-black text-slate-800 dark:text-white">{percTeoria}%</span>
+                  <span className="text-[10px] text-slate-500 block uppercase font-bold tracking-widest">{countTeoria}/{totalAssuntos} Feitos</span>
+                </div>
               </div>
-              <div className="h-4 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full bg-blue-500 transition-all duration-1000" style={{width: `${percTeoria}%`}}></div>
-              </div>
-            </div>
-            {/* Questões */}
-            <div className="w-[90%] mx-auto">
-              <div className="flex justify-between text-xs font-black uppercase tracking-wider mb-2">
-                <span className="text-purple-600 dark:text-purple-400">2. Questões</span>
-                <span className="text-slate-500">{countQuestoes}/{totalAssuntos} ({percQuestoes}%)</span>
-              </div>
-              <div className="h-4 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full bg-purple-500 transition-all duration-1000" style={{width: `${percQuestoes}%`}}></div>
-              </div>
-            </div>
-            {/* Revisões */}
-            <div className="w-[80%] mx-auto">
-              <div className="flex justify-between text-xs font-black uppercase tracking-wider mb-2">
-                <span className="text-emerald-600 dark:text-emerald-400">3. Revisões</span>
-                <span className="text-slate-500">{countRevisao}/{totalAssuntos} ({percRevisao}%)</span>
-              </div>
-              <div className="h-4 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                <div className="h-full bg-emerald-500 transition-all duration-1000" style={{width: `${percRevisao}%`}}></div>
+              <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-blue-500 transition-all duration-1000 rounded-full" style={{width: `${percTeoria}%`}}></div>
               </div>
             </div>
+
+            {/* 2. Questões */}
+            <div className="w-full group">
+              <div className="flex justify-between items-end mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-purple-100 dark:bg-purple-900/30 rounded-xl text-purple-600 dark:text-purple-400">
+                    <Target className="w-5 h-5" />
+                  </div>
+                  <span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">2. Questões</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-xl font-black text-slate-800 dark:text-white">{percQuestoes}%</span>
+                  <span className="text-[10px] text-slate-500 block uppercase font-bold tracking-widest">{countQuestoes}/{totalAssuntos} Feitos</span>
+                </div>
+              </div>
+              <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-purple-500 transition-all duration-1000 rounded-full" style={{width: `${percQuestoes}%`}}></div>
+              </div>
+            </div>
+
+            {/* 3. Revisões */}
+            <div className="w-full group">
+              <div className="flex justify-between items-end mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl text-emerald-600 dark:text-emerald-400">
+                    <RefreshCcw className="w-5 h-5" />
+                  </div>
+                  <span className="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wide">3. Revisões</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-xl font-black text-slate-800 dark:text-white">{percRevisao}%</span>
+                  <span className="text-[10px] text-slate-500 block uppercase font-bold tracking-widest">{countRevisao}/{totalAssuntos} Feitos</span>
+                </div>
+              </div>
+              <div className="h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-full bg-emerald-500 transition-all duration-1000 rounded-full" style={{width: `${percRevisao}%`}}></div>
+              </div>
+            </div>
+
           </div>
         </div>
 
         {/* Radar de Disciplinas */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col">
-          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8 flex flex-col h-full min-h-[400px] max-h-[500px]">
+          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-6 flex items-center gap-2 shrink-0">
             <Activity className="w-5 h-5 text-indigo-500"/> Raio-X por Disciplina
           </h3>
-          <div className="space-y-5 flex-1 overflow-y-auto pr-2 custom-scrollbar">
-            {radarData.map(disc => (
-              <div key={disc.id}>
-                <div className="flex justify-between text-xs font-bold mb-1.5">
-                  <span className="text-slate-700 dark:text-slate-300 truncate pr-2">{disc.nome}</span>
-                  <span className="text-slate-500 shrink-0 font-black">{disc.perc}%</span>
+          
+          <div className="space-y-6 flex-1 overflow-y-auto pr-4 custom-scrollbar">
+            {radarData.length === 0 ? (
+               <div className="text-sm text-slate-400 flex items-center justify-center h-full">Nenhuma disciplina cadastrada.</div>
+            ) : (
+              radarData.map(disc => (
+                <div key={disc.id} className="group">
+                  <div className="flex justify-between items-end mb-2">
+                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate pr-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{disc.nome}</span>
+                    <span className="text-sm font-black text-slate-800 dark:text-white shrink-0">{disc.perc}%</span>
+                  </div>
+                  <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full transition-all duration-1000 rounded-full ${disc.perc === 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-gradient-to-r from-indigo-500 to-blue-500'}`} 
+                      style={{width: `${disc.perc}%`}}
+                    ></div>
+                  </div>
                 </div>
-                <div className="h-2.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                  <div className={`h-full transition-all duration-1000 ${disc.perc === 100 ? 'bg-emerald-500' : 'bg-indigo-500'}`} style={{width: `${disc.perc}%`}}></div>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -565,6 +602,80 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
         return disc;
       })
     })));
+  };
+
+  const handleEditBlocoNome = (blocoId, newNome) => {
+    setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, nome: newNome } : b));
+  };
+
+  const handleDeleteBlocoClick = (blocoId) => {
+    if (confirmDeleteId === `bloco_${blocoId}`) {
+      setEdital(prev => prev.filter(b => b.id !== blocoId));
+      setConfirmDeleteId(null);
+    } else {
+      setConfirmDeleteId(`bloco_${blocoId}`);
+      setTimeout(() => setConfirmDeleteId(null), 3000);
+    }
+  };
+
+  const handleAddBloco = () => {
+    const newBloco = {
+      id: `b_${Date.now()}`,
+      nome: 'Novo Bloco de Matérias',
+      icone: 'Layers',
+      disciplinas: []
+    };
+    setEdital(prev => [...prev, newBloco]);
+  };
+
+  const handleEditDiscNome = (blocoId, discId, newNome) => {
+    setEdital(prev => prev.map(b => b.id === blocoId ? {
+      ...b,
+      disciplinas: b.disciplinas.map(d => d.id === discId ? { ...d, nome: newNome } : d)
+    } : b));
+  };
+
+  const handleDeleteDisciplinaClick = (blocoId, discId) => {
+    if (confirmDeleteId === `disc_${discId}`) {
+      setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: b.disciplinas.filter(d => d.id !== discId) } : b));
+      setConfirmDeleteId(null);
+    } else {
+      setConfirmDeleteId(`disc_${discId}`);
+      setTimeout(() => setConfirmDeleteId(null), 3000);
+    }
+  };
+
+  const handleAddDisciplina = (blocoId) => {
+    const newDisc = {
+      id: `d_${Date.now()}`,
+      nome: 'Nova Disciplina',
+      cor: 'text-indigo-700 bg-indigo-100',
+      assuntos: []
+    };
+    setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: [...b.disciplinas, newDisc] } : b));
+  };
+
+  const handleMoveBloco = (blocoIndex, direction) => {
+    setEdital(prev => {
+      if (blocoIndex + direction < 0 || blocoIndex + direction >= prev.length) return prev;
+      const newEdital = [...prev];
+      const temp = newEdital[blocoIndex];
+      newEdital[blocoIndex] = newEdital[blocoIndex + direction];
+      newEdital[blocoIndex + direction] = temp;
+      return newEdital;
+    });
+  };
+
+  const handleMoveDisciplina = (blocoId, discIndex, direction) => {
+    setEdital(prev => prev.map(b => {
+      if (b.id !== blocoId) return b;
+      if (discIndex + direction < 0 || discIndex + direction >= b.disciplinas.length) return b;
+      const newDisciplinas = [...b.disciplinas];
+      const temp = newDisciplinas[discIndex];
+      newDisciplinas[discIndex] = newDisciplinas[discIndex + direction];
+      newDisciplinas[discIndex + direction] = temp;
+      return { ...b, disciplinas: newDisciplinas };
+    }));
   };
 
   const handleDeleteClick = (discId, assId) => {
@@ -731,14 +842,38 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
         </div>
 
         <div className="flex flex-col gap-6">
-          {edital.map((bloco) => (
+          {edital.map((bloco, bIndex) => (
             <div key={bloco.id} className="border-b border-slate-100 dark:border-slate-800 pb-6 last:border-0 last:pb-0">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 mb-4">
-                <Layers className="w-5 h-5 text-indigo-500"/>
-                <span className="font-black text-xl text-slate-800 dark:text-slate-200 uppercase tracking-tight">{bloco.nome}</span>
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 mb-4 group">
+                <Layers className="w-5 h-5 text-indigo-500 shrink-0"/>
+                {isEditing ? (
+                  <input 
+                    type="text" 
+                    value={bloco.nome} 
+                    onChange={(e) => handleEditBlocoNome(bloco.id, e.target.value)} 
+                    className="flex-1 font-black text-xl text-slate-800 dark:text-slate-200 uppercase tracking-tight bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 rounded px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500/50 w-full"
+                  />
+                ) : (
+                  <span className="flex-1 font-black text-xl text-slate-800 dark:text-slate-200 uppercase tracking-tight">{bloco.nome}</span>
+                )}
+                
+                {isEditing && (
+                  <div className="flex items-center gap-1 shrink-0 ml-2">
+                    <button onClick={() => handleMoveBloco(bIndex, -1)} disabled={bIndex === 0} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors disabled:opacity-30 cursor-pointer" title="Mover para Cima">
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleMoveBloco(bIndex, 1)} disabled={bIndex === edital.length - 1} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors disabled:opacity-30 cursor-pointer" title="Mover para Baixo">
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDeleteBlocoClick(bloco.id)} className={`p-2 rounded-lg transition-colors cursor-pointer flex items-center gap-1 font-bold text-xs ${confirmDeleteId === 'bloco_' + bloco.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Bloco Inteiro">
+                      <Trash2 className="w-4 h-4" />
+                      {confirmDeleteId === `bloco_${bloco.id}` && "Confirmar"}
+                    </button>
+                  </div>
+                )}
               </div>
               <div className="space-y-3">
-                {bloco.disciplinas.map((disc) => {
+                {bloco.disciplinas.map((disc, dIndex) => {
                   const totalAssuntosDisc = disc.assuntos.length;
                   const concluidosAssuntosDisc = disc.assuntos.filter(a => isFullyMastered(a.id)).length;
                   const percConcluidoDisc = totalAssuntosDisc === 0 ? 0 : Math.round((concluidosAssuntosDisc / totalAssuntosDisc) * 100);
@@ -746,13 +881,38 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
 
                   return (
                     <div key={disc.id}>
-                      <div onClick={() => toggleNode(disc.id)} className="flex items-center gap-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 p-3 rounded-lg select-none border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 transition-colors">
-                        {expanded[disc.id] ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
-                        <FolderOpen className={`w-5 h-5 ${disc.cor?.split(' ')[0] || 'text-slate-500'}`} />
-                        <span className="font-bold text-base text-slate-700 dark:text-slate-300">{disc.nome}</span>
+                      <div className="flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 p-3 rounded-lg select-none border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 transition-colors">
+                        {isEditing && (
+                          <div className="flex flex-col gap-0.5 shrink-0 mr-1">
+                            <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, -1); }} disabled={dIndex === 0} className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-md transition-colors disabled:opacity-30 cursor-pointer" title="Sobe">
+                              <ChevronUp className="w-4 h-4" />
+                            </button>
+                            <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, 1); }} disabled={dIndex === bloco.disciplinas.length - 1} className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-md transition-colors disabled:opacity-30 cursor-pointer" title="Desce">
+                              <ChevronDown className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
+                        
+                        <div onClick={() => !isEditing && toggleNode(disc.id)} className={`flex flex-1 items-center gap-2 ${!isEditing ? 'cursor-pointer' : ''}`}>
+                          <div onClick={(e) => { if(isEditing) { e.stopPropagation(); toggleNode(disc.id); } }} className="cursor-pointer flex items-center justify-center">
+                            {expanded[disc.id] ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
+                          </div>
+                          <FolderOpen className={`w-5 h-5 shrink-0 ${disc.cor?.split(' ')[0] || 'text-slate-500'}`} />
+                          
+                          {isEditing ? (
+                            <input 
+                              type="text" 
+                              value={disc.nome} 
+                              onChange={(e) => handleEditDiscNome(bloco.id, disc.id, e.target.value)} 
+                              className="font-bold text-base text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 border border-indigo-300 dark:border-indigo-700 rounded px-2 py-0.5 outline-none focus:ring-2 focus:ring-indigo-500/50 w-full"
+                            />
+                          ) : (
+                            <span className="font-bold text-base text-slate-700 dark:text-slate-300 flex-1">{disc.nome}</span>
+                          )}
+                        </div>
                         
                         {/* NOVO: CHECKLIST GAMIFICADO NA TRILHA */}
-                        <div className="ml-3 flex items-center gap-2 bg-white dark:bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div className="ml-3 flex items-center gap-2 bg-white dark:bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm shrink-0">
                           <span className={`text-[10px] font-black uppercase tracking-wider ${isDiscMastered ? 'text-emerald-500' : 'text-slate-500'}`}>
                             {concluidosAssuntosDisc}/{totalAssuntosDisc} Concluídos
                           </span>
@@ -760,6 +920,13 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                             <div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${percConcluidoDisc}%` }}></div>
                           </div>
                         </div>
+
+                        {isEditing && (
+                          <button onClick={(e) => { e.stopPropagation(); handleDeleteDisciplinaClick(bloco.id, disc.id); }} className={`ml-2 p-2 rounded-lg cursor-pointer transition-colors shrink-0 flex items-center gap-1 font-bold text-xs ${confirmDeleteId === 'disc_' + disc.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Disciplina Inteira">
+                            <Trash2 className="w-4 h-4" />
+                            {confirmDeleteId === `disc_${disc.id}` && "Confirmar"}
+                          </button>
+                        )}
                       </div>
 
                       {expanded[disc.id] && (
@@ -821,19 +988,19 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                                     )}
                                     
                                     <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-2">
-                                    <span className={`font-bold transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500 decoration-2' : 'text-slate-700 dark:text-slate-300'} ${assunto.indent > 0 ? 'text-sm' : 'text-base'}`}>{assunto.titulo}</span>
-                                    
-                                    <div className="flex gap-2 items-center">
-                                      {!isEditing && memoryHealth && (
-                                        <div className={`flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md font-bold tracking-wider ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória">
-                                          <Thermometer className="w-3 h-3"/> {memoryHealth.label}
-                                        </div>
-                                      )}
-                                      {isEditing && assunto.linkTec && <span className="text-[10px] text-blue-500 dark:text-blue-400 flex items-center gap-1"><Link className="w-3 h-3"/> Link TEC</span>}
+                                      <span className={`font-bold transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500 decoration-2' : 'text-slate-700 dark:text-slate-300'} ${assunto.indent > 0 ? 'text-sm' : 'text-base'}`}>{assunto.titulo}</span>
+                                      
+                                      <div className="flex gap-2 items-center">
+                                        {!isEditing && memoryHealth && (
+                                          <div className={`flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md font-bold tracking-wider ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória">
+                                            <Thermometer className="w-3 h-3"/> {memoryHealth.label}
+                                          </div>
+                                        )}
+                                        {isEditing && assunto.linkTec && <span className="text-[10px] text-blue-500 dark:text-blue-400 flex items-center gap-1"><Link className="w-3 h-3"/> Link TEC</span>}
+                                      </div>
                                     </div>
-                                  </div>
-                                  
-                                  {!isEditing && (
+                                    
+                                    {!isEditing && (
                                       <button 
                                         onClick={() => {
                                           if (mastered && !isInSprint) resetProgress(assunto.id);
@@ -917,9 +1084,25 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                     </div>
                   );
                 })}
+                
+                {isEditing && (
+                  <div className="mt-4 pt-2">
+                    <button onClick={() => handleAddDisciplina(bloco.id)} className="w-full flex items-center justify-center gap-2 text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 px-4 py-3 rounded-xl transition-colors border border-indigo-200 dark:border-indigo-800/50 border-dashed cursor-pointer">
+                      <Plus className="w-4 h-4"/> Adicionar Nova Disciplina
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           ))}
+          
+          {isEditing && (
+            <div className="border-t-2 border-dashed border-slate-200 dark:border-slate-700 pt-6 mt-4">
+              <button onClick={handleAddBloco} className="w-full flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 bg-slate-50 hover:bg-indigo-50 dark:bg-slate-800/50 dark:hover:bg-indigo-900/20 px-6 py-4 rounded-2xl transition-colors border-2 border-dashed border-slate-300 hover:border-indigo-300 dark:border-slate-700 dark:hover:border-indigo-700 cursor-pointer">
+                <Layers className="w-5 h-5"/> Criar Novo Bloco de Matérias
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
