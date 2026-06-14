@@ -266,6 +266,7 @@ const AuthScreen = ({ auth }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [accessCode, setAccessCode] = useState(''); // NOVO: Estado do Código de Convite
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -273,6 +274,14 @@ const AuthScreen = ({ auth }) => {
     e.preventDefault();
     setError('');
     setLoading(true);
+    
+    // NOVO: Barreira de Segurança para Novos Registos
+    if (!isLogin && accessCode !== 'APROVADO2026') {
+      setError('Código de convite inválido. Acesso restrito ao Comandante.');
+      setLoading(false);
+      return;
+    }
+
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, email, password);
@@ -325,6 +334,17 @@ const AuthScreen = ({ auth }) => {
               placeholder="••••••••" 
             />
           </div>
+          
+          {!isLogin && (
+            <div className="animate-in fade-in slide-in-from-top-2">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-amber-500 mb-1.5 block ml-1 flex items-center gap-1"><ShieldAlert className="w-3 h-3"/> Código de Convite (Acesso Restrito)</label>
+              <input 
+                type="text" required={!isLogin} value={accessCode} onChange={e => setAccessCode(e.target.value)} 
+                className="w-full p-4 rounded-xl bg-slate-950 border border-amber-500/50 text-amber-500 outline-none focus:border-amber-400 transition-colors shadow-inner font-black tracking-widest uppercase" 
+                placeholder="Insira o código secreto..." 
+              />
+            </div>
+          )}
           
           {error && <p className="text-red-400 text-xs font-bold bg-red-400/10 p-3 rounded-lg flex items-center gap-2"><AlertTriangle className="w-4 h-4"/>{error}</p>}
 
@@ -664,6 +684,22 @@ export default function App() {
               </div>
             ))}
           </nav>
+
+          {/* NOVO: BOTÃO DE SAIR NA BARRA LATERAL */}
+          {user && (
+            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 mt-auto">
+              <button 
+                onClick={() => {
+                  if(window.confirm('Tem certeza que deseja trancar o sistema e sair?')) {
+                    auth && signOut(auth);
+                  }
+                }} 
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors font-bold text-sm cursor-pointer"
+              >
+                <Lock className="w-4 h-4" /> Trancar Sistema
+              </button>
+            </div>
+          )}
         </aside>
 
         <main className="flex-1 p-6 md:p-8 overflow-y-auto pb-24 text-left">
@@ -1558,9 +1594,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
           <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Personalize o seu sistema, ajuste o algoritmo e faça backups.</p>
         </div>
         <div className="flex gap-3">
-          <button onClick={() => auth && signOut(auth)} className="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer shadow-lg">
-            <Lock className="w-5 h-5"/> Sair da Conta
-          </button>
+          {/* Botão de Sair removido daqui e passado para a Sidebar */}
           <button onClick={handleSave} className={`${themeColors.button} px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all cursor-pointer`}>
             <Save className="w-5 h-5"/> Salvar Alterações
           </button>
