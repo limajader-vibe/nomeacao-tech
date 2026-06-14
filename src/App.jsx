@@ -324,7 +324,7 @@ export default function App() {
             {activeTab === 'planner' && <TabPlanner customSprint={customSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} />}
             {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} pomodoroTime={pomodoroTime} isPomodoroActive={isPomodoroActive} isPomodoroBreak={isPomodoroBreak} togglePomodoro={togglePomodoro} resetPomodoro={resetPomodoro} />}
             {activeTab === 'revisoes' && <TabDeckAnki progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} />}
-            {activeTab === 'admin' && <TabAdmin config={projectConfig} setConfig={setProjectConfig} setUserProgress={setUserProgress} setGamification={setGamification} setEdital={setEdital} setCustomSprint={setCustomSprint} initialEdital={initialEdital} />}
+            {activeTab === 'admin' && <TabAdmin config={projectConfig} setConfig={setProjectConfig} setUserProgress={setUserProgress} setGamification={setGamification} setEdital={setEdital} setCustomSprint={setCustomSprint} initialEdital={initialEdital} setSprintsCompleted={setSprintsCompleted} setDailyLogs={setDailyLogs} />}
           </div>
         </main>
       </div>
@@ -1681,7 +1681,7 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
 // ==========================================
 // ABA ADMIN
 // ==========================================
-function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdital, setCustomSprint, initialEdital }) {
+function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdital, setCustomSprint, initialEdital, setSprintsCompleted, setDailyLogs }) {
   const [localConfig, setLocalConfig] = useState({
     ...config,
     revBom: config.revBom || 7,
@@ -1739,6 +1739,7 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
       setUserProgress({});
       setGamification(prev => ({ ...prev, xp: 0, streak: 0 }));
       setCustomSprint([]);
+      setSprintsCompleted(0);
       setConfirmResetProgress(false);
       alert("Progresso, gamificação e fila de sprints foram limpos!");
     } else {
@@ -1752,6 +1753,8 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
       setUserProgress({});
       setGamification(prev => ({ ...prev, xp: 0, streak: 0 }));
       setCustomSprint([]);
+      setSprintsCompleted(0);
+      setDailyLogs({});
       setEdital(initialEdital);
       setConfirmFactoryReset(false);
       alert("Sistema restaurado para o Padrão de Fábrica.");
