@@ -8,15 +8,40 @@ import {
   UnfoldVertical, FoldVertical, FilePlus, Upload, Filter, Play, Pause, Coffee, PartyPopper, X
 } from 'lucide-react';
 
-// --- HELPERS LOCAL STORAGE ---
-const getStorage = (key, defaultValue) => {
-  try { 
-    const item = localStorage.getItem(key);
-    if (item === null) return defaultValue;
-    return JSON.parse(item);
-  } catch (e) { return defaultValue; }
+// --- FIREBASE CLOUD STORAGE SETUP ---
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
+
+// Configuração Automática do Canvas ou Manual (Para o seu Vercel)
+const canvasConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
+
+// 👇 CONCURSEIRO: QUANDO FOR PARA O SEU VERCEL, COLE A SUA CONFIGURAÇÃO DO FIREBASE AQUI! 👇
+const myFirebaseConfig = {
+  apiKey: "AIzaSyDQNSDxWrhWryoL8tpTsa8NDT33RY8wq1w",
+  authDomain: "nomeacao-tech.firebaseapp.com",
+  projectId: "nomeacao-tech",
+  storageBucket: "nomeacao-tech.firebasestorage.app",
+  messagingSenderId: "613255880556",
+  appId: "1:613255880556:web:6127f456517970e8b81d49"
 };
-const setStorage = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} };
+
+const firebaseConfig = canvasConfigStr ? JSON.parse(canvasConfigStr) : myFirebaseConfig;
+
+let app, auth, db;
+try {
+  if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "COLE_AQUI_SUA_API_KEY") {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+  }
+} catch (e) {
+  console.error("Firebase Init Error:", e);
+}
+
+// Sanitização robusta para evitar que a variável de ambiente quebre a leitura de documentos do Firestore
+const appIdStr = typeof __app_id !== 'undefined' ? String(__app_id) : 'nomeacao-tech-prod';
+const safeAppId = encodeURIComponent(appIdStr).replace(/\./g, '_'); 
 
 // --- CONFIGURAÇÃO INICIAL E TEMAS ---
 const initialConfig = { 
@@ -302,7 +327,11 @@ const LevelMapModal = ({ onClose, currentXp }) => {
 };
 
 export default function App() {
-  const [isDarkMode, setIsDarkMode] = useState(() => getStorage('nomeacao_prod_theme', false));
+  // AUTENTICAÇÃO E NUVEM
+  const [user, setUser] = useState(null);
+  const [isCloudReady, setIsCloudReady] = useState(false);
+
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard'); 
 
   // ESTADOS DE DOPAMINA / EFEITOS
@@ -310,21 +339,94 @@ export default function App() {
   const [levelUpData, setLevelUpData] = useState(null);
   const [showLevelMap, setShowLevelMap] = useState(false);
 
-  const [projectConfig, setProjectConfig] = useState(() => {
-    const saved = getStorage('nomeacao_prod_config', initialConfig);
-    return { ...initialConfig, ...saved };
-  });
-  
-  // APLICAÇÃO DO TEMA ATUAL
+  // ESTADOS DOS DADOS
+  const [projectConfig, setProjectConfig] = useState(initialConfig);
+  const [edital, setEdital] = useState(initialEdital);
+  const [userProgress, setUserProgress] = useState({});
+  const [customSprint, setCustomSprint] = useState([]);
+  const [sprintsCompleted, setSprintsCompleted] = useState(0);
+  const [gamification, setGamification] = useState({ xp: 0, streak: 0, lastActiveDate: '' });
+  const [dailyLogs, setDailyLogs] = useState({});
+
   const themeColors = THEMES[projectConfig.appTheme] || THEMES.default;
 
-  const [edital, setEdital] = useState(() => getStorage('nomeacao_prod_edital', initialEdital));
-  const [userProgress, setUserProgress] = useState(() => getStorage('nomeacao_prod_progress', {}));
-  const [customSprint, setCustomSprint] = useState(() => getStorage('nomeacao_prod_sprint', []));
-  const [sprintsCompleted, setSprintsCompleted] = useState(() => getStorage('nomeacao_prod_sprints_completed', 0));
-  
-  const [gamification, setGamification] = useState(() => getStorage('nomeacao_prod_gamification', { xp: 0, streak: 0, lastActiveDate: '' }));
-  const [dailyLogs, setDailyLogs] = useState(() => getStorage('nomeacao_prod_daily_logs', {}));
+  // 1. INICIALIZAÇÃO DO FIREBASE AUTH
+  useEffect(() => {
+    if (!auth) {
+      setIsCloudReady(true); // Fallback caso o Firebase não seja configurado
+      return;
+    }
+    
+    const initAuth = async () => {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
+      } catch (e) {
+        console.error("Auth Error", e);
+        setIsCloudReady(true);
+      }
+    };
+    initAuth();
+
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // 2. SINCRONIZAÇÃO DE LEITURA (NUVEM -> LOCAL)
+  useEffect(() => {
+    if (!user || !db) return;
+
+    try {
+      // safeAppId garante que a referência ao documento não contenha barras invertidas
+      const docRef = doc(db, 'artifacts', safeAppId, 'users', user.uid, 'appData', 'main');
+      const unsubscribe = onSnapshot(docRef, (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data.config) setProjectConfig(data.config);
+          if (data.edital) setEdital(data.edital);
+          if (data.userProgress) setUserProgress(data.userProgress);
+          if (data.customSprint) setCustomSprint(data.customSprint);
+          if (data.sprintsCompleted !== undefined) setSprintsCompleted(data.sprintsCompleted);
+          if (data.gamification) setGamification(data.gamification);
+          if (data.dailyLogs) setDailyLogs(data.dailyLogs);
+          if (data.isDarkMode !== undefined) setIsDarkMode(data.isDarkMode);
+        }
+        setIsCloudReady(true);
+      }, (err) => {
+        console.error("Erro ao sincronizar dados", err);
+        setIsCloudReady(true);
+      });
+
+      return () => unsubscribe();
+    } catch (err) {
+      console.error("Erro ao configurar Firestore listener", err);
+      setIsCloudReady(true);
+    }
+  }, [user]);
+
+  // 3. SINCRONIZAÇÃO DE ESCRITA (LOCAL -> NUVEM)
+  const saveToCloud = async (key, value) => {
+    if (!user || !db || !isCloudReady) return;
+    try {
+      await setDoc(doc(db, 'artifacts', safeAppId, 'users', user.uid, 'appData', 'main'), {
+        [key]: value
+      }, { merge: true });
+    } catch (e) { console.error("Save Error:", e); }
+  };
+
+  useEffect(() => { saveToCloud('isDarkMode', isDarkMode); }, [isDarkMode, isCloudReady]);
+  useEffect(() => { saveToCloud('config', projectConfig); }, [projectConfig, isCloudReady]);
+  useEffect(() => { saveToCloud('edital', edital); }, [edital, isCloudReady]);
+  useEffect(() => { saveToCloud('userProgress', userProgress); }, [userProgress, isCloudReady]);
+  useEffect(() => { saveToCloud('customSprint', customSprint); }, [customSprint, isCloudReady]);
+  useEffect(() => { saveToCloud('sprintsCompleted', sprintsCompleted); }, [sprintsCompleted, isCloudReady]);
+  useEffect(() => { saveToCloud('gamification', gamification); }, [gamification, isCloudReady]);
+  useEffect(() => { saveToCloud('dailyLogs', dailyLogs); }, [dailyLogs, isCloudReady]);
 
   // CÁLCULO DE NÍVEL
   const calculateLevel = (xp) => {
@@ -347,22 +449,14 @@ export default function App() {
       setLevelUpData(userLevel);
       setConfettiFire(f => f + 1);
 
-      // Tocar som pelo Sintetizador Nativo
-      playLevelUpSound(projectConfig.levelSound);
+      // Tocar som pelo Sintetizador Nativo só se a Cloud já estiver carregada
+      if (isCloudReady) {
+        playLevelUpSound(projectConfig.levelSound);
+      }
 
       prevLevelRef.current = currentLevel;
     }
-  }, [gamification.xp, userLevel, projectConfig.levelSound]);
-
-  // PERSISTÊNCIA (Agora fixadas em Produção)
-  useEffect(() => { setStorage('nomeacao_prod_theme', isDarkMode); }, [isDarkMode]);
-  useEffect(() => { setStorage('nomeacao_prod_config', projectConfig); }, [projectConfig]);
-  useEffect(() => { setStorage('nomeacao_prod_edital', edital); }, [edital]);
-  useEffect(() => { setStorage('nomeacao_prod_progress', userProgress); }, [userProgress]);
-  useEffect(() => { setStorage('nomeacao_prod_sprint', customSprint); }, [customSprint]);
-  useEffect(() => { setStorage('nomeacao_prod_sprints_completed', sprintsCompleted); }, [sprintsCompleted]);
-  useEffect(() => { setStorage('nomeacao_prod_gamification', gamification); }, [gamification]);
-  useEffect(() => { setStorage('nomeacao_prod_daily_logs', dailyLogs); }, [dailyLogs]);
+  }, [gamification.xp, userLevel, projectConfig.levelSound, isCloudReady]);
 
   // STREAK
   useEffect(() => {
@@ -378,7 +472,7 @@ export default function App() {
       
       setGamification(prev => ({ ...prev, streak: newStreak }));
     }
-  }, []);
+  }, [gamification.lastActiveDate, gamification.streak]);
 
   const triggerConfetti = () => setConfettiFire(f => f + 1);
 
@@ -522,6 +616,15 @@ export default function App() {
     ]}
   ];
 
+  if (!isCloudReady) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white">
+        <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <h2 className="text-xl font-bold animate-pulse">Sincronizando com a Nuvem...</h2>
+      </div>
+    );
+  }
+
   return (
     <div className={isDarkMode ? 'dark' : ''}>
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 flex flex-col md:flex-row font-sans transition-colors duration-300">
@@ -563,7 +666,7 @@ export default function App() {
                   <div className="bg-black/40 p-2 rounded-lg group-hover:scale-110 transition-transform"><Award className="w-5 h-5 text-amber-300"/></div>
                   <div>
                     <p className="text-xs font-bold text-white">Lvl {userLevel.nivel}: {userLevel.titulo}</p>
-                    <p className="text-[10px] text-amber-300 uppercase font-black tracking-wider mb-1 mt-0.5 truncate">{projectConfig.userName}</p>
+                    <p className="text-[10px] text-amber-300 uppercase font-black tracking-wider mb-1 mt-0.5 truncate">{String(projectConfig.userName).split(' ')[0]}</p>
                     <p className="text-[10px] text-white/80">{gamification.xp} / {userLevel.max} XP</p>
                     <p className="text-[9px] text-white font-bold uppercase mt-0.5 tracking-wider group-hover:text-amber-300 transition-colors">👉 Ver Jornada</p>
                   </div>
@@ -725,7 +828,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
         >
           <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-40 transition-opacity"><Trophy className="w-24 h-24"/></div>
           <div className="z-10 text-left">
-            <h3 className="font-bold text-amber-100 flex items-center gap-2 text-sm uppercase tracking-wider mb-4"><Flame className="w-4 h-4"/> Olá, {config.userName.split(' ')[0]}</h3>
+            <h3 className="font-bold text-amber-100 flex items-center gap-2 text-sm uppercase tracking-wider mb-4"><Flame className="w-4 h-4"/> Olá, {String(config.userName).split(' ')[0]}</h3>
             <div className="flex items-end gap-2">
               <span className="text-5xl font-black">{gamification.streak}</span>
               <span className="text-amber-200 font-medium mb-1">Dias Seguidos</span>
@@ -794,7 +897,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
         <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-center text-left">
           <div className="flex items-center gap-3 mb-4">
-            <div className={`p-3 ${themeColors.lightBg} rounded-xl`}><TrendingUp className={`w-6 h-6 ${themeColors.text}`}/></div>
+            <div className={`p-3 ${themeColors.lightBg} rounded-xl`}><TrendingUp className={`w-6 h-6 ${themeColors.text.split(' ')[0]}`}/></div>
             <div>
               <h3 className="font-bold text-lg text-slate-800 dark:text-white">Domínio da Trilha</h3>
               <p className="text-xs text-slate-500">Progresso de Consolidação</p>
@@ -926,7 +1029,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
                   </div>
                   <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div 
-                      className={`h-full transition-all duration-1000 rounded-full ${disc.perc === 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : themeColors.bg}`} 
+                      className={`h-full transition-all duration-1000 rounded-full ${disc.perc === 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : themeColors.bg.split(' ')[0]}`} 
                       style={{width: `${disc.perc}%`}}
                     ></div>
                   </div>
@@ -1264,7 +1367,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                     value={bloco.nome} 
                     onClick={(e) => e.stopPropagation()}
                     onChange={(e) => handleEditBlocoNome(bloco.id, e.target.value)} 
-                    className={`flex-1 font-black text-xl text-slate-800 dark:text-slate-200 uppercase tracking-tight bg-white dark:bg-slate-900 border ${themeColors.border} rounded px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500/50 w-full`}
+                    className={`flex-1 font-black text-xl text-slate-800 dark:text-slate-200 uppercase tracking-tight bg-white dark:bg-slate-900 border ${themeColors.border.split(' ')[0]} rounded px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500/50 w-full`}
                   />
                 ) : (
                   <span className="flex-1 font-black text-xl text-slate-800 dark:text-slate-200 uppercase tracking-tight">{bloco.nome}</span>
@@ -1319,7 +1422,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                                 type="text" 
                                 value={disc.nome} 
                                 onChange={(e) => handleEditDiscNome(bloco.id, disc.id, e.target.value)} 
-                                className={`font-bold text-base text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 border ${themeColors.border} rounded px-2 py-0.5 outline-none focus:ring-2 focus:ring-indigo-500/50 w-full`}
+                                className={`font-bold text-base text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 border ${themeColors.border.split(' ')[0]} rounded px-2 py-0.5 outline-none focus:ring-2 focus:ring-indigo-500/50 w-full`}
                               />
                             ) : (
                               <span className="font-bold text-base text-slate-700 dark:text-slate-300 flex-1">{disc.nome}</span>
@@ -1351,7 +1454,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                               const isCurrentlyEditing = editingTopicId === assunto.id;
                               const mastered = isFullyMastered(assunto.id);
                               const memoryHealth = getMemoryHealth(assunto.id);
-                              const hasFlashcard = assunto.pergunta || assunto.resposta;
 
                               return (
                                 <div 
@@ -1490,7 +1592,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                   
                   {isEditing && (
                     <div className="mt-4 pt-2">
-                      <button onClick={() => handleAddDisciplina(bloco.id)} className={`w-full flex items-center justify-center gap-2 text-sm font-bold ${themeColors.text} ${themeColors.lightBg} px-4 py-3 rounded-xl transition-colors border ${themeColors.border} border-dashed cursor-pointer`}>
+                      <button onClick={() => handleAddDisciplina(bloco.id)} className={`w-full flex items-center justify-center gap-2 text-sm font-bold ${themeColors.text} ${themeColors.lightBg} px-4 py-3 rounded-xl transition-colors border ${themeColors.border.split(' ')[0]} border-dashed cursor-pointer`}>
                         <Plus className="w-4 h-4"/> Adicionar Nova Disciplina
                       </button>
                     </div>
@@ -1561,14 +1663,14 @@ function TabPlanner({ customSprint, sprintsCompleted, setActiveTab, themeColors 
         </div>
 
         {/* Coluna 2: Em Andamento */}
-        <div className={`w-full lg:w-1/3 ${themeColors.lightBg} rounded-2xl p-4 border ${themeColors.border} min-h-[500px]`}>
-           <h3 className={`font-black ${themeColors.text} uppercase tracking-wider mb-4 flex items-center gap-2`}><PlayCircle className="w-5 h-5"/> Em Curso (Hoje)</h3>
+        <div className={`w-full lg:w-1/3 ${themeColors.lightBg} rounded-2xl p-4 border ${themeColors.border.split(' ')[0]} min-h-[500px]`}>
+           <h3 className={`font-black ${themeColors.text.split(' ')[0]} uppercase tracking-wider mb-4 flex items-center gap-2`}><PlayCircle className="w-5 h-5"/> Em Curso (Hoje)</h3>
            {activeSprint ? (
-             <div className={`bg-white dark:bg-slate-900 p-5 rounded-xl shadow-md border-2 ${themeColors.border}`}>
-                 <div className={`text-[10px] font-bold ${themeColors.text} mb-4 uppercase`}>Sprint {sprintsCompleted + 1}</div>
+             <div className={`bg-white dark:bg-slate-900 p-5 rounded-xl shadow-md border-2 ${themeColors.border.split(' ')[0]}`}>
+                 <div className={`text-[10px] font-bold ${themeColors.text.split(' ')[0]} mb-4 uppercase`}>Sprint {sprintsCompleted + 1}</div>
                  {activeSprint.map(item => (
                    <div key={item.assId} className="mb-4 last:mb-0">
-                     <span className={`block text-[9px] font-bold ${themeColors.text} uppercase truncate`}>{item.discNome}</span>
+                     <span className={`block text-[9px] font-bold ${themeColors.text.split(' ')[0]} uppercase truncate`}>{item.discNome}</span>
                      <span className="block text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight mb-2">{item.assTitulo}</span>
                    </div>
                  ))}
@@ -1577,7 +1679,7 @@ function TabPlanner({ customSprint, sprintsCompleted, setActiveTab, themeColors 
                  </button>
               </div>
            ) : (
-             <div className={`text-sm ${themeColors.text} p-6 border-2 border-dashed ${themeColors.border} rounded-xl flex items-center justify-center`}>Nenhuma Sprint ativada hoje.</div>
+             <div className={`text-sm ${themeColors.text.split(' ')[0]} p-6 border-2 border-dashed ${themeColors.border.split(' ')[0]} rounded-xl flex items-center justify-center`}>Nenhuma Sprint ativada hoje.</div>
            )}
         </div>
 
@@ -1639,9 +1741,9 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
       </header>
 
       {/* WIDGET POMODORO COM TEMAS APLICADOS */}
-      <div className={`p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between transition-all duration-500 shadow-lg border-2 ${isPomodoroActive && !isPomodoroBreak ? `${themeColors.bg} border-transparent ${themeColors.solidText} scale-[1.01]` : isPomodoroBreak ? 'bg-emerald-500 border-emerald-400 text-white scale-[1.01]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
+      <div className={`p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between transition-all duration-500 shadow-lg border-2 ${isPomodoroActive && !isPomodoroBreak ? `${themeColors.bg.split(' ')[0]} border-transparent ${themeColors.solidText} scale-[1.01]` : isPomodoroBreak ? 'bg-emerald-500 border-emerald-400 text-white scale-[1.01]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
         <div className="flex items-center gap-4 mb-4 md:mb-0">
-          <div className={`p-3 rounded-full ${isPomodoroActive ? 'bg-white/20' : `${themeColors.lightBg} ${themeColors.text}`}`}>
+          <div className={`p-3 rounded-full ${isPomodoroActive ? 'bg-white/20' : `${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]}`}`}>
             {isPomodoroBreak ? <Coffee className="w-8 h-8" /> : <Clock className="w-8 h-8" />}
           </div>
           <div>
@@ -1687,8 +1789,8 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
             const isActive = idx === 0;
 
             return (
-              <div key={sprintNum} className={`bg-white dark:bg-slate-900 rounded-2xl p-0 overflow-hidden flex flex-col md:flex-row border-2 transition-all ${isActive ? `${themeColors.border.split(' ')[0].replace('border-', 'border-')} shadow-lg ring-4 ${themeColors.lightBg.replace('bg-', 'ring-')} scale-[1.01]` : 'border-slate-200 dark:border-slate-800 opacity-80'}`}>
-                <div className={`p-5 w-full md:w-32 flex flex-col items-center justify-center font-black border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 ${isActive ? `${themeColors.bg} ${themeColors.solidText}` : 'bg-slate-50 dark:bg-slate-800/50 text-slate-400'}`}>
+              <div key={sprintNum} className={`bg-white dark:bg-slate-900 rounded-2xl p-0 overflow-hidden flex flex-col md:flex-row border-2 transition-all ${isActive ? `${themeColors.border.split(' ')[0]} shadow-lg ring-4 ${themeColors.lightBg.split(' ')[0].replace('bg-', 'ring-')} scale-[1.01]` : 'border-slate-200 dark:border-slate-800 opacity-80'}`}>
+                <div className={`p-5 w-full md:w-32 flex flex-col items-center justify-center font-black border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 ${isActive ? `${themeColors.bg.split(' ')[0]} ${themeColors.solidText}` : 'bg-slate-50 dark:bg-slate-800/50 text-slate-400'}`}>
                   <span className="text-xs uppercase tracking-widest">Sprint</span><span className="text-4xl mt-1">{sprintNum}</span>
                   {isActive && <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded mt-2">EM CURSO</span>}
                 </div>
@@ -1700,24 +1802,24 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                     const isRevisado = progress[item.assId]?.revisado || false;
 
                     return (
-                      <div key={item.assId} className={`rounded-xl p-5 border flex flex-col relative ${isActive ? `${themeColors.lightBg} ${themeColors.border}` : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'}`}>
+                      <div key={item.assId} className={`rounded-xl p-5 border flex flex-col relative ${isActive ? `${themeColors.lightBg.split(' ')[0]} ${themeColors.border.split(' ')[0]}` : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'}`}>
                         <button onClick={() => setCustomSprint(p => p.filter(i => i.assId !== item.assId))} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors cursor-pointer" title="Remover"><Trash2 className="w-4 h-4"/></button>
                         
-                        <span className={`text-[10px] font-black uppercase tracking-wider ${themeColors.text} mb-1 pr-6`}>{item.discNome}</span>
+                        <span className={`text-[10px] font-black uppercase tracking-wider ${themeColors.text.split(' ')[0]} mb-1 pr-6`}>{item.discNome}</span>
                         <p className="font-bold text-lg text-slate-800 dark:text-slate-200 mb-4">{item.assTitulo}</p>
                         
                         <div className="mt-auto space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700/50">
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isEstudado ? themeColors.text : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
+                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isEstudado ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
                             <input type="checkbox" checked={isEstudado} onChange={() => toggleProgress(item.assId, 'estudado')} disabled={!isActive} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0" />
                             <span className="font-bold text-sm uppercase tracking-wide">1. Teoria</span>
                           </label>
 
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isQuestoes ? themeColors.text : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
+                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isQuestoes ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
                             <input type="checkbox" checked={isQuestoes} onChange={() => toggleProgress(item.assId, 'questoes')} disabled={!isActive || !isEstudado} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0" />
                             <span className="font-bold text-sm uppercase tracking-wide">2. Questões</span>
                           </label>
 
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isRevisado ? themeColors.text : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
+                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isRevisado ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
                             <input type="checkbox" checked={isRevisado} onChange={() => toggleProgress(item.assId, 'revisado')} disabled={!isActive || !isQuestoes} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0" />
                             <span className="font-bold text-sm uppercase tracking-wide">3. Revisão (Agenda Auto)</span>
                           </label>
@@ -1810,7 +1912,7 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
                       <h4 className="font-bold text-slate-800 dark:text-slate-200 text-base leading-tight">{data.titulo}</h4>
                     </div>
                     {data.linkTec && (
-                      <a href={data.linkTec} target="_blank" rel="noreferrer" title="Abrir Caderno TEC" className={`p-2 rounded-lg ${themeColors.lightBg} ${themeColors.text} hover:scale-110 transition-transform cursor-pointer shrink-0`}>
+                      <a href={data.linkTec} target="_blank" rel="noreferrer" title="Abrir Caderno TEC" className={`p-2 rounded-lg ${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]} hover:scale-110 transition-transform cursor-pointer shrink-0`}>
                         <ExternalLink className="w-4 h-4" />
                       </a>
                     )}
@@ -1942,13 +2044,12 @@ function TabAdmin({ config, setConfig, userProgress, setUserProgress, gamificati
         if (data.edital) setEdital(data.edital);
         if (data.logs) setDailyLogs(data.logs);
         
-        alert('🎉 Dados restaurados com sucesso! O seu progresso está a salvo.');
+        alert('🎉 Dados restaurados com sucesso na Nuvem! O seu progresso está a salvo.');
       } catch (err) {
         alert('❌ Erro ao ler o arquivo. Certifique-se de que é um arquivo de backup válido (.json).');
       }
     };
     reader.readAsText(file);
-    // Limpa o input para permitir importar o mesmo ficheiro seguidamente se necessário
     e.target.value = null; 
   };
 
@@ -1986,7 +2087,7 @@ function TabAdmin({ config, setConfig, userProgress, setUserProgress, gamificati
     return (
       <div className="flex items-center justify-center min-h-[60vh] animate-in fade-in">
         <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 max-w-sm w-full text-center">
-          <div className={`w-16 h-16 ${themeColors.lightBg} ${themeColors.text} rounded-full flex items-center justify-center mx-auto mb-6`}>
+          <div className={`w-16 h-16 ${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]} rounded-full flex items-center justify-center mx-auto mb-6`}>
             <Lock className="w-8 h-8" />
           </div>
           <h2 className="text-2xl font-black text-slate-800 dark:text-white mb-2">Acesso Restrito</h2>
@@ -2073,7 +2174,7 @@ function TabAdmin({ config, setConfig, userProgress, setUserProgress, gamificati
                   </select>
                   <button 
                     onClick={() => playLevelUpSound(localConfig.levelSound || 'chimes')}
-                    className={`p-3 ${themeColors.lightBg} ${themeColors.text} rounded-xl hover:scale-105 transition-all cursor-pointer`}
+                    className={`p-3 ${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]} rounded-xl hover:scale-105 transition-all cursor-pointer`}
                     title="Testar Som"
                   >
                     <Play size={20} className="fill-current" />
@@ -2232,7 +2333,7 @@ function TabAdmin({ config, setConfig, userProgress, setUserProgress, gamificati
               <Download className="w-4 h-4"/> Exportar Meus Dados (.JSON)
             </button>
             
-            <label className={`w-full py-3.5 rounded-xl font-bold text-sm ${themeColors.lightBg} ${themeColors.text} hover:scale-[1.01] transition-all flex items-center justify-center gap-2 border ${themeColors.border} cursor-pointer`}>
+            <label className={`w-full py-3.5 rounded-xl font-bold text-sm ${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]} hover:scale-[1.01] transition-all flex items-center justify-center gap-2 border ${themeColors.border.split(' ')[0]} cursor-pointer`}>
               <Upload className="w-4 h-4"/> Restaurar Backup Antigo (.JSON)
               <input type="file" accept=".json" className="hidden" onChange={handleImportBackup} />
             </label>
