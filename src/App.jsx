@@ -18,18 +18,123 @@ const getStorage = (key, defaultValue) => {
 };
 const setStorage = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {} };
 
-// --- CONFIGURAÇÃO INICIAL ---
+// --- CONFIGURAÇÃO INICIAL E TEMAS ---
 const initialConfig = { 
   appName: 'Nomeação.Tech',
   logoUrl: 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png',
   userName: 'Futuro Nomeado',
-  levelSound: 'chimes',
+  levelSound: 'mario',
+  appTheme: 'default',
   concurso: 'Base de TI (Iniciantes)', 
   cargo: 'Núcleo Duro - Qualquer Cargo', 
   banca: 'Principais (CEBRASPE, FCC, FGV)', 
   horasDia: 4,
   revBom: 7,
   revFacil: 15
+};
+
+export const THEMES = {
+  default: {
+    name: 'Azul Foco (Padrão)',
+    sidebar: 'from-blue-700 to-indigo-900 dark:from-slate-800 dark:to-slate-950',
+    button: 'bg-blue-600 hover:bg-blue-700 text-white',
+    activeTab: 'bg-blue-600 dark:bg-blue-500 text-white',
+    icon: 'text-blue-500',
+    bg: 'bg-blue-500',
+    lightBg: 'bg-blue-50 dark:bg-blue-900/10',
+    border: 'border-blue-200 dark:border-blue-800',
+    text: 'text-blue-600 dark:text-blue-400',
+    solidText: 'text-white'
+  },
+  esmeralda: {
+    name: 'Esmeralda (Aprovação)',
+    sidebar: 'from-emerald-700 to-teal-900 dark:from-slate-800 dark:to-slate-950',
+    button: 'bg-emerald-600 hover:bg-emerald-700 text-white',
+    activeTab: 'bg-emerald-600 dark:bg-emerald-500 text-white',
+    icon: 'text-emerald-500',
+    bg: 'bg-emerald-500',
+    lightBg: 'bg-emerald-50 dark:bg-emerald-900/10',
+    border: 'border-emerald-200 dark:border-emerald-800',
+    text: 'text-emerald-600 dark:text-emerald-400',
+    solidText: 'text-white'
+  },
+  caveira: {
+    name: 'Caveira (Preto/Dourado)',
+    sidebar: 'from-slate-900 to-black dark:from-black dark:to-slate-950',
+    button: 'bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold',
+    activeTab: 'bg-amber-500 dark:bg-amber-500 text-slate-900 font-black',
+    icon: 'text-amber-500',
+    bg: 'bg-amber-500',
+    lightBg: 'bg-amber-50 dark:bg-amber-900/10',
+    border: 'border-amber-200 dark:border-amber-800',
+    text: 'text-amber-600 dark:text-amber-400',
+    solidText: 'text-slate-900 font-black'
+  },
+  retaFinal: {
+    name: 'Reta Final (Vermelho Alerta)',
+    sidebar: 'from-red-700 to-rose-900 dark:from-slate-800 dark:to-slate-950',
+    button: 'bg-red-600 hover:bg-red-700 text-white',
+    activeTab: 'bg-red-600 dark:bg-red-500 text-white',
+    icon: 'text-red-500',
+    bg: 'bg-red-500',
+    lightBg: 'bg-red-50 dark:bg-red-900/10',
+    border: 'border-red-200 dark:border-red-800',
+    text: 'text-red-600 dark:text-red-400',
+    solidText: 'text-white'
+  }
+};
+
+// --- SINTETIZADOR NATIVO DE EFEITOS SONOROS (WEB AUDIO API) ---
+const playLevelUpSound = (soundType) => {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+
+    const playTone = (freq, type, startTime, duration, vol) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = type;
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + startTime);
+      
+      gain.gain.setValueAtTime(vol, ctx.currentTime + startTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + startTime + duration);
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      
+      osc.start(ctx.currentTime + startTime);
+      osc.stop(ctx.currentTime + startTime + duration);
+    };
+
+    if (soundType === 'mario') {
+      // O clássico som de moeda do Super Mario!
+      playTone(987.77, 'square', 0, 0.1, 0.1);     // B5
+      playTone(1318.51, 'square', 0.1, 0.4, 0.1);  // E6
+    }
+    else if (soundType === 'arcade') {
+      const notes = [330, 440, 554, 659, 880];
+      notes.forEach((f, i) => playTone(f, 'square', i * 0.08, 0.2, 0.08));
+    } 
+    else if (soundType === 'modern') {
+      playTone(659.25, 'sine', 0, 0.15, 0.3);
+      playTone(1318.51, 'sine', 0.15, 0.4, 0.3);
+    } 
+    else if (soundType === 'epic') {
+      playTone(392.00, 'triangle', 0, 0.15, 0.3); // G4
+      playTone(392.00, 'triangle', 0.15, 0.15, 0.3); // G4
+      playTone(392.00, 'triangle', 0.30, 0.15, 0.3); // G4
+      playTone(523.25, 'triangle', 0.45, 0.6, 0.4);  // C5 (longo)
+      playTone(392.00, 'triangle', 0.80, 0.15, 0.3); // G4 (curto)
+      playTone(523.25, 'triangle', 0.95, 0.8, 0.4);  // C5 (final)
+    }
+    else { // chimes
+      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+      notes.forEach((f, i) => playTone(f, 'sine', i * 0.08, 0.8, 0.2));
+    }
+  } catch (e) {
+    console.warn('Áudio não suportado pelo navegador.', e);
+  }
 };
 
 // --- ÁRVORE DA TRILHA BASE ---
@@ -197,7 +302,7 @@ const LevelMapModal = ({ onClose, currentXp }) => {
 };
 
 export default function App() {
-  const [isDarkMode, setIsDarkMode] = useState(() => getStorage('pareto_theme_v22', false));
+  const [isDarkMode, setIsDarkMode] = useState(() => getStorage('pareto_theme_v23', false));
   const [activeTab, setActiveTab] = useState('dashboard'); 
 
   // ESTADOS DE DOPAMINA / EFEITOS
@@ -206,17 +311,20 @@ export default function App() {
   const [showLevelMap, setShowLevelMap] = useState(false);
 
   const [projectConfig, setProjectConfig] = useState(() => {
-    const saved = getStorage('pareto_config_v22', initialConfig);
+    const saved = getStorage('pareto_config_v23', initialConfig);
     return { ...initialConfig, ...saved };
   });
   
-  const [edital, setEdital] = useState(() => getStorage('pareto_edital_v22', initialEdital));
-  const [userProgress, setUserProgress] = useState(() => getStorage('pareto_progress_v22', {}));
-  const [customSprint, setCustomSprint] = useState(() => getStorage('pareto_custom_sprint_v22', []));
-  const [sprintsCompleted, setSprintsCompleted] = useState(() => getStorage('pareto_sprints_completed_v22', 0));
+  // APLICAÇÃO DO TEMA ATUAL
+  const themeColors = THEMES[projectConfig.appTheme] || THEMES.default;
+
+  const [edital, setEdital] = useState(() => getStorage('pareto_edital_v23', initialEdital));
+  const [userProgress, setUserProgress] = useState(() => getStorage('pareto_progress_v23', {}));
+  const [customSprint, setCustomSprint] = useState(() => getStorage('pareto_custom_sprint_v23', []));
+  const [sprintsCompleted, setSprintsCompleted] = useState(() => getStorage('pareto_sprints_completed_v23', 0));
   
-  const [gamification, setGamification] = useState(() => getStorage('pareto_gamification_v22', { xp: 0, streak: 0, lastActiveDate: '' }));
-  const [dailyLogs, setDailyLogs] = useState(() => getStorage('pareto_daily_logs_v22', {}));
+  const [gamification, setGamification] = useState(() => getStorage('pareto_gamification_v23', { xp: 0, streak: 0, lastActiveDate: '' }));
+  const [dailyLogs, setDailyLogs] = useState(() => getStorage('pareto_daily_logs_v23', {}));
 
   // CÁLCULO DE NÍVEL
   const calculateLevel = (xp) => {
@@ -228,7 +336,7 @@ export default function App() {
   const userLevel = calculateLevel(gamification.xp);
   const prevLevelRef = useRef(userLevel.nivel);
 
-  // CORREÇÃO: DETETAR MUDANÇA DE NÍVEL DE FORMA SEGURA (Para disparar áudio e efeitos sem bugar no React Strict Mode)
+  // CORREÇÃO: DETETAR MUDANÇA DE NÍVEL E TOCAR SOM SINTETIZADO
   useEffect(() => {
     const currentLevel = userLevel.nivel;
 
@@ -239,31 +347,22 @@ export default function App() {
       setLevelUpData(userLevel);
       setConfettiFire(f => f + 1);
 
-      // Tocar Som Selecionado no Painel
-      try {
-        let audioUrl = 'https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3'; // chimes
-        if (projectConfig.levelSound === 'arcade') audioUrl = 'https://assets.mixkit.co/sfx/preview/mixkit-game-level-completed-2059.mp3';
-        if (projectConfig.levelSound === 'modern') audioUrl = 'https://assets.mixkit.co/sfx/preview/mixkit-unlock-game-notification-253.mp3';
-        if (projectConfig.levelSound === 'epic') audioUrl = 'https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3';
-
-        const audio = new Audio(audioUrl);
-        audio.volume = projectConfig.levelSound === 'epic' ? 1.0 : 0.6;
-        audio.play().catch(e => console.warn('Áudio bloqueado pelo navegador:', e));
-      } catch (e) {}
+      // Tocar som pelo Sintetizador Nativo
+      playLevelUpSound(projectConfig.levelSound);
 
       prevLevelRef.current = currentLevel;
     }
   }, [gamification.xp, userLevel, projectConfig.levelSound]);
 
   // PERSISTÊNCIA
-  useEffect(() => { setStorage('pareto_theme_v22', isDarkMode); }, [isDarkMode]);
-  useEffect(() => { setStorage('pareto_config_v22', projectConfig); }, [projectConfig]);
-  useEffect(() => { setStorage('pareto_edital_v22', edital); }, [edital]);
-  useEffect(() => { setStorage('pareto_progress_v22', userProgress); }, [userProgress]);
-  useEffect(() => { setStorage('pareto_custom_sprint_v22', customSprint); }, [customSprint]);
-  useEffect(() => { setStorage('pareto_sprints_completed_v22', sprintsCompleted); }, [sprintsCompleted]);
-  useEffect(() => { setStorage('pareto_gamification_v22', gamification); }, [gamification]);
-  useEffect(() => { setStorage('pareto_daily_logs_v22', dailyLogs); }, [dailyLogs]);
+  useEffect(() => { setStorage('pareto_theme_v23', isDarkMode); }, [isDarkMode]);
+  useEffect(() => { setStorage('pareto_config_v23', projectConfig); }, [projectConfig]);
+  useEffect(() => { setStorage('pareto_edital_v23', edital); }, [edital]);
+  useEffect(() => { setStorage('pareto_progress_v23', userProgress); }, [userProgress]);
+  useEffect(() => { setStorage('pareto_custom_sprint_v23', customSprint); }, [customSprint]);
+  useEffect(() => { setStorage('pareto_sprints_completed_v23', sprintsCompleted); }, [sprintsCompleted]);
+  useEffect(() => { setStorage('pareto_gamification_v23', gamification); }, [gamification]);
+  useEffect(() => { setStorage('pareto_daily_logs_v23', dailyLogs); }, [dailyLogs]);
 
   // STREAK
   useEffect(() => {
@@ -283,7 +382,6 @@ export default function App() {
 
   const triggerConfetti = () => setConfettiFire(f => f + 1);
 
-  // A função addXP agora foca estritamente em somar os pontos. O useEffect acima toma conta das celebrações!
   const addXP = (amount) => { 
     setGamification(prev => ({ ...prev, xp: prev.xp + amount }));
   };
@@ -417,7 +515,7 @@ export default function App() {
     ]},
     { phase: 'Execução', id: 'acao', items: [
       { id: 'cronograma', icon: Calendar, label: 'Sprints Diárias' }, 
-      { id: 'revisoes', icon: BrainCircuit, label: 'Revisão Espaçada', badge: pendingReviewsCount }
+      { id: 'revisoes', icon: BrainCircuit, label: 'Deck de Combate', badge: pendingReviewsCount }
     ]},
     { phase: 'Sistema', id: 'sistema', items: [
       { id: 'admin', icon: Settings, label: 'Painel de Controle' }
@@ -434,9 +532,9 @@ export default function App() {
         {showLevelMap && <LevelMapModal currentXp={gamification.xp} onClose={() => setShowLevelMap(false)} />}
 
         <aside className="w-full md:w-72 bg-white dark:bg-slate-900 shadow-xl flex flex-col z-10 shrink-0 border-r border-slate-200 dark:border-slate-800">
-          <div className="p-6 bg-gradient-to-br from-blue-700 to-indigo-900 dark:from-slate-800 dark:to-slate-950 text-white relative">
+          <div className={`p-6 bg-gradient-to-br ${themeColors.sidebar} text-white relative transition-colors duration-500`}>
             <button onClick={() => setIsDarkMode(!isDarkMode)} className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer">
-              {isDarkMode ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-blue-200" />}
+              {isDarkMode ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-white" />}
             </button>
             
             <div className="flex items-center gap-3 mt-2">
@@ -453,21 +551,21 @@ export default function App() {
             
             <div className="mt-5 p-4 bg-white/10 rounded-xl relative">
               <div className="animate-in fade-in text-left">
-                <p className="text-[10px] text-blue-200 uppercase font-black mb-1">{projectConfig.concurso}</p>
+                <p className="text-[10px] text-white/70 uppercase font-black mb-1">{projectConfig.concurso}</p>
                 <p className="font-bold text-lg leading-tight mb-2">{projectConfig.cargo}</p>
-                <div className="flex flex-wrap gap-2 text-xs text-blue-100 font-medium">
-                  <span className="bg-blue-900/60 px-2 py-1 rounded border border-white/10">{projectConfig.banca}</span>
-                  <span className="bg-blue-900/60 px-2 py-1 rounded border border-white/10">Meta: {projectConfig.horasDia}h/dia</span>
+                <div className="flex flex-wrap gap-2 text-xs text-white/90 font-medium">
+                  <span className="bg-black/30 px-2 py-1 rounded border border-white/10">{projectConfig.banca}</span>
+                  <span className="bg-black/30 px-2 py-1 rounded border border-white/10">Meta: {projectConfig.horasDia}h/dia</span>
                 </div>
                 
                 {/* BOTÃO DA JORNADA DE APROVAÇÃO */}
                 <div onClick={() => setShowLevelMap(true)} className="mt-4 pt-4 border-t border-white/20 flex items-center gap-3 cursor-pointer hover:bg-white/10 p-2 -mx-2 rounded-xl transition-colors group">
-                  <div className="bg-blue-800 p-2 rounded-lg group-hover:scale-110 transition-transform"><Award className="w-5 h-5 text-amber-300"/></div>
+                  <div className="bg-black/40 p-2 rounded-lg group-hover:scale-110 transition-transform"><Award className="w-5 h-5 text-amber-300"/></div>
                   <div>
                     <p className="text-xs font-bold text-white">Lvl {userLevel.nivel}: {userLevel.titulo}</p>
                     <p className="text-[10px] text-amber-300 uppercase font-black tracking-wider mb-1 mt-0.5 truncate">{projectConfig.userName}</p>
-                    <p className="text-[10px] text-blue-200">{gamification.xp} / {userLevel.max} XP</p>
-                    <p className="text-[9px] text-blue-300 font-bold uppercase mt-0.5 tracking-wider">👉 Ver Jornada</p>
+                    <p className="text-[10px] text-white/80">{gamification.xp} / {userLevel.max} XP</p>
+                    <p className="text-[9px] text-white font-bold uppercase mt-0.5 tracking-wider group-hover:text-amber-300 transition-colors">👉 Ver Jornada</p>
                   </div>
                 </div>
               </div>
@@ -482,8 +580,8 @@ export default function App() {
                   {phaseGroup.items.map((item) => {
                     const IconComponent = item.icon;
                     return (
-                      <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all font-medium cursor-pointer ${activeTab === item.id ? 'bg-blue-600 dark:bg-blue-500 text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
-                        <IconComponent className={`w-5 h-5 ${activeTab === item.id ? 'text-white' : 'opacity-70'}`} />
+                      <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all font-medium cursor-pointer ${activeTab === item.id ? themeColors.activeTab + ' shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                        <IconComponent className={`w-5 h-5 ${activeTab === item.id ? 'opacity-100' : 'opacity-70'}`} />
                         <span className="flex-1 text-left">{item.label}</span>
                         {item.id === 'cronograma' && customSprint.length > 0 && <span className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{customSprint.length}</span>}
                         {item.badge > 0 && <span className="bg-red-500 animate-pulse text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">{item.badge}</span>}
@@ -498,12 +596,12 @@ export default function App() {
 
         <main className="flex-1 p-6 md:p-8 overflow-y-auto pb-24 text-left">
           <div className="max-w-5xl mx-auto">
-            {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} userProgress={userProgress} edital={edital} activeSubjectIds={activeSubjectIds} onShowLevelMap={() => setShowLevelMap(true)} />}
-            {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} />}
-            {activeTab === 'planner' && <TabPlanner customSprint={customSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} />}
-            {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} pomodoroTime={pomodoroTime} isPomodoroActive={isPomodoroActive} isPomodoroBreak={isPomodoroBreak} togglePomodoro={togglePomodoro} resetPomodoro={resetPomodoro} triggerConfetti={triggerConfetti} />}
-            {activeTab === 'revisoes' && <TabDeckAnki progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} />}
-            {activeTab === 'admin' && <TabAdmin config={projectConfig} setConfig={setProjectConfig} setUserProgress={setUserProgress} setGamification={setGamification} setEdital={setEdital} setCustomSprint={setCustomSprint} initialEdital={initialEdital} setSprintsCompleted={setSprintsCompleted} setDailyLogs={setDailyLogs} />}
+            {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} userProgress={userProgress} edital={edital} activeSubjectIds={activeSubjectIds} onShowLevelMap={() => setShowLevelMap(true)} themeColors={themeColors} />}
+            {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} />}
+            {activeTab === 'planner' && <TabPlanner customSprint={customSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} />}
+            {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} pomodoroTime={pomodoroTime} isPomodoroActive={isPomodoroActive} isPomodoroBreak={isPomodoroBreak} togglePomodoro={togglePomodoro} resetPomodoro={resetPomodoro} triggerConfetti={triggerConfetti} themeColors={themeColors} appTheme={projectConfig.appTheme} />}
+            {activeTab === 'revisoes' && <TabDeckAnki progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} />}
+            {activeTab === 'admin' && <TabAdmin config={projectConfig} setConfig={setProjectConfig} setUserProgress={setUserProgress} setGamification={setGamification} setEdital={setEdital} setCustomSprint={setCustomSprint} initialEdital={initialEdital} setSprintsCompleted={setSprintsCompleted} setDailyLogs={setDailyLogs} themeColors={themeColors} playLevelUpSound={playLevelUpSound} />}
           </div>
         </main>
       </div>
@@ -514,7 +612,7 @@ export default function App() {
 // ==========================================
 // ABA DASHBOARD / COCKPIT
 // ==========================================
-function TabDashboard({ config, progressPerc, gamification, setGamification, dailyLogs, setDailyLogs, userLevel, pendingReviewsCount, setActiveTab, customSprint, userProgress, edital, activeSubjectIds, onShowLevelMap }) {
+function TabDashboard({ config, progressPerc, gamification, setGamification, dailyLogs, setDailyLogs, userLevel, pendingReviewsCount, setActiveTab, customSprint, userProgress, edital, activeSubjectIds, onShowLevelMap, themeColors }) {
   const [loggedHoursToday, setLoggedHoursToday] = useState('');
   const today = new Date().toLocaleDateString();
   const todayHours = dailyLogs[today] || 0;
@@ -599,11 +697,11 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
       {/* LINHA 1: COCKPIT DIÁRIO E OFENSIVA */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="md:col-span-2 bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+          <div className={`absolute top-0 right-0 w-32 h-32 ${themeColors.bg} opacity-10 rounded-full -mr-10 -mt-10 blur-2xl`}></div>
           <div className="relative w-32 h-32 shrink-0 flex items-center justify-center">
             <svg className="w-full h-full transform -rotate-90">
               <circle cx="64" cy="64" r="56" className="stroke-slate-100 dark:stroke-slate-800" strokeWidth="12" fill="none" />
-              <circle cx="64" cy="64" r="56" className="stroke-blue-500 drop-shadow-md transition-all duration-1000 ease-out" strokeWidth="12" fill="none" strokeDasharray="351.85" strokeDashoffset={351.85 - (351.85 * progressDaily) / 100} strokeLinecap="round" />
+              <circle cx="64" cy="64" r="56" className={`${themeColors.text.split(' ')[0].replace('text-', 'stroke-')} drop-shadow-md transition-all duration-1000 ease-out`} strokeWidth="12" fill="none" strokeDasharray="351.85" strokeDashoffset={351.85 - (351.85 * progressDaily) / 100} strokeLinecap="round" />
             </svg>
             <div className="absolute flex flex-col items-center justify-center">
               <span className="text-3xl font-black text-slate-800 dark:text-white">{todayHours.toFixed(1)}<span className="text-lg text-slate-400">h</span></span>
@@ -614,8 +712,8 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
             <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-1">Foco de Hoje</h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">Registe as horas líquidas de estudo focadas no edital.</p>
             <form onSubmit={handleLogHours} className="flex gap-2">
-              <input type="number" step="0.5" placeholder="Ex: 2.5" value={loggedHoursToday} onChange={(e) => setLoggedHoursToday(e.target.value)} className="w-24 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500 font-bold text-center" />
-              <button type="submit" className="bg-slate-800 hover:bg-slate-900 dark:bg-blue-600 dark:hover:bg-blue-500 text-white px-5 py-3 rounded-xl font-bold transition-colors cursor-pointer">Adicionar Horas</button>
+              <input type="number" step="0.5" placeholder="Ex: 2.5" value={loggedHoursToday} onChange={(e) => setLoggedHoursToday(e.target.value)} className="w-24 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 font-bold text-center" />
+              <button type="submit" className={`${themeColors.button} px-5 py-3 rounded-xl font-bold transition-colors cursor-pointer`}>Adicionar Horas</button>
             </form>
           </div>
         </div>
@@ -627,7 +725,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
         >
           <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-40 transition-opacity"><Trophy className="w-24 h-24"/></div>
           <div className="z-10 text-left">
-            <h3 className="font-bold text-amber-100 flex items-center gap-2 text-sm uppercase tracking-wider mb-4"><Flame className="w-4 h-4"/> Olá, {config.userName}</h3>
+            <h3 className="font-bold text-amber-100 flex items-center gap-2 text-sm uppercase tracking-wider mb-4"><Flame className="w-4 h-4"/> Olá, {config.userName.split(' ')[0]}</h3>
             <div className="flex items-end gap-2">
               <span className="text-5xl font-black">{gamification.streak}</span>
               <span className="text-amber-200 font-medium mb-1">Dias Seguidos</span>
@@ -696,7 +794,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
         <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 flex flex-col justify-center text-left">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-blue-100 dark:bg-blue-900/40 rounded-xl"><TrendingUp className="w-6 h-6 text-blue-600 dark:text-blue-400"/></div>
+            <div className={`p-3 ${themeColors.lightBg} rounded-xl`}><TrendingUp className={`w-6 h-6 ${themeColors.text}`}/></div>
             <div>
               <h3 className="font-bold text-lg text-slate-800 dark:text-white">Domínio da Trilha</h3>
               <p className="text-xs text-slate-500">Progresso de Consolidação</p>
@@ -707,7 +805,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
             <span className="text-sm font-bold text-slate-400 mb-1">Consolidado</span>
           </div>
           <div className="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-3">
-            <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${progressPerc}%` }}></div>
+            <div className={`h-full transition-all duration-1000 ${themeColors.bg}`} style={{ width: `${progressPerc}%` }}></div>
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400">Continue a fechar tópicos para consolidar a sua aprovação.</p>
         </div>
@@ -746,7 +844,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
         {/* Funil da Aprovação */}
         <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8 flex flex-col h-full min-h-[400px]">
           <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-8 flex items-center gap-2 shrink-0">
-            <Filter className="w-5 h-5 text-blue-500"/> O Funil da Aprovação
+            <Filter className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> O Funil da Aprovação
           </h3>
           <div className="flex-1 flex flex-col justify-center space-y-8 w-full">
             
@@ -813,7 +911,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
         {/* Radar de Disciplinas */}
         <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8 flex flex-col h-full min-h-[400px] max-h-[500px]">
           <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-6 flex items-center gap-2 shrink-0">
-            <Activity className="w-5 h-5 text-indigo-500"/> Raio-X por Disciplina
+            <Activity className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Raio-X por Disciplina
           </h3>
           
           <div className="space-y-6 flex-1 overflow-y-auto pr-4 custom-scrollbar">
@@ -823,12 +921,12 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
               radarData.map(disc => (
                 <div key={disc.id} className="group">
                   <div className="flex justify-between items-end mb-2">
-                    <span className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate pr-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{disc.nome}</span>
+                    <span className={`text-sm font-bold text-slate-700 dark:text-slate-300 truncate pr-2 hover:${themeColors.text.split(' ')[0]} transition-colors`}>{disc.nome}</span>
                     <span className="text-sm font-black text-slate-800 dark:text-white shrink-0">{disc.perc}%</span>
                   </div>
                   <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                     <div 
-                      className={`h-full transition-all duration-1000 rounded-full ${disc.perc === 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-gradient-to-r from-indigo-500 to-blue-500'}`} 
+                      className={`h-full transition-all duration-1000 rounded-full ${disc.perc === 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : themeColors.bg}`} 
                       style={{width: `${disc.perc}%`}}
                     ></div>
                   </div>
@@ -845,7 +943,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
 // ==========================================
 // ABA 1: ARSENAL DE MATÉRIAS
 // ==========================================
-function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprintItem, resetProgress }) {
+function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprintItem, resetProgress, themeColors }) {
   const [expanded, setExpanded] = useState(() => {
     const initial = {};
     edital.forEach(bloco => { initial[bloco.id] = true; });
@@ -1158,7 +1256,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                 <div onClick={(e) => { if(isEditing) { e.stopPropagation(); toggleNode(bloco.id); } }} className="cursor-pointer flex items-center justify-center shrink-0 transition-transform">
                   {expanded[bloco.id] ? <ChevronDown className="w-5 h-5 text-slate-500" /> : <ChevronRight className="w-5 h-5 text-slate-500" />}
                 </div>
-                <Layers className="w-5 h-5 text-indigo-500 shrink-0"/>
+                <Layers className={`w-5 h-5 ${themeColors.text.split(' ')[0]} shrink-0`}/>
                 
                 {isEditing ? (
                   <input 
@@ -1166,7 +1264,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                     value={bloco.nome} 
                     onClick={(e) => e.stopPropagation()}
                     onChange={(e) => handleEditBlocoNome(bloco.id, e.target.value)} 
-                    className="flex-1 font-black text-xl text-slate-800 dark:text-slate-200 uppercase tracking-tight bg-white dark:bg-slate-900 border border-indigo-300 dark:border-indigo-700 rounded px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500/50 w-full"
+                    className={`flex-1 font-black text-xl text-slate-800 dark:text-slate-200 uppercase tracking-tight bg-white dark:bg-slate-900 border ${themeColors.border} rounded px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500/50 w-full`}
                   />
                 ) : (
                   <span className="flex-1 font-black text-xl text-slate-800 dark:text-slate-200 uppercase tracking-tight">{bloco.nome}</span>
@@ -1174,10 +1272,10 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                 
                 {isEditing && (
                   <div className="flex items-center gap-1 shrink-0 ml-2" onClick={(e) => e.stopPropagation()}>
-                    <button onClick={() => handleMoveBloco(bIndex, -1)} disabled={bIndex === 0} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors disabled:opacity-30 cursor-pointer" title="Mover para Cima">
+                    <button onClick={() => handleMoveBloco(bIndex, -1)} disabled={bIndex === 0} className={`p-2 text-slate-400 hover:${themeColors.text.split(' ')[0]} hover:${themeColors.lightBg.split(' ')[0]} rounded-lg transition-colors disabled:opacity-30 cursor-pointer`} title="Mover para Cima">
                       <ChevronUp className="w-4 h-4" />
                     </button>
-                    <button onClick={() => handleMoveBloco(bIndex, 1)} disabled={bIndex === edital.length - 1} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-lg transition-colors disabled:opacity-30 cursor-pointer" title="Mover para Baixo">
+                    <button onClick={() => handleMoveBloco(bIndex, 1)} disabled={bIndex === edital.length - 1} className={`p-2 text-slate-400 hover:${themeColors.text.split(' ')[0]} hover:${themeColors.lightBg.split(' ')[0]} rounded-lg transition-colors disabled:opacity-30 cursor-pointer`} title="Mover para Baixo">
                       <ChevronDown className="w-4 h-4" />
                     </button>
                     <button onClick={() => handleDeleteBlocoClick(bloco.id)} className={`p-2 rounded-lg transition-colors cursor-pointer flex items-center gap-1 font-bold text-xs ${confirmDeleteId === 'bloco_' + bloco.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Bloco Inteiro">
@@ -1201,10 +1299,10 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                         <div className="flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 p-3 rounded-lg select-none border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 transition-colors">
                           {isEditing && (
                             <div className="flex flex-col gap-0.5 shrink-0 mr-1">
-                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, -1); }} disabled={dIndex === 0} className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-md transition-colors disabled:opacity-30 cursor-pointer" title="Sobe">
+                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, -1); }} disabled={dIndex === 0} className={`p-1 text-slate-400 hover:${themeColors.text.split(' ')[0]} hover:${themeColors.lightBg.split(' ')[0]} rounded-md transition-colors disabled:opacity-30 cursor-pointer`} title="Sobe">
                                 <ChevronUp className="w-4 h-4" />
                               </button>
-                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, 1); }} disabled={dIndex === bloco.disciplinas.length - 1} className="p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-md transition-colors disabled:opacity-30 cursor-pointer" title="Desce">
+                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, 1); }} disabled={dIndex === bloco.disciplinas.length - 1} className={`p-1 text-slate-400 hover:${themeColors.text.split(' ')[0]} hover:${themeColors.lightBg.split(' ')[0]} rounded-md transition-colors disabled:opacity-30 cursor-pointer`} title="Desce">
                                 <ChevronDown className="w-4 h-4" />
                               </button>
                             </div>
@@ -1221,7 +1319,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                                 type="text" 
                                 value={disc.nome} 
                                 onChange={(e) => handleEditDiscNome(bloco.id, disc.id, e.target.value)} 
-                                className="font-bold text-base text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 border border-indigo-300 dark:border-indigo-700 rounded px-2 py-0.5 outline-none focus:ring-2 focus:ring-indigo-500/50 w-full"
+                                className={`font-bold text-base text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 border ${themeColors.border} rounded px-2 py-0.5 outline-none focus:ring-2 focus:ring-indigo-500/50 w-full`}
                               />
                             ) : (
                               <span className="font-bold text-base text-slate-700 dark:text-slate-300 flex-1">{disc.nome}</span>
@@ -1404,7 +1502,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                   
                   {isEditing && (
                     <div className="mt-4 pt-2">
-                      <button onClick={() => handleAddDisciplina(bloco.id)} className="w-full flex items-center justify-center gap-2 text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 px-4 py-3 rounded-xl transition-colors border border-indigo-200 dark:border-indigo-800/50 border-dashed cursor-pointer">
+                      <button onClick={() => handleAddDisciplina(bloco.id)} className={`w-full flex items-center justify-center gap-2 text-sm font-bold ${themeColors.text} ${themeColors.lightBg} px-4 py-3 rounded-xl transition-colors border ${themeColors.border} border-dashed cursor-pointer`}>
                         <Plus className="w-4 h-4"/> Adicionar Nova Disciplina
                       </button>
                     </div>
@@ -1416,7 +1514,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
           
           {isEditing && (
             <div className="border-t-2 border-dashed border-slate-200 dark:border-slate-700 pt-6 mt-4">
-              <button onClick={handleAddBloco} className="w-full flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 bg-slate-50 hover:bg-indigo-50 dark:bg-slate-800/50 dark:hover:bg-indigo-900/20 px-6 py-4 rounded-2xl transition-colors border-2 border-dashed border-slate-300 hover:border-indigo-300 dark:border-slate-700 dark:hover:border-indigo-700 cursor-pointer">
+              <button onClick={handleAddBloco} className={`w-full flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest text-slate-500 hover:${themeColors.text.split(' ')[0]} bg-slate-50 hover:${themeColors.lightBg.split(' ')[0]} dark:bg-slate-800/50 dark:hover:${themeColors.lightBg.split(' ')[1]} px-6 py-4 rounded-2xl transition-colors border-2 border-dashed border-slate-300 hover:${themeColors.border.split(' ')[0]} dark:border-slate-700 cursor-pointer`}>
                 <Layers className="w-5 h-5"/> Criar Novo Bloco de Matérias
               </button>
             </div>
@@ -1430,7 +1528,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
 // ==========================================
 // ABA: METAS DA SEMANA
 // ==========================================
-function TabPlanner({ customSprint, sprintsCompleted, setActiveTab }) {
+function TabPlanner({ customSprint, sprintsCompleted, setActiveTab, themeColors }) {
   const sprintGroups = [];
   for (let i = 0; i < customSprint.length; i += 2) sprintGroups.push(customSprint.slice(i, i + 2));
 
@@ -1441,7 +1539,7 @@ function TabPlanner({ customSprint, sprintsCompleted, setActiveTab }) {
     <div className="space-y-6 animate-in fade-in text-left h-full">
       <header className="border-b border-slate-200 dark:border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2"><LayoutGrid className="w-8 h-8 text-blue-500"/> Metas da Semana</h2>
+          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2"><LayoutGrid className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`}/> Metas da Semana</h2>
           <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">A sua visão estratégica. O que for agendado aqui será executado na Sprint Diária.</p>
         </div>
       </header>
@@ -1475,23 +1573,23 @@ function TabPlanner({ customSprint, sprintsCompleted, setActiveTab }) {
         </div>
 
         {/* Coluna 2: Em Andamento */}
-        <div className="w-full lg:w-1/3 bg-blue-50 dark:bg-blue-900/10 rounded-2xl p-4 border border-blue-200 dark:border-blue-900/30 min-h-[500px]">
-           <h3 className="font-black text-blue-700 dark:text-blue-400 uppercase tracking-wider mb-4 flex items-center gap-2"><PlayCircle className="w-5 h-5"/> Em Curso (Hoje)</h3>
+        <div className={`w-full lg:w-1/3 ${themeColors.lightBg} rounded-2xl p-4 border ${themeColors.border} min-h-[500px]`}>
+           <h3 className={`font-black ${themeColors.text} uppercase tracking-wider mb-4 flex items-center gap-2`}><PlayCircle className="w-5 h-5"/> Em Curso (Hoje)</h3>
            {activeSprint ? (
-             <div className="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-md border-2 border-blue-400 dark:border-blue-500">
-                 <div className="text-[10px] font-bold text-blue-500 mb-4 uppercase">Sprint {sprintsCompleted + 1}</div>
+             <div className={`bg-white dark:bg-slate-900 p-5 rounded-xl shadow-md border-2 ${themeColors.border}`}>
+                 <div className={`text-[10px] font-bold ${themeColors.text} mb-4 uppercase`}>Sprint {sprintsCompleted + 1}</div>
                  {activeSprint.map(item => (
                    <div key={item.assId} className="mb-4 last:mb-0">
-                     <span className="block text-[9px] font-bold text-blue-500 uppercase truncate">{item.discNome}</span>
+                     <span className={`block text-[9px] font-bold ${themeColors.text} uppercase truncate`}>{item.discNome}</span>
                      <span className="block text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight mb-2">{item.assTitulo}</span>
                    </div>
                  ))}
-                 <button onClick={() => setActiveTab('cronograma')} className="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 rounded-lg transition-colors cursor-pointer">
+                 <button onClick={() => setActiveTab('cronograma')} className={`mt-4 w-full ${themeColors.button} font-bold text-xs py-2 rounded-lg transition-colors cursor-pointer`}>
                    Ir para Execução
                  </button>
               </div>
            ) : (
-             <div className="text-sm text-blue-400 p-6 border-2 border-dashed border-blue-300 dark:border-blue-800 rounded-xl flex items-center justify-center">Nenhuma Sprint ativada hoje.</div>
+             <div className={`text-sm ${themeColors.text} p-6 border-2 border-dashed ${themeColors.border} rounded-xl flex items-center justify-center`}>Nenhuma Sprint ativada hoje.</div>
            )}
         </div>
 
@@ -1513,7 +1611,7 @@ function TabPlanner({ customSprint, sprintsCompleted, setActiveTab }) {
 // ==========================================
 // ABA 4: SPRINTS DE ESTUDO DIÁRIA
 // ==========================================
-function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, addXP, pomodoroTime, isPomodoroActive, isPomodoroBreak, togglePomodoro, resetPomodoro, triggerConfetti }) {
+function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, addXP, pomodoroTime, isPomodoroActive, isPomodoroBreak, togglePomodoro, resetPomodoro, triggerConfetti, themeColors, appTheme }) {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const sprintGroups = [];
@@ -1543,7 +1641,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200 dark:border-slate-800 pb-4 gap-4">
         <div>
           <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">Sprints de Estudo</h2>
-          <p className="text-slate-500 mt-1">Marque os passos. Bater a Sprint rende <strong className="text-blue-500">+50 XP</strong>.</p>
+          <p className="text-slate-500 mt-1">Marque os passos. Bater a Sprint rende <strong className={`${themeColors.text.split(' ')[0]}`}>+50 XP</strong>.</p>
         </div>
         <div className="flex gap-3 items-center w-full md:w-auto">
           <button disabled={sprintGroups.length === 0} onClick={handleCompleteSprint} className={`w-full md:w-auto px-6 py-3 rounded-xl font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${showConfirm ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white disabled:opacity-50'}`}>
@@ -1552,10 +1650,10 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
         </div>
       </header>
 
-      {/* WIDGET POMODORO */}
-      <div className={`p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between transition-all duration-500 shadow-lg border-2 ${isPomodoroActive && !isPomodoroBreak ? 'bg-indigo-600 border-indigo-500 text-white scale-[1.01]' : isPomodoroBreak ? 'bg-emerald-500 border-emerald-400 text-white scale-[1.01]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
+      {/* WIDGET POMODORO COM TEMAS APLICADOS */}
+      <div className={`p-6 rounded-2xl flex flex-col md:flex-row items-center justify-between transition-all duration-500 shadow-lg border-2 ${isPomodoroActive && !isPomodoroBreak ? `${themeColors.bg} border-transparent ${themeColors.solidText} scale-[1.01]` : isPomodoroBreak ? 'bg-emerald-500 border-emerald-400 text-white scale-[1.01]' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`}>
         <div className="flex items-center gap-4 mb-4 md:mb-0">
-          <div className={`p-3 rounded-full ${isPomodoroActive ? 'bg-white/20' : 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400'}`}>
+          <div className={`p-3 rounded-full ${isPomodoroActive ? 'bg-white/20' : `${themeColors.lightBg} ${themeColors.text}`}`}>
             {isPomodoroBreak ? <Coffee className="w-8 h-8" /> : <Clock className="w-8 h-8" />}
           </div>
           <div>
@@ -1573,7 +1671,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
             {formatTime(pomodoroTime)}
           </span>
           <div className="flex flex-col gap-2">
-            <button onClick={togglePomodoro} className={`p-3 rounded-xl transition-all hover:scale-105 shadow-sm cursor-pointer ${isPomodoroActive ? 'bg-white text-slate-900' : 'bg-indigo-600 hover:bg-indigo-700 text-white'}`}>
+            <button onClick={togglePomodoro} className={`p-3 rounded-xl transition-all hover:scale-105 shadow-sm cursor-pointer ${isPomodoroActive ? `bg-white ${appTheme === 'caveira' ? 'text-amber-600' : 'text-slate-900'}` : themeColors.button}`}>
               {isPomodoroActive ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
             </button>
             <button onClick={resetPomodoro} className={`p-2 rounded-xl transition-all hover:scale-105 cursor-pointer ${isPomodoroActive ? 'bg-white/20 hover:bg-white/30 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200'}`}>
@@ -1601,8 +1699,8 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
             const isActive = idx === 0;
 
             return (
-              <div key={sprintNum} className={`bg-white dark:bg-slate-900 rounded-2xl p-0 overflow-hidden flex flex-col md:flex-row border-2 transition-all ${isActive ? 'border-blue-400 shadow-lg ring-4 ring-blue-50 dark:ring-blue-900/20 scale-[1.01]' : 'border-slate-200 dark:border-slate-800 opacity-80'}`}>
-                <div className={`p-5 w-full md:w-32 flex flex-col items-center justify-center font-black border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 ${isActive ? 'bg-blue-500 text-white' : 'bg-slate-50 dark:bg-slate-800/50 text-slate-400'}`}>
+              <div key={sprintNum} className={`bg-white dark:bg-slate-900 rounded-2xl p-0 overflow-hidden flex flex-col md:flex-row border-2 transition-all ${isActive ? `${themeColors.border.split(' ')[0].replace('border-', 'border-')} shadow-lg ring-4 ${themeColors.lightBg.replace('bg-', 'ring-')} scale-[1.01]` : 'border-slate-200 dark:border-slate-800 opacity-80'}`}>
+                <div className={`p-5 w-full md:w-32 flex flex-col items-center justify-center font-black border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 ${isActive ? `${themeColors.bg} ${themeColors.solidText}` : 'bg-slate-50 dark:bg-slate-800/50 text-slate-400'}`}>
                   <span className="text-xs uppercase tracking-widest">Sprint</span><span className="text-4xl mt-1">{sprintNum}</span>
                   {isActive && <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded mt-2">EM CURSO</span>}
                 </div>
@@ -1614,30 +1712,30 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                     const isRevisado = progress[item.assId]?.revisado || false;
 
                     return (
-                      <div key={item.assId} className={`rounded-xl p-5 border flex flex-col relative ${isActive ? 'bg-blue-50/50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'}`}>
+                      <div key={item.assId} className={`rounded-xl p-5 border flex flex-col relative ${isActive ? `${themeColors.lightBg} ${themeColors.border}` : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'}`}>
                         <button onClick={() => setCustomSprint(p => p.filter(i => i.assId !== item.assId))} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors cursor-pointer" title="Remover"><Trash2 className="w-4 h-4"/></button>
                         
-                        <span className="text-[10px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-1 pr-6">{item.discNome}</span>
+                        <span className={`text-[10px] font-black uppercase tracking-wider ${themeColors.text} mb-1 pr-6`}>{item.discNome}</span>
                         <p className="font-bold text-lg text-slate-800 dark:text-slate-200 mb-4">{item.assTitulo}</p>
                         
                         <div className="mt-auto space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700/50">
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isEstudado ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
+                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isEstudado ? themeColors.text : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
                             <input type="checkbox" checked={isEstudado} onChange={() => toggleProgress(item.assId, 'estudado')} disabled={!isActive} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0" />
                             <span className="font-bold text-sm uppercase tracking-wide">1. Teoria</span>
                           </label>
 
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isQuestoes ? 'text-purple-600 dark:text-purple-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
+                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isQuestoes ? themeColors.text : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
                             <input type="checkbox" checked={isQuestoes} onChange={() => toggleProgress(item.assId, 'questoes')} disabled={!isActive || !isEstudado} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0" />
                             <span className="font-bold text-sm uppercase tracking-wide">2. Questões</span>
                           </label>
 
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isRevisado ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
+                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isRevisado ? themeColors.text : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
                             <input type="checkbox" checked={isRevisado} onChange={() => toggleProgress(item.assId, 'revisado')} disabled={!isActive || !isQuestoes} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0" />
                             <span className="font-bold text-sm uppercase tracking-wide">3. Revisão (Agenda Auto)</span>
                           </label>
                           
                           {item.linkTec && isActive && (
-                            <a href={item.linkTec} target="_blank" rel="noopener noreferrer" className="mt-4 flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-all shadow-sm cursor-pointer">
+                            <a href={item.linkTec} target="_blank" rel="noopener noreferrer" className={`mt-4 flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold rounded-lg ${themeColors.button} transition-all shadow-sm cursor-pointer`}>
                               <ExternalLink className="w-4 h-4" /> Resolver no TEC
                             </a>
                           )}
@@ -1665,7 +1763,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
 // ==========================================
 // ABA 5: DECK DE COMBATE (ANKI NATIVO)
 // ==========================================
-function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds }) {
+function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds, themeColors }) {
   const [isReviewing, setIsReviewing] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
 
@@ -1715,10 +1813,10 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
         <div className="w-full max-w-2xl bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden text-left">
           
           <div className="bg-slate-100 dark:bg-slate-800 p-4 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center relative">
-            <span className="text-xs font-black uppercase text-blue-500 tracking-widest">{activeCard.discNome}</span>
+            <span className={`text-xs font-black uppercase ${themeColors.text.split(' ')[0]} tracking-widest`}>{activeCard.discNome}</span>
             <span className="text-xs font-bold text-slate-400 bg-white dark:bg-slate-900 px-3 py-1 rounded-full shadow-sm">{revisoesPendentes.length} restantes</span>
             {activeCard.linkTec && (
-              <a href={activeCard.linkTec} target="_blank" rel="noreferrer" title="Abrir Caderno TEC" className="absolute top-3 right-3 p-1.5 rounded-lg bg-blue-100 text-blue-600 hover:bg-blue-200 cursor-pointer">
+              <a href={activeCard.linkTec} target="_blank" rel="noreferrer" title="Abrir Caderno TEC" className={`absolute top-3 right-3 p-1.5 rounded-lg ${themeColors.lightBg} ${themeColors.text} hover:scale-110 transition-transform cursor-pointer`}>
                 <ExternalLink className="w-4 h-4" />
               </a>
             )}
@@ -1729,7 +1827,7 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
           </div>
 
           {isFlipped ? (
-            <div className="border-t border-slate-100 dark:border-slate-800 bg-blue-50/30 dark:bg-blue-900/10 animate-in slide-in-from-bottom-4">
+            <div className={`border-t border-slate-100 dark:border-slate-800 ${themeColors.lightBg} animate-in slide-in-from-bottom-4`}>
               <div className="p-8 min-h-[150px] flex items-center justify-center">
                 <p className="text-lg md:text-xl font-medium text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{answerText}</p>
               </div>
@@ -1754,7 +1852,7 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
             </div>
           ) : (
             <div className="p-6 bg-slate-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 flex justify-center">
-              <button onClick={() => setIsFlipped(true)} className="w-full md:w-auto px-12 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl shadow-lg hover:shadow-blue-500/20 transition-all flex items-center justify-center gap-2 text-lg cursor-pointer">
+              <button onClick={() => setIsFlipped(true)} className={`w-full md:w-auto px-12 py-4 ${themeColors.button} font-black rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 text-lg cursor-pointer`}>
                 <Eye className="w-5 h-5"/> Revelar Resposta
               </button>
             </div>
@@ -1769,13 +1867,13 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
     <div className="space-y-6 animate-in fade-in text-left">
       <header className="border-b border-slate-200 dark:border-slate-800 pb-4">
         <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
-          <BrainCircuit className="w-8 h-8 text-blue-500" /> Deck de Combate
+          <BrainCircuit className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Deck de Combate
         </h2>
         <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Retenção ativa. A sua memória não terá espaço para falhar.</p>
         
         {revisoesPendentes.length > 0 && (
           <div className="mt-4">
-            <button onClick={() => setIsReviewing(true)} className="w-full md:w-auto px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer">
+            <button onClick={() => setIsReviewing(true)} className={`w-full md:w-auto px-8 py-3 ${themeColors.button} font-black rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer`}>
               <Zap className="w-5 h-5"/> Iniciar Revisão ({revisoesPendentes.length})
             </button>
           </div>
@@ -1801,7 +1899,7 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
                     <span className="text-[9px] uppercase font-black text-slate-400 block mb-0.5">{data.discNome}</span>
                     <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm truncate">{data.titulo}</h4>
                   </div>
-                  {(data.pergunta || data.resposta) && <BrainCircuit className="w-4 h-4 text-blue-400 shrink-0" title="Possui Flashcard Customizado"/>}
+                  {(data.pergunta || data.resposta) && <BrainCircuit className={`w-4 h-4 ${themeColors.text.split(' ')[0]} shrink-0`} title="Possui Flashcard Customizado"/>}
                 </div>
               ))
             )}
@@ -1845,7 +1943,7 @@ function TabDeckAnki({ progress, handleReviewFeedback, edital, activeSubjectIds 
 // ==========================================
 // ABA NOVA: PAINEL DE CONTROLE (ADMINISTRAÇÃO)
 // ==========================================
-function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdital, setCustomSprint, initialEdital, setSprintsCompleted, setDailyLogs }) {
+function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdital, setCustomSprint, initialEdital, setSprintsCompleted, setDailyLogs, themeColors, playLevelUpSound }) {
   const [localConfig, setLocalConfig] = useState({
     ...config,
     revBom: config.revBom || 7,
@@ -1881,11 +1979,11 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
   const handleExportBackup = () => {
     const backupData = {
       config: localConfig,
-      progress: JSON.parse(localStorage.getItem('pareto_progress_v22') || '{}'),
-      gamification: JSON.parse(localStorage.getItem('pareto_gamification_v22') || '{}'),
-      sprints: JSON.parse(localStorage.getItem('pareto_custom_sprint_v22') || '[]'),
-      edital: JSON.parse(localStorage.getItem('pareto_edital_v22') || '[]'),
-      logs: JSON.parse(localStorage.getItem('pareto_daily_logs_v22') || '{}'),
+      progress: JSON.parse(localStorage.getItem('pareto_progress_v23') || '{}'),
+      gamification: JSON.parse(localStorage.getItem('pareto_gamification_v23') || '{}'),
+      sprints: JSON.parse(localStorage.getItem('pareto_custom_sprint_v23') || '[]'),
+      edital: JSON.parse(localStorage.getItem('pareto_edital_v23') || '[]'),
+      logs: JSON.parse(localStorage.getItem('pareto_daily_logs_v23') || '{}'),
       exportDate: new Date().toISOString()
     };
     
@@ -1932,7 +2030,7 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
     return (
       <div className="flex items-center justify-center min-h-[60vh] animate-in fade-in">
         <div className="bg-white dark:bg-slate-900 p-8 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800 max-w-sm w-full text-center">
-          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className={`w-16 h-16 ${themeColors.lightBg} ${themeColors.text} rounded-full flex items-center justify-center mx-auto mb-6`}>
             <Lock className="w-8 h-8" />
           </div>
           <h2 className="text-2xl font-black text-slate-800 dark:text-white mb-2">Acesso Restrito</h2>
@@ -1945,11 +2043,11 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
                 placeholder="Palavra-passe..." 
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
-                className="w-full p-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-colors text-center font-black tracking-widest"
+                className={`w-full p-4 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:${themeColors.border.split(' ')[0].replace('border-', 'border-')} transition-colors text-center font-black tracking-widest`}
               />
               {errorMsg && <p className="text-red-500 text-xs font-bold mt-2">{errorMsg}</p>}
             </div>
-            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-black shadow-lg transition-all cursor-pointer">
+            <button type="submit" className={`w-full ${themeColors.button} py-4 rounded-xl font-black shadow-lg transition-all cursor-pointer`}>
               Desbloquear Painel
             </button>
           </form>
@@ -1963,7 +2061,7 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
       <header className="border-b border-slate-200 dark:border-slate-800 pb-4 flex justify-between items-end">
         <div>
           <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
-            <Settings className="w-8 h-8 text-blue-500" /> Painel de Controle
+            <Settings className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Painel de Controle
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Personalize o seu sistema, ajuste o algoritmo e faça backups.</p>
         </div>
@@ -1971,7 +2069,7 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
           <button onClick={() => { setIsAuthenticated(false); sessionStorage.removeItem('admin_auth'); }} className="bg-slate-200 hover:bg-slate-300 text-slate-700 px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all cursor-pointer dark:bg-slate-800 dark:text-slate-300">
             <Lock className="w-5 h-5"/> Trancar
           </button>
-          <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all cursor-pointer">
+          <button onClick={handleSave} className={`${themeColors.button} px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg transition-all cursor-pointer`}>
             <Save className="w-5 h-5"/> Salvar Alterações
           </button>
         </div>
@@ -1985,10 +2083,10 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
-        {/* BLOCO 1: PERSONALIZAÇÃO VISUAL */}
+        {/* BLOCO 1: PERSONALIZAÇÃO VISUAL E UX */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
           <h3 className="text-lg font-black text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-            <ImageIcon className="w-5 h-5 text-indigo-500"/> Identidade Visual
+            <ImageIcon className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Identidade & UX
           </h3>
           
           <div className="space-y-5">
@@ -2005,27 +2103,52 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
 
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Som de Subida de Nível</label>
-                <select 
-                  value={localConfig.levelSound || 'chimes'} 
-                  onChange={e => setLocalConfig({...localConfig, levelSound: e.target.value})}
-                  className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors cursor-pointer"
-                >
-                  <option value="chimes">Sinos Mágicos (Suave)</option>
-                  <option value="arcade">Arcade 8-bits (Retro)</option>
-                  <option value="modern">Notificação Moderna (Limpa)</option>
-                  <option value="epic">Trombetas de Vitória (Épico)</option>
-                </select>
+                <div className="flex gap-2">
+                  <select 
+                    value={localConfig.levelSound || 'chimes'} 
+                    onChange={e => setLocalConfig({...localConfig, levelSound: e.target.value})}
+                    className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors cursor-pointer"
+                  >
+                    <option value="mario">Moeda Super Mario (Nostalgia)</option>
+                    <option value="chimes">Sinos Mágicos (Suave)</option>
+                    <option value="arcade">Arcade 8-bits (Retro)</option>
+                    <option value="modern">Notificação Moderna (Limpa)</option>
+                    <option value="epic">Trombetas de Vitória (Épico)</option>
+                  </select>
+                  <button 
+                    onClick={() => playLevelUpSound(localConfig.levelSound || 'chimes')}
+                    className={`p-3 ${themeColors.lightBg} ${themeColors.text} rounded-xl hover:scale-105 transition-all cursor-pointer`}
+                    title="Testar Som"
+                  >
+                    <Play size={20} className="fill-current" />
+                  </button>
+                </div>
               </div>
             </div>
 
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Nome do App / Sistema</label>
-              <input 
-                type="text" 
-                value={localConfig.appName} 
-                onChange={e => setLocalConfig({...localConfig, appName: e.target.value})}
-                className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Nome do App / Sistema</label>
+                <input 
+                  type="text" 
+                  value={localConfig.appName} 
+                  onChange={e => setLocalConfig({...localConfig, appName: e.target.value})}
+                  className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Tema do Sistema (Cores)</label>
+                <select 
+                  value={localConfig.appTheme || 'default'} 
+                  onChange={e => setLocalConfig({...localConfig, appTheme: e.target.value})}
+                  className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors cursor-pointer font-bold"
+                >
+                  {Object.entries(THEMES).map(([key, theme]) => (
+                    <option key={key} value={key}>{theme.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
             
             <div>
@@ -2042,6 +2165,7 @@ function TabAdmin({ config, setConfig, setUserProgress, setGamification, setEdit
                   className="flex-1 p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors text-sm font-mono"
                 />
               </div>
+              <p className="text-[10px] text-slate-400 mt-2">Dica: Use imagens transparentes (PNG) hospedadas em sites como Imgur.</p>
             </div>
           </div>
         </div>
