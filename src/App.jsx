@@ -170,7 +170,7 @@ const initialEdital = [
     id: 'bloco-gerais', nome: 'Conhecimentos Gerais (Base)', icone: 'Layers',
     disciplinas: [
       { id: 'port', nome: 'Língua Portuguesa', cor: 'text-rose-700 bg-rose-100', 
-        assuntos: [{ id: 'port_1', titulo: 'Compreensão de Textos', temp: '🔥 QUENTE', linkTec: '', indent: 0, pergunta: "", resposta: "" }] 
+        assuntos: [{ id: 'port_1', titulo: 'Compreensão de Textos', temp: '🔥 QUENTE', linkTec: '', indent: 0 }] 
       }
     ]
   }
@@ -263,10 +263,16 @@ const InlineTopicEditor = ({ assunto, onSave, onCancel, themeColors }) => {
   return (
     <div className="flex-1 flex flex-col gap-3 p-1 animate-in fade-in">
       <div className="grid md:grid-cols-2 gap-3 w-full">
-        <div><input type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Título do Assunto" autoFocus /></div>
-        <div><input type="text" value={link} onChange={(e) => setLink(e.target.value)} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Link Caderno TEC (Opcional)" /></div>
+        <div>
+          <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Título do Assunto</label>
+          <input type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500 mt-1" placeholder="Título do Assunto" autoFocus />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Link Caderno TEC (Opcional)</label>
+          <input type="text" value={link} onChange={(e) => setLink(e.target.value)} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500 mt-1" placeholder="Link Caderno TEC" />
+        </div>
       </div>
-      <div className="flex gap-2">
+      <div className="flex gap-2 mt-1">
         <button onClick={() => onSave(titulo, link)} className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer">Salvar Alterações</button>
         <button onClick={onCancel} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer">Cancelar</button>
       </div>
@@ -1134,16 +1140,20 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
   };
   const handleAddTopic = (discId) => {
     if(!newTopic.titulo) return; const newAssId = `t_${Date.now()}`;
-    setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => { if(d.id === discId) return { ...d, assuntos: [...d.assuntos, { id: newAssId, titulo: newTopic.titulo, temp: '⭐ NOVO', linkTec: newTopic.linkTec, indent: 0, pergunta: '', resposta: '' }] }; return d; }) })));
+    setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => { if(d.id === discId) return { ...d, assuntos: [...d.assuntos, { id: newAssId, titulo: newTopic.titulo, temp: '⭐ NOVO', linkTec: newTopic.linkTec, indent: 0 }] }; return d; }) })));
     setNewTopic({ discId: '', titulo: '', linkTec: '' });
   };
   const handleBulkAdd = (discId) => {
     if (!bulkInput.text.trim()) return; const lines = bulkInput.text.split('\n').filter(line => line.trim() !== ''); if (lines.length === 0) return;
-    const newAssuntos = lines.map((line, idx) => ({ id: `t_${Date.now()}_${idx}`, titulo: line.trim(), temp: '⭐ NOVO', linkTec: '', indent: 0, pergunta: '', resposta: '' }));
+    const newAssuntos = lines.map((line, idx) => ({ id: `t_${Date.now()}_${idx}`, titulo: line.trim(), temp: '⭐ NOVO', linkTec: '', indent: 0 }));
     setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => { if(d.id === discId) { return { ...d, assuntos: [...d.assuntos, ...newAssuntos] }; } return d; }) })));
     setBulkInput({ discId: null, text: '' });
   };
 
+  const startEditTopic = (assunto) => { 
+    setEditingTopicId(assunto.id); 
+  };
+  
   const saveEditTopic = (discId, assId, novoTitulo, novoLink) => {
     if (!novoTitulo) return; 
     setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => { if (d.id === discId) return { ...d, assuntos: d.assuntos.map(a => a.id === assId ? { ...a, titulo: novoTitulo, linkTec: novoLink } : a) }; return d; }) }))); 
