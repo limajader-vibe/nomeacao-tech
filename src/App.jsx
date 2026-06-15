@@ -76,6 +76,7 @@ export const THEMES = {
     icon: 'text-blue-500',
     bg: 'bg-blue-500',
     lightBg: 'bg-blue-50 dark:bg-blue-900/10',
+    headerBg: 'bg-blue-100 dark:bg-blue-950/90',
     border: 'border-blue-200 dark:border-blue-800',
     text: 'text-blue-600 dark:text-blue-400',
     solidText: 'text-white'
@@ -88,6 +89,7 @@ export const THEMES = {
     icon: 'text-emerald-500',
     bg: 'bg-emerald-500',
     lightBg: 'bg-emerald-50 dark:bg-emerald-900/10',
+    headerBg: 'bg-emerald-100 dark:bg-teal-950/90',
     border: 'border-emerald-200 dark:border-emerald-800',
     text: 'text-emerald-600 dark:text-emerald-400',
     solidText: 'text-white'
@@ -100,6 +102,7 @@ export const THEMES = {
     icon: 'text-amber-500',
     bg: 'bg-amber-500',
     lightBg: 'bg-amber-50 dark:bg-amber-900/10',
+    headerBg: 'bg-amber-100 dark:bg-amber-950/80',
     border: 'border-amber-200 dark:border-amber-800',
     text: 'text-amber-600 dark:text-amber-400',
     solidText: 'text-slate-900 font-black'
@@ -112,6 +115,7 @@ export const THEMES = {
     icon: 'text-red-500',
     bg: 'bg-red-500',
     lightBg: 'bg-red-50 dark:bg-red-900/10',
+    headerBg: 'bg-red-100 dark:bg-rose-950/90',
     border: 'border-red-200 dark:border-red-800',
     text: 'text-red-600 dark:text-red-400',
     solidText: 'text-white'
@@ -652,76 +656,76 @@ export default function App() {
         {showLevelMap && <LevelMapModal currentXp={gamification.xp} onClose={() => setShowLevelMap(false)} />}
 
         {/* MOBILE TOP HEADER */}
-        <div className={`md:hidden flex items-center justify-between p-4 bg-gradient-to-br ${themeColors.sidebar} text-white shadow-md z-20 sticky top-0`}>
+        <div className={`md:hidden flex items-center justify-between p-4 ${themeColors.headerBg} text-slate-800 dark:text-white shadow-sm border-b ${themeColors.border} z-20 sticky top-0`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center overflow-hidden shrink-0 border border-white/30 backdrop-blur-sm shadow-inner">
+            <div className={`w-10 h-10 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center overflow-hidden shrink-0 border ${themeColors.border} shadow-inner`}>
               <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-cover opacity-90 bg-white p-0.5" />
             </div>
             <div className="flex flex-col">
-              <h2 className="font-bold text-base leading-tight tracking-tight shadow-sm truncate max-w-[150px]">{projectConfig.appName}</h2>
+              <h2 className="font-bold text-base leading-tight tracking-tight truncate max-w-[150px]">{projectConfig.appName}</h2>
               <div className="flex items-center gap-2 mt-0.5">
-                <p className="text-[10px] text-amber-300 font-bold uppercase tracking-wider flex items-center gap-1">Lvl {userLevel.nivel} <Award className="w-3 h-3"/></p>
-                <span className="text-[10px] text-orange-400 font-black flex items-center gap-0.5 border-l border-white/20 pl-2"><Flame className="w-3 h-3"/> {gamification.streak}</span>
+                <p className={`text-[10px] ${themeColors.text} font-bold uppercase tracking-wider flex items-center gap-1`}>Lvl {userLevel.nivel} <Award className="w-3 h-3"/></p>
+                <span className="text-[10px] text-orange-500 dark:text-orange-400 font-black flex items-center gap-0.5 border-l border-slate-300 dark:border-slate-700 pl-2"><Flame className="w-3 h-3"/> {gamification.streak}</span>
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer">
-              {isDarkMode ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-white" />}
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border ${themeColors.border} rounded-full transition-colors cursor-pointer`}>
+              {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text}`} />}
             </button>
-            <button onClick={() => setActiveTab('admin')} className="p-2.5 bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer">
-              <Settings className="w-4 h-4 text-white" />
+            <button onClick={() => setActiveTab('admin')} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border ${themeColors.border} rounded-full transition-colors cursor-pointer`}>
+              <Settings className={`w-4 h-4 ${themeColors.text}`} />
             </button>
           </div>
         </div>
 
         {/* SIDEBAR DESKTOP */}
         <aside className="hidden md:flex w-72 bg-white dark:bg-slate-900 shadow-xl flex-col z-10 shrink-0 border-r border-slate-200 dark:border-slate-800 sticky top-0 h-screen overflow-hidden">
-          <div className={`p-5 bg-gradient-to-br ${themeColors.sidebar} text-white relative transition-colors duration-500 shrink-0`}>
+          <div className={`p-5 ${themeColors.headerBg} border-b ${themeColors.border} relative transition-colors duration-500 shrink-0`}>
             {/* LOGO + APP NAME + THEME TOGGLE (TUDO NA MESMA LINHA) */}
             <div className="flex justify-between items-center mb-5">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center overflow-hidden shrink-0 border border-white/30 backdrop-blur-sm shadow-inner">
-                  <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity bg-white p-0.5" />
+                <div className={`w-10 h-10 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center overflow-hidden shrink-0 border ${themeColors.border} shadow-sm`}>
+                  <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity p-0.5" />
                 </div>
-                <h2 className="font-bold text-xl tracking-tight text-white shadow-sm truncate" title={projectConfig.appName}>{projectConfig.appName}</h2>
+                <h2 className="font-bold text-xl tracking-tight text-slate-800 dark:text-white truncate" title={projectConfig.appName}>{projectConfig.appName}</h2>
               </div>
-              <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer shrink-0 ml-2">
-                {isDarkMode ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-white" />}
+              <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border ${themeColors.border} rounded-full transition-colors cursor-pointer shrink-0 ml-2 shadow-sm`}>
+                {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text}`} />}
               </button>
             </div>
             
-            {/* CARTÃO DE TRILHA E STATUS MODERNO (ULTRA-COMPACTO) */}
+            {/* CARTÃO DE TRILHA E STATUS MODERNO (ULTRA-COMPACTO E HARMONIZADO) */}
             <div className="flex flex-col gap-3">
               {/* Info Trilha */}
               <div>
-                <p className="text-[9px] text-white/60 font-bold uppercase tracking-widest leading-tight mb-0.5 truncate">{projectConfig.concurso}</p>
-                <h3 className="text-lg font-black leading-tight text-white truncate mb-2">{projectConfig.cargo}</h3>
+                <p className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest leading-tight mb-0.5 truncate">{projectConfig.concurso}</p>
+                <h3 className="text-lg font-black leading-tight text-slate-800 dark:text-white truncate mb-2">{projectConfig.cargo}</h3>
                 
-                {/* Tags Compactas */}
-                <div className="flex flex-wrap gap-1.5">
-                  <span className="flex items-center gap-1 bg-white/10 px-1.5 py-0.5 rounded text-[9px] font-bold text-white/90 border border-white/10 backdrop-blur-sm"><Target size={10} /> {projectConfig.horasDia}h/dia</span>
-                  <span className="flex items-center gap-1 bg-white/10 px-1.5 py-0.5 rounded text-[9px] font-bold text-white/90 border border-white/10 backdrop-blur-sm truncate max-w-[130px]" title={projectConfig.banca}>{projectConfig.banca}</span>
+                {/* Tags Compactas (Expandidas horizontalmente) */}
+                <div className="flex gap-1.5 w-full">
+                  <span className={`flex flex-1 items-center justify-center gap-1 bg-white dark:bg-slate-800 px-1.5 py-1 rounded text-[8px] font-bold ${themeColors.text} border ${themeColors.border} shadow-sm truncate`} title={projectConfig.banca}>{projectConfig.banca}</span>
+                  <span className={`flex shrink-0 items-center gap-1 bg-white dark:bg-slate-800 px-1.5 py-1 rounded text-[8px] font-bold ${themeColors.text} border ${themeColors.border} shadow-sm`}><Target size={10} className={themeColors.text.split(' ')[0]} /> {projectConfig.horasDia}h</span>
                 </div>
               </div>
 
               {/* Nível e Streak Card Moderno */}
-              <div onClick={() => setShowLevelMap(true)} className="group relative overflow-hidden rounded-xl bg-white/[0.05] border border-white/10 p-2.5 transition-all hover:bg-white/[0.1] hover:border-white/20 cursor-pointer backdrop-blur-sm shadow-inner mt-1">
-                <div className="flex justify-between items-center mb-1.5">
-                  <div className="flex items-center gap-2.5">
-                    <Award size={18} className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] group-hover:scale-110 transition-transform duration-300" />
+              <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-xl bg-white dark:bg-slate-900/60 border ${themeColors.border} p-3.5 transition-all hover:shadow-md cursor-pointer shadow-sm mt-1`}>
+                <div className="flex justify-between items-center mb-2.5">
+                  <div className="flex items-center gap-3">
+                    <Award size={20} className="text-amber-500 dark:text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)] group-hover:scale-110 transition-transform duration-300" />
                     <div className="flex flex-col">
-                      <span className="text-sm font-black text-white leading-none">Lvl {userLevel.nivel}</span>
-                      <span className="text-[8px] text-white/60 font-bold uppercase tracking-widest mt-0.5 truncate max-w-[90px]">{userLevel.titulo}</span>
+                      <span className="text-sm font-black text-slate-800 dark:text-white leading-none">Lvl {userLevel.nivel}</span>
+                      <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1 truncate max-w-[90px]">{userLevel.titulo}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded flex-shrink-0 border border-orange-500/20">
-                    <Flame size={10} className="fill-current animate-pulse" />
-                    <span className="text-[10px] font-black">{gamification.streak}</span>
+                  <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/10 px-2 py-1 rounded-md flex-shrink-0 border border-orange-200 dark:border-orange-500/20">
+                    <Flame size={12} className="fill-current animate-pulse" />
+                    <span className="text-[11px] font-black">{gamification.streak}</span>
                   </div>
                 </div>
                 {/* Barra de Progresso Minimalista */}
-                <div className="relative w-full h-1 bg-black/40 rounded-full overflow-hidden">
+                <div className="relative w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
                   <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
                 </div>
               </div>
@@ -763,7 +767,7 @@ export default function App() {
           <div className="max-w-5xl mx-auto">
             {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} />}
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} />}
-            {activeTab === 'planner' && <TabPlanner customSprint={customSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} />}
+            {activeTab === 'planner' && <TabPlanner customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} progress={userProgress} toggleProgress={toggleProgress} />}
             {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} pomodoroTime={pomodoroTime} isPomodoroActive={isPomodoroActive} isPomodoroBreak={isPomodoroBreak} togglePomodoro={togglePomodoro} resetPomodoro={resetPomodoro} triggerConfetti={triggerConfetti} themeColors={themeColors} appTheme={projectConfig.appTheme} />}
             {activeTab === 'revisoes' && <TabRevisaoInteligente progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} />}
             {activeTab === 'admin' && <TabAdmin auth={auth} config={projectConfig} setConfig={setProjectConfig} userProgress={userProgress} setUserProgress={setUserProgress} gamification={gamification} setGamification={setGamification} edital={edital} setEdital={setEdital} customSprint={customSprint} setCustomSprint={setCustomSprint} initialEdital={initialEdital} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} reviewStats={reviewStats} themeColors={themeColors} playLevelUpSound={playLevelUpSound} />}
@@ -842,7 +846,6 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
     return { dateObj: d, dateStr: d.toLocaleDateString(), dayLabel: d.toLocaleDateString('pt-BR', { weekday: 'short' }).charAt(0).toUpperCase() };
   });
   
-  // CORREÇÃO: Escala do gráfico garante que a Meta (horasDia) cabe perfeitamente sem vazar para cima
   const maxHoursLogged = Math.max(...last14Days.map(d => dailyLogs[d.dateStr] || 0));
   const maxHours = Math.max(maxHoursLogged, config.horasDia * 1.2, 2); 
   
@@ -870,66 +873,66 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in pb-10">
-      <header className="border-b border-slate-200 dark:border-slate-800 pb-4">
-        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
-          <Activity className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Painel Geral
+    <div className="space-y-4 animate-in fade-in pb-10">
+      <header className="border-b border-slate-200 dark:border-slate-800 pb-3">
+        <h2 className="text-2xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
+          <Activity className={`w-6 h-6 ${themeColors.text.split(' ')[0]}`} /> Painel Geral
         </h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Central de comando. Zero distrações, máximo desempenho.</p>
+        <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">Central de comando. Zero distrações, máximo desempenho.</p>
       </header>
 
       {/* LINHA 1: OS 3 INDICADORES VITAIS (KPIs) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-center items-center text-center">
-          <div className={`p-3 ${themeColors.lightBg.split(' ')[0]} rounded-full mb-3`}><TrendingUp className={`w-6 h-6 ${themeColors.text.split(' ')[0]}`}/></div>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Domínio da Trilha</p>
-          <span className="text-4xl font-black text-slate-800 dark:text-white mt-1 mb-2">{progressPerc}%</span>
-          <div className="w-full max-w-[150px] h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-center items-center text-center">
+          <div className={`p-2 ${themeColors.lightBg.split(' ')[0]} rounded-full mb-2`}><TrendingUp className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/></div>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Domínio da Trilha</p>
+          <span className="text-2xl font-black text-slate-800 dark:text-white mt-0.5 mb-1.5">{progressPerc}%</span>
+          <div className="w-full max-w-[120px] h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
             <div className={`h-full transition-all duration-1000 ${themeColors.bg.split(' ')[0]}`} style={{ width: `${progressPerc}%` }}></div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-center items-center text-center">
-          <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-full mb-3"><Clock className="w-6 h-6 text-blue-500"/></div>
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Horas de Hoje</p>
-          <div className="flex items-end gap-1 mt-1 mb-2">
-            <span className="text-4xl font-black text-slate-800 dark:text-white">{todayHours.toFixed(1)}</span>
-            <span className="text-sm font-bold text-slate-400 mb-1">/ {config.horasDia}h</span>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-center items-center text-center">
+          <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full mb-2"><Clock className="w-5 h-5 text-blue-500"/></div>
+          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Horas de Hoje</p>
+          <div className="flex items-end gap-1 mt-0.5 mb-1.5">
+            <span className="text-2xl font-black text-slate-800 dark:text-white">{todayHours.toFixed(1)}</span>
+            <span className="text-xs font-bold text-slate-400 mb-0.5">/ {config.horasDia}h</span>
           </div>
-          <div className="w-full max-w-[150px] h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div className="w-full max-w-[120px] h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
             <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${Math.min((todayHours / config.horasDia) * 100, 100)}%` }}></div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-3xl p-6 shadow-md text-white flex flex-col justify-center items-center text-center relative overflow-hidden">
-          <div className="absolute -right-4 -top-4 opacity-20"><Trophy className="w-24 h-24"/></div>
-          <div className="p-3 bg-white/20 rounded-full mb-3 z-10"><Award className="w-6 h-6 text-amber-200"/></div>
-          <p className="text-xs font-bold text-amber-200 uppercase tracking-widest z-10">XP Acumulado</p>
-          <span className="text-4xl font-black text-white mt-1 mb-2 z-10">{gamification.xp.toLocaleString()}</span>
-          <p className="text-[10px] uppercase font-bold text-amber-200 z-10">Nível {userLevel.nivel} • {userLevel.titulo}</p>
+        <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-4 shadow-md text-white flex flex-col justify-center items-center text-center relative overflow-hidden">
+          <div className="absolute -right-2 -top-2 opacity-20"><Trophy className="w-16 h-16"/></div>
+          <div className="p-2 bg-white/20 rounded-full mb-2 z-10"><Award className="w-5 h-5 text-amber-200"/></div>
+          <p className="text-[10px] font-bold text-amber-200 uppercase tracking-widest z-10">XP Acumulado</p>
+          <span className="text-2xl font-black text-white mt-0.5 mb-1.5 z-10">{gamification.xp.toLocaleString()}</span>
+          <p className="text-[9px] uppercase font-bold text-amber-200 z-10">Nível {userLevel.nivel} • {userLevel.titulo}</p>
         </div>
       </div>
 
       {/* LINHA 2: GRÁFICOS DE MÉTRICAS */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
         {/* Gráfico de Barras com Input Minimalista */}
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-full min-h-[350px]">
-          <div className="flex justify-between items-start mb-6">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-full min-h-[240px]">
+          <div className="flex justify-between items-start mb-4">
             <div>
-              <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><BarChart2 className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Esforço Diário</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Média: <strong className="text-slate-700 dark:text-slate-300">{avgHours}h/dia</strong></p>
+              <h3 className="font-bold text-base text-slate-800 dark:text-white flex items-center gap-1.5"><BarChart2 className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`}/> Esforço Diário</h3>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">Média: <strong className="text-slate-700 dark:text-slate-300">{avgHours}h/dia</strong></p>
             </div>
             
             {/* INPUT MINIMALISTA DE HORAS */}
-            <form onSubmit={handleLogHours} className="flex gap-1.5 bg-slate-50 dark:bg-slate-800 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
-              <input type="number" step="0.5" placeholder="+ Hrs" value={loggedHoursToday} onChange={(e) => setLoggedHoursToday(e.target.value)} className="w-16 p-2 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none text-xs font-bold text-center border border-slate-200 dark:border-slate-700 focus:border-blue-500 transition-colors" />
-              <button type="submit" className={`${themeColors.bg.split(' ')[0]} hover:opacity-80 text-white px-3 py-2 rounded-lg font-bold transition-colors text-xs flex items-center justify-center cursor-pointer`} title="Adicionar Horas"><Plus className="w-4 h-4"/></button>
+            <form onSubmit={handleLogHours} className="flex gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
+              <input type="number" step="0.5" placeholder="+ Hrs" value={loggedHoursToday} onChange={(e) => setLoggedHoursToday(e.target.value)} className="w-14 p-1.5 rounded-md bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none text-[10px] font-bold text-center border border-slate-200 dark:border-slate-700 focus:border-blue-500 transition-colors" />
+              <button type="submit" className={`${themeColors.bg.split(' ')[0]} hover:opacity-80 text-white px-2 py-1.5 rounded-md font-bold transition-colors text-[10px] flex items-center justify-center cursor-pointer`} title="Adicionar Horas"><Plus className="w-3 h-3"/></button>
             </form>
           </div>
           
-          <div className="flex-1 flex items-end justify-between gap-1 md:gap-2 mt-auto pt-4 relative">
+          <div className="flex-1 flex items-end justify-between gap-1 mt-auto pt-2 relative">
             <div className="absolute w-full border-t border-dashed border-emerald-500/50 flex items-center justify-end pr-1" style={{ bottom: `${(config.horasDia / maxHours) * 100}%` }}>
-              <span className="text-[9px] font-bold text-emerald-500 bg-white dark:bg-slate-900 px-1 -translate-y-1/2">Meta: {config.horasDia}h</span>
+              <span className="text-[8px] font-bold text-emerald-500 bg-white dark:bg-slate-900 px-1 -translate-y-1/2">Meta: {config.horasDia}h</span>
             </div>
             {last14Days.map((day, i) => {
               const hours = dailyLogs[day.dateStr] || 0;
@@ -937,40 +940,39 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
               const isToday = i === 13;
               return (
                 <div key={i} className="flex flex-col items-center flex-1 group">
-                  <div className="w-full h-40 flex items-end justify-center relative">
-                    <div className={`w-full max-w-[24px] rounded-t-md transition-all duration-700 ease-out hover:opacity-80 ${isToday ? themeColors.bg.split(' ')[0] : 'bg-slate-200 dark:bg-slate-700'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '4px' : '0' }}>
-                      <span className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded pointer-events-none transition-opacity z-10">{hours > 0 ? `${hours}h` : '0h'}</span>
+                  <div className="w-full h-24 flex items-end justify-center relative">
+                    <div className={`w-full max-w-[16px] rounded-t-sm transition-all duration-700 ease-out hover:opacity-80 ${isToday ? themeColors.bg.split(' ')[0] : 'bg-slate-200 dark:bg-slate-700'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '4px' : '0' }}>
+                      <span className="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] font-bold px-1.5 py-0.5 rounded pointer-events-none transition-opacity z-10">{hours > 0 ? `${hours}h` : '0h'}</span>
                     </div>
                   </div>
-                  <span className={`text-[9px] font-bold mt-2 uppercase ${isToday ? themeColors.text.split(' ')[0] : 'text-slate-400'}`}>{day.dayLabel}</span>
+                  <span className={`text-[8px] font-bold mt-1.5 uppercase ${isToday ? themeColors.text.split(' ')[0] : 'text-slate-400'}`}>{day.dayLabel}</span>
                 </div>
               );
             })}
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-full min-h-[350px]">
-          <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2 mb-2"><BrainCircuit className="w-5 h-5 text-emerald-500"/> Retenção de Memória</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-8">Precisão do seu cérebro no Deck de Combate (Anki).</p>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col h-full min-h-[240px]">
+          <h3 className="font-bold text-base text-slate-800 dark:text-white flex items-center gap-1.5 mb-1"><BrainCircuit className="w-4 h-4 text-emerald-500"/> Retenção de Memória</h3>
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4">Precisão do seu cérebro no Deck de Combate (Anki).</p>
           {totalReviews === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-sm">
-              <PieChart className="w-12 h-12 mb-3 opacity-30"/>
-              <p>Faça revisões para gerar o seu gráfico mental.</p>
+            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-xs">
+              <PieChart className="w-8 h-8 mb-2 opacity-30"/>
+              <p>Faça revisões para gerar o gráfico.</p>
             </div>
           ) : (
-            <div className="flex flex-col md:flex-row items-center justify-center gap-8 flex-1">
-              <div className="relative w-40 h-40 shrink-0">
+            <div className="flex flex-row items-center justify-center gap-6 flex-1">
+              <div className="relative w-28 h-28 shrink-0">
                 <div className="w-full h-full rounded-full shadow-inner" style={{ background: `conic-gradient(#10b981 0% ${facilPerc}%, #f59e0b ${facilPerc}% ${facilPerc + bomPerc}%, #ef4444 ${facilPerc + bomPerc}% 100%)` }}></div>
-                <div className="absolute inset-0 m-auto w-28 h-28 bg-white dark:bg-slate-900 rounded-full flex flex-col items-center justify-center shadow-[inset_0_0_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]">
-                  <span className="text-2xl font-black text-slate-800 dark:text-white">{successRate}%</span>
-                  <span className="text-[9px] uppercase font-bold text-slate-400">De Acerto</span>
+                <div className="absolute inset-0 m-auto w-20 h-20 bg-white dark:bg-slate-900 rounded-full flex flex-col items-center justify-center shadow-[inset_0_0_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]">
+                  <span className="text-xl font-black text-slate-800 dark:text-white leading-none">{successRate}%</span>
+                  <span className="text-[8px] uppercase font-bold text-slate-400 mt-0.5">De Acerto</span>
                 </div>
               </div>
-              <div className="space-y-4 w-full md:w-auto">
-                <div className="flex items-center justify-between gap-6"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm"></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300">Fácil</span></div><span className="font-black text-slate-800 dark:text-white">{facilPerc}%</span></div>
-                <div className="flex items-center justify-between gap-6"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-amber-500 shadow-sm"></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300">Bom</span></div><span className="font-black text-slate-800 dark:text-white">{bomPerc}%</span></div>
-                <div className="flex items-center justify-between gap-6"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-red-500 shadow-sm"></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300">Difícil</span></div><span className="font-black text-slate-800 dark:text-white">{dificilPerc}%</span></div>
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 mt-2"><p className="text-[10px] uppercase font-bold text-slate-400 text-center">Total de Revisões Realizadas: <strong className="text-indigo-500">{totalReviews}</strong></p></div>
+              <div className="space-y-3 w-full max-w-[120px]">
+                <div className="flex items-center justify-between gap-2"><div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm"></div><span className="text-xs font-bold text-slate-700 dark:text-slate-300">Fácil</span></div><span className="font-black text-sm text-slate-800 dark:text-white">{facilPerc}%</span></div>
+                <div className="flex items-center justify-between gap-2"><div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm"></div><span className="text-xs font-bold text-slate-700 dark:text-slate-300">Bom</span></div><span className="font-black text-sm text-slate-800 dark:text-white">{bomPerc}%</span></div>
+                <div className="flex items-center justify-between gap-2"><div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm"></div><span className="text-xs font-bold text-slate-700 dark:text-slate-300">Difícil</span></div><span className="font-black text-sm text-slate-800 dark:text-white">{dificilPerc}%</span></div>
               </div>
             </div>
           )}
@@ -978,29 +980,29 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
       </div>
 
       {/* LINHA 3: MAPA E RADAR */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 items-stretch">
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8 mt-0">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 items-stretch">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-5 mt-0 flex flex-col">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 gap-2">
             <div>
-              <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><CalendarDays className="w-5 h-5 text-emerald-500"/> Mapa de Constância</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">O seu histórico nos últimos 3 meses.</p>
+              <h3 className="font-bold text-base text-slate-800 dark:text-white flex items-center gap-1.5"><CalendarDays className="w-4 h-4 text-emerald-500"/> Mapa de Constância</h3>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Últimos 3 meses.</p>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-400">
-              <span>Menos</span><div className="w-3 h-3 rounded-sm bg-slate-100 dark:bg-slate-800"></div><div className="w-3 h-3 rounded-sm bg-emerald-200 dark:bg-emerald-900/40"></div><div className="w-3 h-3 rounded-sm bg-emerald-300 dark:bg-emerald-700/60"></div><div className="w-3 h-3 rounded-sm bg-emerald-500 dark:bg-emerald-500"></div><div className="w-3 h-3 rounded-sm bg-emerald-700 dark:bg-emerald-400"></div><span>Mais</span>
+            <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase text-slate-400">
+              <span>Menos</span><div className="w-2.5 h-2.5 rounded-sm bg-slate-100 dark:bg-slate-800"></div><div className="w-2.5 h-2.5 rounded-sm bg-emerald-200 dark:bg-emerald-900/40"></div><div className="w-2.5 h-2.5 rounded-sm bg-emerald-300 dark:bg-emerald-700/60"></div><div className="w-2.5 h-2.5 rounded-sm bg-emerald-500 dark:bg-emerald-500"></div><div className="w-2.5 h-2.5 rounded-sm bg-emerald-700 dark:bg-emerald-400"></div><span>Mais</span>
             </div>
           </div>
-          <div className="overflow-x-auto custom-scrollbar pb-2">
-            <div className="min-w-max flex gap-2">
-              <div className="grid grid-rows-7 gap-1 text-[9px] font-bold text-slate-400 pr-2 text-right"><div className="h-3.5 flex items-center justify-end">D</div><div className="h-3.5 flex items-center justify-end">S</div><div className="h-3.5 flex items-center justify-end">T</div><div className="h-3.5 flex items-center justify-end">Q</div><div className="h-3.5 flex items-center justify-end">Q</div><div className="h-3.5 flex items-center justify-end">S</div><div className="h-3.5 flex items-center justify-end">S</div></div>
-              <div className="grid grid-rows-7 grid-flow-col gap-1.5">{heatmapDays.map((day, idx) => (<div key={idx} title={`${day.date}: ${day.hours.toFixed(1)}h estudadas`} className={`w-3.5 h-3.5 rounded-sm transition-all hover:scale-125 cursor-pointer relative ${day.colorClass}`}></div>))}</div>
+          <div className="overflow-x-auto custom-scrollbar pb-1 flex-1 flex items-center">
+            <div className="min-w-max flex gap-1.5 mx-auto">
+              <div className="grid grid-rows-7 gap-1 text-[8px] font-bold text-slate-400 pr-1 text-right"><div className="h-3 flex items-center justify-end">D</div><div className="h-3 flex items-center justify-end">S</div><div className="h-3 flex items-center justify-end">T</div><div className="h-3 flex items-center justify-end">Q</div><div className="h-3 flex items-center justify-end">Q</div><div className="h-3 flex items-center justify-end">S</div><div className="h-3 flex items-center justify-end">S</div></div>
+              <div className="grid grid-rows-7 grid-flow-col gap-1">{heatmapDays.map((day, idx) => (<div key={idx} title={`${day.date}: ${day.hours.toFixed(1)}h estudadas`} className={`w-3 h-3 rounded-[2px] transition-all hover:scale-125 cursor-pointer relative ${day.colorClass}`}></div>))}</div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 md:p-8 flex flex-col h-full min-h-[350px] max-h-[450px]">
-          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-6 flex items-center gap-2 shrink-0"><Filter className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Raio-X por Disciplina</h3>
-          <div className="space-y-6 flex-1 overflow-y-auto pr-4 custom-scrollbar">
-            {radarData.length === 0 ? <div className="text-sm text-slate-400 flex items-center justify-center h-full">Nenhuma disciplina cadastrada.</div> : radarData.map(disc => (<div key={disc.id} className="group"><div className="flex justify-between items-end mb-2"><span className={`text-sm font-bold text-slate-700 dark:text-slate-300 truncate pr-2 hover:${themeColors.text.split(' ')[0]} transition-colors`}>{disc.nome}</span><span className="text-sm font-black text-slate-800 dark:text-white shrink-0">{disc.perc}%</span></div><div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div className={`h-full transition-all duration-1000 rounded-full ${disc.perc === 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : themeColors.bg.split(' ')[0]}`} style={{width: `${disc.perc}%`}}></div></div></div>))}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-5 flex flex-col h-full max-h-[220px]">
+          <h3 className="font-bold text-base text-slate-800 dark:text-white mb-3 flex items-center gap-1.5 shrink-0"><Filter className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`}/> Raio-X por Disciplina</h3>
+          <div className="space-y-3.5 flex-1 overflow-y-auto pr-3 custom-scrollbar">
+            {radarData.length === 0 ? <div className="text-[10px] text-slate-400 flex items-center justify-center h-full">Nenhuma disciplina cadastrada.</div> : radarData.map(disc => (<div key={disc.id} className="group"><div className="flex justify-between items-end mb-1.5"><span className={`text-xs font-bold text-slate-700 dark:text-slate-300 truncate pr-2 hover:${themeColors.text.split(' ')[0]} transition-colors`}>{disc.nome}</span><span className="text-xs font-black text-slate-800 dark:text-white shrink-0">{disc.perc}%</span></div><div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div className={`h-full transition-all duration-1000 rounded-full ${disc.perc === 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : themeColors.bg.split(' ')[0]}`} style={{width: `${disc.perc}%`}}></div></div></div>))}
           </div>
         </div>
       </div>
@@ -1045,7 +1047,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
     else { setConfirmDeleteId(`bloco_${blocoId}`); setTimeout(() => setConfirmDeleteId(null), 3000); }
   };
   const handleAddBloco = () => {
-    const newId = `b_${Date.now()}`; const newBloco = { id: newId, nome: 'Novo Bloco de Matérias', icone: 'Layers', disciplinas: [] };
+    const newId = `b_${Date.now()}`; const newBloco = { id: newId, nome: 'Novo Bloco', icone: 'Layers', disciplinas: [] };
     setEdital(prev => [...prev, newBloco]); setExpanded(prev => ({ ...prev, [newId]: true }));
   };
 
@@ -1096,66 +1098,71 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
   const getMemoryHealth = (assId) => {
     const p = progress[assId]; if (!p?.lastReviewedTimestamp) return null; 
     const now = new Date().getTime(); const diffDays = (now - p.lastReviewedTimestamp) / (1000 * 3600 * 24);
-    if (diffDays <= 3) return { color: 'text-emerald-500', bg: 'bg-emerald-100 dark:bg-emerald-900/30', label: 'Memória Fresca' };
-    if (diffDays <= 7) return { color: 'text-amber-500', bg: 'bg-amber-100 dark:bg-amber-900/30', label: 'A Enfraquecer' };
-    return { color: 'text-red-500', bg: 'bg-red-100 dark:bg-red-900/30', label: 'Alerta Crítico' };
+    if (diffDays <= 3) return { color: 'text-emerald-500', bg: 'bg-emerald-100 dark:bg-emerald-900/30', label: 'Fresco' };
+    if (diffDays <= 7) return { color: 'text-amber-500', bg: 'bg-amber-100 dark:bg-amber-900/30', label: 'Enfraquecer' };
+    return { color: 'text-red-500', bg: 'bg-red-100 dark:bg-red-900/30', label: 'Alerta' };
   };
   const checkStatus = (assId) => {
     const p = progress[assId]; const count = (p?.estudado ? 1 : 0) + (p?.questoes ? 1 : 0) + (p?.revisado ? 1 : 0);
-    if (count === 3) return <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />;
-    if (count > 0) return <PlayCircle className="w-5 h-5 text-blue-400 shrink-0" />;
-    return <div className="w-5 h-5 rounded-full border-2 border-slate-200 dark:border-slate-600 shrink-0"></div>;
+    if (count === 3) return <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />;
+    if (count > 0) return <PlayCircle className="w-3.5 h-3.5 text-blue-400 shrink-0" />;
+    return <div className="w-3.5 h-3.5 rounded-full border border-slate-300 dark:border-slate-600 shrink-0"></div>;
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in text-left">
-      <header className="border-b border-slate-200 dark:border-slate-800 pb-4 flex flex-col xl:flex-row justify-between items-start xl:items-end gap-4">
-        <div><h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">Arsenal de Matérias</h2><p className="text-slate-500 dark:text-slate-400 mt-2">A sua Trilha Base. Assuntos 100% dominados ficam riscados.</p></div>
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
-          <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); }} className={`flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl font-bold text-sm transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-700'}`}>
-            {isEditing ? <Save className="w-4 h-4"/> : <Edit className="w-4 h-4"/>}{isEditing ? 'Concluir Gestão' : 'Gerenciar Matérias'}
-          </button>
+    <div className="space-y-4 animate-in fade-in text-left pb-10">
+      {/* HEADER COMPACTO */}
+      <header className="border-b border-slate-200 dark:border-slate-800 pb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+          <h2 className="text-2xl font-extrabold text-slate-800 dark:text-white leading-tight">Arsenal de Matérias</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-0.5 text-[11px] uppercase tracking-wider font-bold">A sua Trilha Base. Assuntos dominados ficam riscados.</p>
         </div>
+        <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); }} className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-bold text-xs transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-700'}`}>
+          {isEditing ? <Save className="w-3.5 h-3.5"/> : <Edit className="w-3.5 h-3.5"/>}{isEditing ? 'Concluir Gestão' : 'Gerenciar Matérias'}
+        </button>
       </header>
 
       {isEditing && (
-        <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 p-4 rounded-xl flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-          <div className="text-sm text-amber-800 dark:text-amber-200/80"><strong>Modo Edição Ativo:</strong><br/>Arraste os itens para reordenar, clique no lápis para renomear ou gerencie as suas disciplinas clicando nos botões abaixo.</div>
+        <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 p-2.5 rounded-lg flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+          <div className="text-[10px] text-amber-800 dark:text-amber-200/80 leading-tight"><strong>Modo Edição:</strong> Arraste itens para reordenar, clique no lápis para editar ou exclua conforme necessário.</div>
         </div>
       )}
 
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-        <div className="flex justify-start mb-4">
-          <button onClick={toggleExpandAll} className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/50 dark:hover:bg-blue-900/20 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer">
-            {isAllExpanded ? <ChevronUp className="w-3.5 h-3.5"/> : <ChevronDown className="w-3.5 h-3.5"/>}{isAllExpanded ? 'Recolher Tudo' : 'Expandir Tudo'}
+      {/* CONTAINER PRINCIPAL MAIS FINO */}
+      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-3 md:p-4">
+        <div className="flex justify-start mb-3">
+          <button onClick={toggleExpandAll} className="flex items-center gap-1 text-[10px] font-bold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/50 dark:hover:bg-blue-900/20 px-2.5 py-1.5 rounded-md border border-slate-200 dark:border-slate-700 shadow-sm cursor-pointer">
+            {isAllExpanded ? <ChevronUp className="w-3 h-3"/> : <ChevronDown className="w-3 h-3"/>}{isAllExpanded ? 'Recolher Tudo' : 'Expandir Tudo'}
           </button>
         </div>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-3">
           {edital.map((bloco, bIndex) => (
-            <div key={bloco.id} className="border-b border-slate-100 dark:border-slate-800 pb-6 last:border-0 last:pb-0">
-              <div onClick={() => !isEditing && toggleNode(bloco.id)} className={`flex items-center gap-3 p-3 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 mb-4 group transition-colors ${!isEditing ? 'cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700/80' : ''}`}>
-                <div onClick={(e) => { if(isEditing) { e.stopPropagation(); toggleNode(bloco.id); } }} className="cursor-pointer flex items-center justify-center shrink-0 transition-transform">
-                  {expanded[bloco.id] ? <ChevronDown className="w-5 h-5 text-slate-500" /> : <ChevronRight className="w-5 h-5 text-slate-500" />}
+            <div key={bloco.id} className="border-b border-slate-100 dark:border-slate-800/60 pb-3 mb-1 last:border-0 last:pb-0">
+              
+              {/* BLOCO - SUPER COMPACTO */}
+              <div onClick={() => !isEditing && toggleNode(bloco.id)} className={`flex items-center gap-2 p-2 rounded-lg bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 mb-2 group transition-colors ${!isEditing ? 'cursor-pointer hover:bg-slate-200/60 dark:hover:bg-slate-700' : ''}`}>
+                <div onClick={(e) => { if(isEditing) { e.stopPropagation(); toggleNode(bloco.id); } }} className="cursor-pointer flex items-center justify-center shrink-0">
+                  {expanded[bloco.id] ? <ChevronDown className="w-4 h-4 text-slate-500" /> : <ChevronRight className="w-4 h-4 text-slate-500" />}
                 </div>
-                <Layers className={`w-5 h-5 ${themeColors.text.split(' ')[0]} shrink-0`}/>
+                <Layers className={`w-4 h-4 ${themeColors.text.split(' ')[0]} shrink-0`}/>
                 {isEditing ? (
-                  <input type="text" value={bloco.nome} onClick={(e) => e.stopPropagation()} onChange={(e) => handleEditBlocoNome(bloco.id, e.target.value)} className={`flex-1 font-black text-xl text-slate-800 dark:text-slate-200 uppercase tracking-tight bg-white dark:bg-slate-900 border ${themeColors.border.split(' ')[0]} rounded px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500/50 w-full`} />
+                  <input type="text" value={bloco.nome} onClick={(e) => e.stopPropagation()} onChange={(e) => handleEditBlocoNome(bloco.id, e.target.value)} className={`flex-1 font-black text-sm text-slate-800 dark:text-slate-200 uppercase tracking-tight bg-white dark:bg-slate-900 border ${themeColors.border.split(' ')[0]} rounded px-1.5 py-0.5 outline-none focus:ring-1 focus:ring-indigo-500 w-full`} />
                 ) : (
-                  <span className="flex-1 font-black text-xl text-slate-800 dark:text-slate-200 uppercase tracking-tight">{bloco.nome}</span>
+                  <span className="flex-1 font-black text-sm text-slate-800 dark:text-slate-200 uppercase tracking-tight truncate">{bloco.nome}</span>
                 )}
                 {isEditing && (
-                  <div className="flex items-center gap-1 shrink-0 ml-2" onClick={(e) => e.stopPropagation()}>
-                    <button onClick={() => handleMoveBloco(bIndex, -1)} disabled={bIndex === 0} className={`p-2 text-slate-400 hover:${themeColors.text.split(' ')[0]} hover:${themeColors.lightBg.split(' ')[0]} rounded-lg transition-colors disabled:opacity-30 cursor-pointer`} title="Mover para Cima"><ChevronUp className="w-4 h-4" /></button>
-                    <button onClick={() => handleMoveBloco(bIndex, 1)} disabled={bIndex === edital.length - 1} className={`p-2 text-slate-400 hover:${themeColors.text.split(' ')[0]} hover:${themeColors.lightBg.split(' ')[0]} rounded-lg transition-colors disabled:opacity-30 cursor-pointer`} title="Mover para Baixo"><ChevronDown className="w-4 h-4" /></button>
-                    <button onClick={() => handleDeleteBlocoClick(bloco.id)} className={`p-2 rounded-lg transition-colors cursor-pointer flex items-center gap-1 font-bold text-xs ${confirmDeleteId === 'bloco_' + bloco.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Bloco Inteiro"><Trash2 className="w-4 h-4" />{confirmDeleteId === `bloco_${bloco.id}` && "Confirmar"}</button>
+                  <div className="flex items-center gap-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                    <button onClick={() => handleMoveBloco(bIndex, -1)} disabled={bIndex === 0} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded transition-colors disabled:opacity-30 cursor-pointer" title="Sobe"><ChevronUp className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => handleMoveBloco(bIndex, 1)} disabled={bIndex === edital.length - 1} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded transition-colors disabled:opacity-30 cursor-pointer" title="Desce"><ChevronDown className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => handleDeleteBlocoClick(bloco.id)} className={`p-1.5 rounded cursor-pointer transition-colors flex items-center ${confirmDeleteId === 'bloco_' + bloco.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Bloco"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 )}
               </div>
 
               {expanded[bloco.id] && (
-                <div className="space-y-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
                   {bloco.disciplinas.map((disc, dIndex) => {
                     const totalAssuntosDisc = disc.assuntos.length;
                     const concluidosAssuntosDisc = disc.assuntos.filter(a => isFullyMastered(a.id)).length;
@@ -1164,35 +1171,39 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
 
                     return (
                       <div key={disc.id}>
-                        <div className="flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 p-3 rounded-lg select-none border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 transition-colors">
+                        {/* DISCIPLINA - LINHA FINA */}
+                        <div className="flex items-center gap-1.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-md select-none border border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-900 transition-colors">
                           {isEditing && (
-                            <div className="flex flex-col gap-0.5 shrink-0 mr-1">
-                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, -1); }} disabled={dIndex === 0} className={`p-1 text-slate-400 hover:${themeColors.text.split(' ')[0]} hover:${themeColors.lightBg.split(' ')[0]} rounded-md transition-colors disabled:opacity-30 cursor-pointer`} title="Sobe"><ChevronUp className="w-4 h-4" /></button>
-                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, 1); }} disabled={dIndex === bloco.disciplinas.length - 1} className={`p-1 text-slate-400 hover:${themeColors.text.split(' ')[0]} hover:${themeColors.lightBg.split(' ')[0]} rounded-md transition-colors disabled:opacity-30 cursor-pointer`} title="Desce"><ChevronDown className="w-4 h-4" /></button>
+                            <div className="flex flex-col gap-0 shrink-0">
+                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, -1); }} disabled={dIndex === 0} className="text-slate-400 hover:text-slate-600 disabled:opacity-30 cursor-pointer"><ChevronUp className="w-3 h-3" /></button>
+                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, 1); }} disabled={dIndex === bloco.disciplinas.length - 1} className="text-slate-400 hover:text-slate-600 disabled:opacity-30 cursor-pointer"><ChevronDown className="w-3 h-3" /></button>
                             </div>
                           )}
-                          <div onClick={() => !isEditing && toggleNode(disc.id)} className={`flex flex-1 items-center gap-2 ${!isEditing ? 'cursor-pointer' : ''}`}>
+                          <div onClick={() => !isEditing && toggleNode(disc.id)} className={`flex flex-1 items-center gap-1.5 ${!isEditing ? 'cursor-pointer' : ''} overflow-hidden`}>
                             <div onClick={(e) => { if(isEditing) { e.stopPropagation(); toggleNode(disc.id); } }} className="cursor-pointer flex items-center justify-center">
-                              {expanded[disc.id] ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
+                              {expanded[disc.id] ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
                             </div>
-                            <FolderOpen className={`w-5 h-5 shrink-0 ${disc.cor?.split(' ')[0] || 'text-slate-500'}`} />
+                            <FolderOpen className={`w-4 h-4 shrink-0 ${disc.cor?.split(' ')[0] || 'text-slate-500'}`} />
                             {isEditing ? (
-                              <input type="text" value={disc.nome} onChange={(e) => handleEditDiscNome(bloco.id, disc.id, e.target.value)} className={`font-bold text-base text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 border ${themeColors.border.split(' ')[0]} rounded px-2 py-0.5 outline-none focus:ring-2 focus:ring-indigo-500/50 w-full`} />
+                              <input type="text" value={disc.nome} onChange={(e) => handleEditDiscNome(bloco.id, disc.id, e.target.value)} className={`font-bold text-xs text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 border ${themeColors.border.split(' ')[0]} rounded px-1.5 py-0.5 outline-none focus:ring-1 focus:ring-indigo-500 w-full`} />
                             ) : (
-                              <span className="font-bold text-base text-slate-700 dark:text-slate-300 flex-1">{disc.nome}</span>
+                              <span className="font-bold text-xs text-slate-700 dark:text-slate-300 flex-1 truncate">{disc.nome}</span>
                             )}
                           </div>
-                          <div className="ml-3 flex items-center gap-2 bg-white dark:bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm shrink-0">
-                            <span className={`text-[10px] font-black uppercase tracking-wider ${isDiscMastered ? 'text-emerald-500' : 'text-slate-500'}`}>{concluidosAssuntosDisc}/{totalAssuntosDisc} Concluídos</span>
-                            <div className="w-16 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden hidden sm:block"><div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${percConcluidoDisc}%` }}></div></div>
+                          
+                          <div className="flex items-center gap-1.5 bg-white dark:bg-slate-950 px-2 py-1 rounded border border-slate-200 dark:border-slate-700 shadow-sm shrink-0">
+                            <span className={`text-[9px] font-black tracking-wider ${isDiscMastered ? 'text-emerald-500' : 'text-slate-500'}`}>{concluidosAssuntosDisc}/{totalAssuntosDisc}</span>
+                            <div className="w-10 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden hidden sm:block"><div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${percConcluidoDisc}%` }}></div></div>
                           </div>
+                          
                           {isEditing && (
-                            <button onClick={(e) => { e.stopPropagation(); handleDeleteDisciplinaClick(bloco.id, disc.id); }} className={`ml-2 p-2 rounded-lg cursor-pointer transition-colors shrink-0 flex items-center gap-1 font-bold text-xs ${confirmDeleteId === 'disc_' + disc.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Disciplina Inteira"><Trash2 className="w-4 h-4" />{confirmDeleteId === `disc_${disc.id}` && "Confirmar"}</button>
+                            <button onClick={(e) => { e.stopPropagation(); handleDeleteDisciplinaClick(bloco.id, disc.id); }} className={`ml-1 p-1 rounded cursor-pointer transition-colors shrink-0 ${confirmDeleteId === 'disc_' + disc.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Disciplina"><Trash2 className="w-3.5 h-3.5" /></button>
                           )}
                         </div>
 
+                        {/* ASSUNTOS - LISTA DE ALTA DENSIDADE */}
                         {expanded[disc.id] && (
-                          <div className="mt-2 space-y-2">
+                          <div className="mt-1 space-y-1">
                             {disc.assuntos.map((assunto, index) => {
                               const isInSprint = customSprint.some(item => item.assId === assunto.id);
                               const isCurrentlyEditing = editingTopicId === assunto.id;
@@ -1200,40 +1211,43 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                               const memoryHealth = getMemoryHealth(assunto.id);
 
                               return (
-                                <div key={assunto.id} draggable={isEditing && !isCurrentlyEditing} onDragStart={(e) => handleDragStart(e, index, disc.id)} onDragEnter={(e) => handleDragEnter(e, index, disc.id)} onDragOver={(e) => e.preventDefault()} onDrop={handleDrop} style={{ marginLeft: assunto.indent ? `${assunto.indent * 1.5}rem` : '0' }} className={`flex items-center gap-3 py-3 px-4 rounded-xl border transition-colors bg-white dark:bg-slate-900 shadow-sm ${isEditing && !isCurrentlyEditing ? 'border-dashed border-amber-300 cursor-move hover:bg-amber-50 dark:hover:bg-amber-900/10' : 'border-slate-200 dark:border-slate-800'} ${mastered && !isEditing ? 'opacity-70 bg-slate-50 dark:bg-slate-900/50' : ''}`}>
+                                <div key={assunto.id} draggable={isEditing && !isCurrentlyEditing} onDragStart={(e) => handleDragStart(e, index, disc.id)} onDragEnter={(e) => handleDragEnter(e, index, disc.id)} onDragOver={(e) => e.preventDefault()} onDrop={handleDrop} style={{ marginLeft: assunto.indent ? `${assunto.indent * 0.75}rem` : '0' }} className={`flex items-center gap-2 py-1.5 px-2.5 rounded-md border transition-colors bg-white dark:bg-slate-900 shadow-sm ${isEditing && !isCurrentlyEditing ? 'border-dashed border-amber-300 cursor-move hover:bg-amber-50 dark:hover:bg-amber-900/10' : 'border-slate-200 dark:border-slate-800/80'} ${mastered && !isEditing ? 'opacity-60 bg-slate-50 dark:bg-slate-900/40' : ''}`}>
                                   {isCurrentlyEditing ? (
-                                    <div className="flex-1 flex flex-col gap-4 p-2 animate-in fade-in">
-                                      <div className="grid md:grid-cols-2 gap-3">
-                                        <div><label className="text-[10px] font-bold uppercase text-slate-400 block mb-1">Título do Assunto</label><input type="text" value={editTopicData.titulo} onChange={(e) => setEditTopicData({...editTopicData, titulo: e.target.value})} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" /></div>
-                                        <div><label className="text-[10px] font-bold uppercase text-slate-400 block mb-1">Link Caderno TEC</label><input type="text" value={editTopicData.linkTec} onChange={(e) => setEditTopicData({...editTopicData, linkTec: e.target.value})} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="https://..." /></div>
+                                    <div className="flex-1 flex flex-col gap-2 p-1 animate-in fade-in">
+                                      <div className="grid md:grid-cols-2 gap-2 w-full">
+                                        <div><input type="text" value={editTopicData.titulo} onChange={(e) => setEditTopicData({...editTopicData, titulo: e.target.value})} className="w-full p-1.5 text-xs rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Título do Assunto" /></div>
+                                        <div><input type="text" value={editTopicData.linkTec} onChange={(e) => setEditTopicData({...editTopicData, linkTec: e.target.value})} className="w-full p-1.5 text-xs rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Link Caderno TEC (Opcional)" /></div>
                                       </div>
-                                      <div className="flex gap-2 mt-1">
-                                        <button onClick={() => saveEditTopic(disc.id, assunto.id)} className="bg-emerald-500 hover:bg-emerald-600 text-white px-5 py-2 rounded-lg text-sm font-bold transition-colors cursor-pointer">Salvar Alterações</button>
-                                        <button onClick={() => setEditingTopicId(null)} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-5 py-2 rounded-lg text-sm font-bold transition-colors cursor-pointer">Cancelar</button>
+                                      <div className="flex gap-1.5">
+                                        <button onClick={() => saveEditTopic(disc.id, assunto.id)} className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded text-[10px] font-bold transition-colors cursor-pointer">Salvar</button>
+                                        <button onClick={() => setEditingTopicId(null)} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-1 rounded text-[10px] font-bold transition-colors cursor-pointer">Cancelar</button>
                                       </div>
                                     </div>
                                   ) : (
                                     <>
-                                      {isEditing ? (<GripVertical className="w-5 h-5 text-slate-300 dark:text-slate-600 cursor-move" />) : (mastered ? <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" /> : checkStatus(assunto.id))}
-                                      <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-2">
-                                        <span className={`font-bold transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500 decoration-2' : 'text-slate-700 dark:text-slate-300'} ${assunto.indent > 0 ? 'text-sm' : 'text-base'}`}>{assunto.titulo}</span>
-                                        <div className="flex gap-2 items-center">
-                                          {!isEditing && memoryHealth && (<div className={`flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md font-bold tracking-wider ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória"><Thermometer className="w-3 h-3"/> {memoryHealth.label}</div>)}
-                                          {isEditing && assunto.linkTec && <span className="text-[10px] text-blue-500 dark:text-blue-400 flex items-center gap-1"><Link className="w-3 h-3"/> Link TEC</span>}
+                                      {isEditing ? (<GripVertical className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 cursor-move shrink-0" />) : (mastered ? <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> : checkStatus(assunto.id))}
+                                      
+                                      <div className="flex-1 flex items-center justify-between gap-2 overflow-hidden">
+                                        <span className={`font-semibold truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-300'} ${assunto.indent > 0 ? 'text-[11px]' : 'text-xs'}`}>{assunto.titulo}</span>
+                                        <div className="flex gap-1 items-center shrink-0">
+                                          {!isEditing && memoryHealth && (<div className={`flex items-center gap-0.5 text-[8px] px-1.5 py-0.5 rounded font-bold tracking-wider ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória"><Thermometer className="w-2.5 h-2.5"/> <span className="hidden sm:inline">{memoryHealth.label}</span></div>)}
+                                          {isEditing && assunto.linkTec && <span className="text-[8px] text-blue-500 dark:text-blue-400 flex items-center gap-0.5 border border-blue-200 dark:border-blue-800 px-1 rounded"><Link className="w-2.5 h-2.5"/> TEC</span>}
                                         </div>
                                       </div>
+
                                       {!isEditing && (
-                                        <button onClick={() => { if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(disc.id, assunto.id, disc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center gap-1.5 text-xs font-black uppercase transition-colors px-3 py-1.5 rounded-lg border shadow-sm cursor-pointer ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' : 'bg-white text-indigo-600 border-indigo-200 dark:bg-slate-800 dark:text-indigo-400 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40'}`}>
-                                          {isInSprint ? <CheckCircle className="w-4 h-4" /> : (mastered ? <RefreshCcw className="w-4 h-4" /> : <Target className="w-4 h-4" />)}
-                                          <span className="hidden md:inline">{isInSprint ? 'Na Sprint' : (mastered ? 'Refazer Ciclo' : 'Add à Sprint')}</span>
+                                        <button onClick={() => { if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(disc.id, assunto.id, disc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center gap-1 text-[9px] font-black uppercase transition-colors px-2 py-1 rounded border shadow-sm cursor-pointer shrink-0 ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' : 'bg-white text-indigo-600 border-indigo-200 dark:bg-slate-800 dark:text-indigo-400 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40'}`}>
+                                          {isInSprint ? <CheckCircle className="w-3 h-3" /> : (mastered ? <RefreshCcw className="w-3 h-3" /> : <Target className="w-3 h-3" />)}
+                                          <span className="hidden md:inline">{isInSprint ? 'Na Sprint' : (mastered ? 'Refazer' : 'Add Sprint')}</span>
                                         </button>
                                       )}
+                                      
                                       {isEditing && (
-                                        <div className="flex flex-wrap gap-2">
-                                          <button onClick={() => handleIndent(disc.id, assunto.id, -1)} disabled={!assunto.indent} className="p-2 text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-30 cursor-pointer" title="Recuar Nível"><ArrowLeft className="w-4 h-4"/></button>
-                                          <button onClick={() => handleIndent(disc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3} className="p-2 text-slate-500 hover:bg-slate-200 dark:text-slate-400 dark:hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-30 cursor-pointer" title="Avançar Nível"><ArrowRight className="w-4 h-4"/></button>
-                                          <button onClick={() => startEditTopic(assunto)} className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors cursor-pointer" title="Editar"><Pencil className="w-4 h-4"/></button>
-                                          <button onClick={() => handleDeleteClick(disc.id, assunto.id)} className={`p-2 rounded-lg transition-colors font-bold text-xs flex items-center gap-1 cursor-pointer ${confirmDeleteId === assunto.id ? 'bg-red-500 text-white' : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir"><Trash2 className="w-4 h-4"/>{confirmDeleteId === assunto.id && "Confirmar"}</button>
+                                        <div className="flex gap-1 shrink-0">
+                                          <button onClick={() => handleIndent(disc.id, assunto.id, -1)} disabled={!assunto.indent} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer" title="Recuar"><ArrowLeft className="w-3.5 h-3.5"/></button>
+                                          <button onClick={() => handleIndent(disc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer" title="Avançar"><ArrowRight className="w-3.5 h-3.5"/></button>
+                                          <button onClick={() => startEditTopic(assunto)} className="p-1 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors cursor-pointer" title="Editar"><Pencil className="w-3.5 h-3.5"/></button>
+                                          <button onClick={() => handleDeleteClick(disc.id, assunto.id)} className={`p-1 rounded transition-colors ${confirmDeleteId === assunto.id ? 'bg-red-500 text-white' : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30'} cursor-pointer`} title="Excluir"><Trash2 className="w-3.5 h-3.5"/></button>
                                         </div>
                                       )}
                                     </>
@@ -1241,30 +1255,28 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                                 </div>
                               );
                             })}
+                            
+                            {/* CAIXA DE IMPORTAÇÃO / ADIÇÃO (COMPACTA) */}
                             {isEditing && (
-                              <div className="mt-3 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50 rounded-xl flex flex-col gap-4 shadow-inner">
+                              <div className="mt-2 p-2.5 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50 rounded-lg flex flex-col gap-2 shadow-inner">
                                 {bulkInput.discId === disc.id ? (
-                                  <div className="flex flex-col gap-3 animate-in fade-in">
-                                    <h4 className="text-xs font-black uppercase text-amber-700 dark:text-amber-500 flex items-center gap-2"><ListPlus className="w-4 h-4"/> Importação Rápida</h4>
-                                    <textarea rows="6" placeholder="Exemplo:&#10;Modelagem de Dados&#10;Normalização" value={bulkInput.text} onChange={(e) => setBulkInput({ discId: disc.id, text: e.target.value })} className="w-full p-3 text-sm rounded-lg border border-amber-300 dark:border-amber-700/50 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500 resize-none" />
-                                    <div className="flex gap-2">
-                                      <button onClick={() => handleBulkAdd(disc.id)} className="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer">Gerar Tópicos</button>
-                                      <button onClick={() => setBulkInput({ discId: null, text: '' })} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-5 py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer">Cancelar</button>
+                                  <div className="flex flex-col gap-2 animate-in fade-in">
+                                    <h4 className="text-[10px] font-black uppercase text-amber-700 dark:text-amber-500 flex items-center gap-1.5"><ListPlus className="w-3.5 h-3.5"/> Importação Rápida</h4>
+                                    <textarea rows="4" placeholder="Exemplo:&#10;Modelagem de Dados&#10;Normalização" value={bulkInput.text} onChange={(e) => setBulkInput({ discId: disc.id, text: e.target.value })} className="w-full p-2 text-xs rounded border border-amber-300 dark:border-amber-700/50 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500 resize-none" />
+                                    <div className="flex gap-1.5">
+                                      <button onClick={() => handleBulkAdd(disc.id)} className="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">Gerar</button>
+                                      <button onClick={() => setBulkInput({ discId: null, text: '' })} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded text-[10px] font-bold transition-colors cursor-pointer">Cancelar</button>
                                     </div>
                                   </div>
                                 ) : (
                                   <>
-                                    <div>
-                                      <h4 className="text-xs font-black uppercase text-amber-700 dark:text-amber-500 flex items-center gap-2 mb-3"><Plus className="w-4 h-4"/> Adicionar Único</h4>
-                                      <div className="flex flex-col md:flex-row gap-2">
-                                        <input type="text" placeholder="Nome do assunto..." value={newTopic.discId === disc.id ? newTopic.titulo : ''} onChange={(e) => setNewTopic({...newTopic, discId: disc.id, titulo: e.target.value})} className="flex-1 p-2.5 text-sm rounded-lg border border-amber-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500" />
-                                        <input type="text" placeholder="Link Caderno TEC (Opcional)" value={newTopic.discId === disc.id ? newTopic.linkTec : ''} onChange={(e) => setNewTopic({...newTopic, discId: disc.id, linkTec: e.target.value})} className="flex-1 p-2.5 text-sm rounded-lg border border-amber-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500 hidden md:block" />
-                                        <button onClick={() => handleAddTopic(disc.id)} className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer">Adicionar</button>
-                                      </div>
+                                    <div className="flex flex-col sm:flex-row gap-1.5 items-center">
+                                      <Plus className="w-3.5 h-3.5 text-amber-600 shrink-0 hidden sm:block"/>
+                                      <input type="text" placeholder="Adicionar assunto..." value={newTopic.discId === disc.id ? newTopic.titulo : ''} onChange={(e) => setNewTopic({...newTopic, discId: disc.id, titulo: e.target.value})} className="flex-1 w-full p-1.5 text-xs rounded border border-amber-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500" />
+                                      <button onClick={() => handleAddTopic(disc.id)} className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded text-[10px] font-bold w-full sm:w-auto transition-colors cursor-pointer">Add</button>
                                     </div>
-                                    <div className="relative flex items-center py-2"><div className="flex-grow border-t border-amber-200 dark:border-amber-800/50"></div><span className="flex-shrink-0 mx-4 text-amber-600 dark:text-amber-500 text-xs font-bold uppercase tracking-widest">OU</span><div className="flex-grow border-t border-amber-200 dark:border-amber-800/50"></div></div>
-                                    <button onClick={() => setBulkInput({ discId: disc.id, text: '' })} className="w-full border-2 border-dashed border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-500 bg-amber-50/50 dark:bg-amber-900/20 hover:bg-amber-100 dark:hover:bg-amber-900/40 px-4 py-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer">
-                                      <ListPlus className="w-5 h-5"/> Importar Vários (Copiar e Colar Índice)
+                                    <button onClick={() => setBulkInput({ discId: disc.id, text: '' })} className="w-full mt-1 border border-dashed border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 px-2 py-1.5 rounded text-[9px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
+                                      <ListPlus className="w-3.5 h-3.5"/> Colar Índice
                                     </button>
                                   </>
                                 )}
@@ -1275,10 +1287,11 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                       </div>
                     );
                   })}
+                  
                   {isEditing && (
-                    <div className="mt-4 pt-2">
-                      <button onClick={() => handleAddDisciplina(bloco.id)} className={`w-full flex items-center justify-center gap-2 text-sm font-bold ${themeColors.text.split(' ')[0]} ${themeColors.lightBg.split(' ')[0]} px-4 py-3 rounded-xl transition-colors border ${themeColors.border.split(' ')[0]} border-dashed cursor-pointer`}>
-                        <Plus className="w-4 h-4"/> Adicionar Nova Disciplina
+                    <div className="mt-2">
+                      <button onClick={() => handleAddDisciplina(bloco.id)} className={`w-full flex items-center justify-center gap-1.5 text-xs font-bold ${themeColors.text.split(' ')[0]} ${themeColors.lightBg.split(' ')[0]} px-3 py-2 rounded-lg transition-colors border ${themeColors.border.split(' ')[0]} border-dashed cursor-pointer`}>
+                        <Plus className="w-3.5 h-3.5"/> Nova Disciplina
                       </button>
                     </div>
                   )}
@@ -1286,10 +1299,11 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
               )}
             </div>
           ))}
+          
           {isEditing && (
-            <div className="border-t-2 border-dashed border-slate-200 dark:border-slate-700 pt-6 mt-4">
-              <button onClick={handleAddBloco} className={`w-full flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest text-slate-500 hover:${themeColors.text.split(' ')[0]} bg-slate-50 hover:${themeColors.lightBg.split(' ')[0]} dark:bg-slate-800/50 dark:hover:${themeColors.lightBg.split(' ')[1]} px-6 py-4 rounded-2xl transition-colors border-2 border-dashed border-slate-300 hover:${themeColors.border.split(' ')[0]} dark:border-slate-700 cursor-pointer`}>
-                <Layers className="w-5 h-5"/> Criar Novo Bloco de Matérias
+            <div className="pt-2 mt-1">
+              <button onClick={handleAddBloco} className={`w-full flex items-center justify-center gap-1.5 text-xs font-black uppercase tracking-widest text-slate-500 hover:${themeColors.text.split(' ')[0]} bg-slate-50 hover:${themeColors.lightBg.split(' ')[0]} dark:bg-slate-800/50 dark:hover:${themeColors.lightBg.split(' ')[1]} px-4 py-3 rounded-lg transition-colors border border-dashed border-slate-300 hover:${themeColors.border.split(' ')[0]} dark:border-slate-700 cursor-pointer`}>
+                <Layers className="w-4 h-4"/> Novo Bloco
               </button>
             </div>
           )}
@@ -1302,7 +1316,35 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
 // ==========================================
 // ABA: METAS DA SEMANA
 // ==========================================
-function TabPlanner({ customSprint, sprintsCompleted, setActiveTab, themeColors }) {
+function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActiveTab, themeColors, progress, toggleProgress }) {
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const dragItem = useRef(null);
+  const dragOverItem = useRef(null);
+
+  const handleDragStart = (e, index) => {
+    dragItem.current = index;
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target);
+  };
+
+  const handleDragEnter = (e, index) => {
+    e.preventDefault();
+    dragOverItem.current = index;
+  };
+
+  const handleDragEnd = () => {
+    if (dragItem.current !== null && dragOverItem.current !== null && dragItem.current !== dragOverItem.current) {
+      const newSprint = [...customSprint];
+      const draggedItemContent = newSprint.splice(dragItem.current, 1)[0];
+      newSprint.splice(dragOverItem.current, 0, draggedItemContent);
+      setCustomSprint(newSprint);
+    }
+    dragItem.current = null;
+    dragOverItem.current = null;
+    setDraggedIndex(null);
+  };
+
   const sprintGroups = [];
   for (let i = 0; i < customSprint.length; i += 2) sprintGroups.push(customSprint.slice(i, i + 2));
 
@@ -1318,53 +1360,83 @@ function TabPlanner({ customSprint, sprintsCompleted, setActiveTab, themeColors 
         </div>
       </header>
 
-      <div className="flex flex-col lg:flex-row gap-6 items-start">
-        <div className="w-full lg:w-1/3 bg-slate-100 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 min-h-[500px]">
-          <h3 className="font-black text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2"><ListPlus className="w-5 h-5"/> Fila de Sprints ({backlogSprints.length})</h3>
-          <div className="space-y-4">
-            {backlogSprints.map((group, idx) => (
-              <div key={idx} className="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition-colors opacity-90">
-                 <div className="text-[10px] font-bold text-slate-400 mb-3 uppercase flex justify-between"><span>Sprint {sprintsCompleted + idx + 2}</span></div>
-                 {group.map(item => (
-                   <div key={item.assId} className="mb-3 last:mb-0 pl-2 border-l-2 border-slate-200 dark:border-slate-700">
-                     <span className="block text-[9px] font-bold text-slate-400 uppercase truncate">{item.discNome}</span>
-                     <span className="block text-sm font-bold text-slate-700 dark:text-slate-300 leading-tight">{item.assTitulo}</span>
-                   </div>
-                 ))}
+      <div className="flex flex-col lg:flex-row gap-5 items-start">
+        <div className="w-full lg:w-1/3 bg-slate-100 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200 dark:border-slate-700 min-h-[400px]">
+          <h3 className="font-black text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2 text-sm"><ListPlus className="w-4 h-4"/> Fila de Sprints ({backlogSprints.length})</h3>
+          <div className="space-y-3">
+            {backlogSprints.map((group, groupIdx) => (
+              <div key={groupIdx} className="bg-white dark:bg-slate-900 p-3 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 transition-colors opacity-90">
+                 <div className="text-[9px] font-bold text-slate-400 mb-2 uppercase flex justify-between"><span>Sprint {sprintsCompleted + groupIdx + 2}</span></div>
+                 {group.map((item, localIdx) => {
+                   const globalIdx = 2 + (groupIdx * 2) + localIdx;
+                   const isDragging = draggedIndex === globalIdx;
+                   return (
+                     <div 
+                       key={item.assId} 
+                       draggable
+                       onDragStart={(e) => handleDragStart(e, globalIdx)}
+                       onDragEnter={(e) => handleDragEnter(e, globalIdx)}
+                       onDragEnd={handleDragEnd}
+                       onDragOver={(e) => e.preventDefault()}
+                       className={`mb-1.5 last:mb-0 flex items-start gap-1.5 pl-1 cursor-move hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg transition-all border-l-2 border-transparent hover:border-slate-300 dark:hover:border-slate-600 ${isDragging ? 'opacity-40 border-dashed scale-95' : ''}`}
+                     >
+                       <GripVertical className="w-3.5 h-3.5 shrink-0 text-slate-300 mt-0.5" />
+                       <div>
+                         <span className="block text-[8px] font-bold text-slate-400 uppercase truncate">{item.discNome}</span>
+                         <span className="block text-[11px] font-bold text-slate-700 dark:text-slate-300 leading-tight">{item.assTitulo}</span>
+                       </div>
+                     </div>
+                   )
+                 })}
               </div>
             ))}
             {backlogSprints.length === 0 && (
-              <div className="text-sm text-slate-400 p-6 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl flex flex-col items-center gap-3">
-                <p>O seu Backlog está vazio.</p><p className="text-xs">Vá ao Arsenal de Matérias para organizar a sua semana.</p>
+              <div className="text-xs text-slate-400 p-4 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl flex flex-col items-center gap-2 text-center">
+                <p>O seu Backlog está vazio.</p><p className="text-[10px]">Vá ao Arsenal de Matérias para organizar a semana.</p>
               </div>
             )}
           </div>
         </div>
 
-        <div className={`w-full lg:w-1/3 ${themeColors.lightBg.split(' ')[0]} rounded-2xl p-4 border ${themeColors.border.split(' ')[0]} min-h-[500px]`}>
-           <h3 className={`font-black ${themeColors.text.split(' ')[0]} uppercase tracking-wider mb-4 flex items-center gap-2`}><PlayCircle className="w-5 h-5"/> Em Curso (Hoje)</h3>
+        <div className={`w-full lg:w-1/3 ${themeColors.lightBg.split(' ')[0]} rounded-2xl p-4 border ${themeColors.border.split(' ')[0]} min-h-[400px]`}>
+           <h3 className={`font-black ${themeColors.text.split(' ')[0]} uppercase tracking-wider mb-3 flex items-center gap-2 text-sm`}><PlayCircle className="w-4 h-4"/> Em Curso (Hoje)</h3>
            {activeSprint ? (
-             <div className={`bg-white dark:bg-slate-900 p-5 rounded-xl shadow-md border-2 ${themeColors.border.split(' ')[0]}`}>
-                 <div className={`text-[10px] font-bold ${themeColors.text.split(' ')[0]} mb-4 uppercase`}>Sprint {sprintsCompleted + 1}</div>
-                 {activeSprint.map(item => (
-                   <div key={item.assId} className="mb-4 last:mb-0">
-                     <span className={`block text-[9px] font-bold ${themeColors.text.split(' ')[0]} uppercase truncate`}>{item.discNome}</span>
-                     <span className="block text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight mb-2">{item.assTitulo}</span>
-                   </div>
-                 ))}
-                 <button onClick={() => setActiveTab('cronograma')} className={`mt-4 w-full ${themeColors.button} font-bold text-xs py-2 rounded-lg transition-colors cursor-pointer`}>Ir para Execução</button>
+             <div className={`bg-white dark:bg-slate-900 p-3.5 rounded-xl shadow-md border ${themeColors.border.split(' ')[0]}`}>
+                 <div className={`text-[9px] font-bold ${themeColors.text.split(' ')[0]} mb-2 uppercase`}>Sprint {sprintsCompleted + 1}</div>
+                 {activeSprint.map((item, localIdx) => {
+                   const globalIdx = localIdx;
+                   const isDragging = draggedIndex === globalIdx;
+                   return (
+                     <div 
+                       key={item.assId} 
+                       draggable
+                       onDragStart={(e) => handleDragStart(e, globalIdx)}
+                       onDragEnter={(e) => handleDragEnter(e, globalIdx)}
+                       onDragEnd={handleDragEnd}
+                       onDragOver={(e) => e.preventDefault()}
+                       className={`mb-1.5 last:mb-0 flex items-start gap-1.5 cursor-move hover:bg-slate-50 dark:hover:bg-slate-800 p-1.5 rounded-lg transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700 ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95' : ''}`}
+                     >
+                       <GripVertical className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${themeColors.text.split(' ')[0]} opacity-50`} />
+                       <div>
+                         <span className={`block text-[8px] font-bold ${themeColors.text.split(' ')[0]} uppercase truncate`}>{item.discNome}</span>
+                         <span className="block text-xs font-bold text-slate-800 dark:text-slate-200 leading-tight">{item.assTitulo}</span>
+                       </div>
+                     </div>
+                   )
+                 })}
+                 <button onClick={() => setActiveTab('cronograma')} className={`mt-3 w-full ${themeColors.button} font-bold text-[10px] py-1.5 rounded-lg transition-colors cursor-pointer`}>Ir para Execução</button>
               </div>
            ) : (
-             <div className={`text-sm ${themeColors.text.split(' ')[0]} p-6 border-2 border-dashed ${themeColors.border.split(' ')[0]} rounded-xl flex items-center justify-center`}>Nenhuma Sprint ativada hoje.</div>
+             <div className={`text-xs ${themeColors.text.split(' ')[0]} p-6 border-2 border-dashed ${themeColors.border.split(' ')[0]} rounded-xl flex items-center justify-center text-center`}>Nenhuma Sprint ativada hoje.</div>
            )}
         </div>
 
-        <div className="w-full lg:w-1/3 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-4 border border-emerald-200 dark:border-emerald-900/30 min-h-[500px]">
-           <h3 className="font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-4 flex items-center gap-2"><CheckCircle className="w-5 h-5"/> Vitórias</h3>
-           <div className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-emerald-200 dark:border-emerald-800 flex flex-col items-center justify-center h-48">
-             <Trophy className="w-12 h-12 text-emerald-500 mb-3" />
-             <span className="text-4xl font-black text-emerald-600 dark:text-emerald-400">{sprintsCompleted}</span>
-             <span className="text-xs font-bold text-slate-500 uppercase mt-1">Sprints Fechadas</span>
+        <div className="w-full lg:w-1/3 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-4 border border-emerald-200 dark:border-emerald-900/30 min-h-[400px]">
+           <h3 className="font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-3 flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4"/> Vitórias</h3>
+           <div className="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-sm border border-emerald-200 dark:border-emerald-800 flex flex-col items-center justify-center h-32">
+             <Trophy className="w-8 h-8 text-emerald-500 mb-2" />
+             <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400 leading-none">{sprintsCompleted}</span>
+             <span className="text-[10px] font-bold text-slate-500 uppercase mt-1">Sprints Fechadas</span>
            </div>
         </div>
       </div>
@@ -1463,31 +1535,35 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
          </div>
       </div>
 
+      {/* SPRINTS: CARDS MINIMALISTAS E LIPOASPIRADOS */}
       {sprintGroups.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-12 flex flex-col items-center justify-center mt-6">
-          <ShoppingCart className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-4" />
-          <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">Fila Vazia!</h3>
-          <p className="text-slate-500 mb-6 text-center">Planeje a sua semana adicionando matérias.</p>
-          <div className="flex gap-4">
-            <button onClick={() => setActiveTab('disciplinas')} className="bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-6 py-3 rounded-xl font-bold cursor-pointer">
+        <div className="bg-white dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-10 flex flex-col items-center justify-center mt-6">
+          <ShoppingCart className="w-10 h-10 text-slate-300 dark:text-slate-600 mb-3" />
+          <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-1">Fila Vazia!</h3>
+          <p className="text-sm text-slate-500 mb-5 text-center">Planeje a sua semana adicionando matérias.</p>
+          <div className="flex gap-3">
+            <button onClick={() => setActiveTab('disciplinas')} className="bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer">
               Ir para o Arsenal de Matérias
             </button>
           </div>
         </div>
       ) : (
-        <div className="grid gap-6 mt-6">
+        <div className="grid gap-4 mt-4">
           {sprintGroups.map((group, idx) => {
             const sprintNum = sprintsCompleted + idx + 1;
             const isActive = idx === 0;
 
             return (
-              <div key={sprintNum} className={`bg-white dark:bg-slate-900 rounded-2xl p-0 overflow-hidden flex flex-col md:flex-row border-2 transition-all ${isActive ? `${themeColors.border.split(' ')[0]} shadow-lg ring-4 ${themeColors.lightBg.split(' ')[0].replace('bg-', 'ring-')} scale-[1.01]` : 'border-slate-200 dark:border-slate-800 opacity-80'}`}>
-                <div className={`p-5 w-full md:w-32 flex flex-col items-center justify-center font-black border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 ${isActive ? `${themeColors.bg.split(' ')[0]} ${themeColors.solidText.split(' ')[0]}` : 'bg-slate-50 dark:bg-slate-800/50 text-slate-400'}`}>
-                  <span className="text-xs uppercase tracking-widest">Sprint</span><span className="text-4xl mt-1">{sprintNum}</span>
-                  {isActive && <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded mt-2">EM CURSO</span>}
+              <div key={sprintNum} className={`bg-white dark:bg-slate-900 rounded-xl overflow-hidden flex flex-col md:flex-row border border-slate-200 dark:border-slate-800 transition-all ${isActive ? `shadow-md ring-2 ${themeColors.lightBg.split(' ')[0].replace('bg-', 'ring-')}` : 'opacity-80'}`}>
+                
+                {/* Lado Laranja / Marcação da Sprint */}
+                <div className={`p-2.5 w-full md:w-16 shrink-0 flex flex-col items-center justify-center font-black border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-800 ${isActive ? `${themeColors.bg.split(' ')[0]} ${themeColors.solidText.split(' ')[0]}` : 'bg-slate-50 dark:bg-slate-800/50 text-slate-400'}`}>
+                  <span className="text-[7px] uppercase tracking-widest">Sprint</span><span className="text-xl mt-0.5">{sprintNum}</span>
+                  {isActive && <span className="text-[6px] bg-white/20 px-1.5 py-0.5 rounded mt-1 font-bold tracking-wider">EM CURSO</span>}
                 </div>
                 
-                <div className="p-5 flex-1 grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Cartões das Matérias LIPOASPIRADOS */}
+                <div className="p-2.5 flex-1 grid grid-cols-1 md:grid-cols-2 gap-2.5">
                   {group.map((item, localIdx) => {
                     const globalIdx = (idx * 2) + localIdx;
                     const isDragging = draggedIndex === globalIdx;
@@ -1503,35 +1579,36 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                         onDragEnter={(e) => handleDragEnter(e, globalIdx)}
                         onDragEnd={handleDragEnd}
                         onDragOver={(e) => e.preventDefault()}
-                        className={`rounded-xl p-5 border flex flex-col relative transition-all cursor-move ${isActive ? `${themeColors.lightBg.split(' ')[0]} ${themeColors.border.split(' ')[0]}` : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'} ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95 z-10' : 'hover:shadow-md'}`}
+                        className={`rounded-lg p-2.5 border flex flex-col relative transition-all cursor-move ${isActive ? `${themeColors.lightBg.split(' ')[0]} ${themeColors.border.split(' ')[0]}` : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'} ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95 z-10' : 'hover:shadow-sm'}`}
                       >
-                        <div className="absolute top-4 right-10 text-slate-300 hover:text-slate-500 transition-colors" title="Arrastar e Soltar">
-                          <GripVertical className="w-4 h-4" />
+                        <div className="absolute top-2 right-7 text-slate-300 hover:text-slate-500 transition-colors" title="Arrastar e Soltar">
+                          <GripVertical className="w-3.5 h-3.5" />
                         </div>
-                        <button onClick={() => setCustomSprint(p => p.filter(i => i.assId !== item.assId))} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors cursor-pointer" title="Remover"><Trash2 className="w-4 h-4"/></button>
+                        <button onClick={() => setCustomSprint(p => p.filter(i => i.assId !== item.assId))} className="absolute top-2 right-2 text-slate-300 hover:text-red-500 transition-colors cursor-pointer" title="Remover"><Trash2 className="w-3.5 h-3.5"/></button>
                         
-                        <span className={`text-[10px] font-black uppercase tracking-wider ${themeColors.text.split(' ')[0]} mb-1 pr-12`}>{item.discNome}</span>
-                        <p className="font-bold text-lg text-slate-800 dark:text-slate-200 mb-4 pr-12">{item.assTitulo}</p>
+                        <span className={`text-[7px] font-black uppercase tracking-wider ${themeColors.text.split(' ')[0]} mb-0.5 pr-8`}>{item.discNome}</span>
+                        <p className="font-bold text-xs text-slate-800 dark:text-slate-200 mb-1.5 pr-8 leading-tight">{item.assTitulo}</p>
                         
-                        <div className="mt-auto space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700/50">
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isEstudado ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
-                            <input type="checkbox" checked={isEstudado} onChange={() => toggleProgress(item.assId, 'estudado')} disabled={!isActive} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0" />
-                            <span className="font-bold text-sm uppercase tracking-wide">1. Teoria</span>
+                        {/* Checkboxes Super Compactas */}
+                        <div className="mt-auto space-y-1 pt-1.5 border-t border-slate-200 dark:border-slate-700/50">
+                          <label className={`flex items-center gap-1.5 cursor-pointer transition-colors ${isEstudado ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
+                            <input type="checkbox" checked={isEstudado} onChange={() => toggleProgress(item.assId, 'estudado')} disabled={!isActive} className="w-3 h-3 rounded cursor-pointer disabled:opacity-50 shrink-0" />
+                            <span className="font-bold text-[9px] uppercase tracking-wide">1. Teoria</span>
                           </label>
 
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isQuestoes ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
-                            <input type="checkbox" checked={isQuestoes} onChange={() => toggleProgress(item.assId, 'questoes')} disabled={!isActive || !isEstudado} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0" />
-                            <span className="font-bold text-sm uppercase tracking-wide">2. Questões</span>
+                          <label className={`flex items-center gap-1.5 cursor-pointer transition-colors ${isQuestoes ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
+                            <input type="checkbox" checked={isQuestoes} onChange={() => toggleProgress(item.assId, 'questoes')} disabled={!isActive || !isEstudado} className="w-3 h-3 rounded cursor-pointer disabled:opacity-50 shrink-0" />
+                            <span className="font-bold text-[9px] uppercase tracking-wide">2. Questões</span>
                           </label>
 
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isRevisado ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
-                            <input type="checkbox" checked={isRevisado} onChange={() => toggleProgress(item.assId, 'revisado')} disabled={!isActive || !isQuestoes} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0" />
-                            <span className="font-bold text-sm uppercase tracking-wide">3. Revisão (Agenda Auto)</span>
+                          <label className={`flex items-center gap-1.5 cursor-pointer transition-colors ${isRevisado ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
+                            <input type="checkbox" checked={isRevisado} onChange={() => toggleProgress(item.assId, 'revisado')} disabled={!isActive || !isQuestoes} className="w-3 h-3 rounded cursor-pointer disabled:opacity-50 shrink-0" />
+                            <span className="font-bold text-[9px] uppercase tracking-wide">3. Revisão Auto</span>
                           </label>
                           
                           {item.linkTec && isActive && (
-                            <a href={item.linkTec} target="_blank" rel="noopener noreferrer" className={`mt-4 flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold rounded-lg ${themeColors.button} transition-all shadow-sm cursor-pointer`}>
-                              <ExternalLink className="w-4 h-4" /> Resolver no TEC
+                            <a href={item.linkTec} target="_blank" rel="noopener noreferrer" className={`mt-1.5 flex items-center justify-center gap-1 w-full py-1 text-[9px] font-bold rounded ${themeColors.button} transition-all shadow-sm cursor-pointer`}>
+                              <ExternalLink className="w-2.5 h-2.5" /> Resolver no TEC
                             </a>
                           )}
                         </div>
@@ -1540,9 +1617,9 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                   })}
                   {/* Placeholder */}
                   {group.length === 1 && (
-                    <div className="rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 opacity-60 p-5">
-                      <Target className="w-8 h-8 mb-2" />
-                      <p className="text-sm font-bold uppercase tracking-wider">Espaço Vazio</p>
+                    <div className="rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 opacity-60 p-2 min-h-[100px]">
+                      <Target className="w-4 h-4 mb-1" />
+                      <p className="text-[8px] font-bold uppercase tracking-wider">Espaço Vazio</p>
                     </div>
                   )}
                 </div>
