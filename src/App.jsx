@@ -1142,12 +1142,21 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
   // FASE 2: TABS E ESTADOS DA VISÃO ZEN
   const [topicTab, setTopicTab] = useState('todos'); // 'todos', 'pendentes', 'sprint', 'dominados'
   const [expandedTopics, setExpandedTopics] = useState({});
+  const [viewMode, setViewMode] = useState('detailed');
   
   // UX 4: Seleção em Massa
   const [selectedAssuntosBulk, setSelectedAssuntosBulk] = useState(new Set());
 
-  // REMOVIDO o useEffect que forçava a abertura da primeira disciplina
-  // O utilizador entra agora num ecrã limpo e focado.
+  useEffect(() => {
+    if (!selectedDiscId && edital.length > 0 && edital[0].disciplinas.length > 0) {
+      setSelectedDiscId(edital[0].disciplinas[0].id);
+    }
+  }, [edital, selectedDiscId]);
+
+  // UX: Limpar a barra de pesquisa ao mudar de disciplina
+  useEffect(() => {
+    setSearchTerm('');
+  }, [selectedDiscId]);
 
   const toggleNode = (id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
   
@@ -1300,16 +1309,6 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     return visible;
   }, [filteredAssuntos, shouldApplyCollapse, expandedTopics]);
 
-  const assuntoAtual = useMemo(() => {
-    if (!activeDisc) return null;
-    let inProgress = activeDisc.assuntos.find(a => {
-       const p = progress[a.id];
-       return p && (p.estudado || p.questoes) && !(p.estudado && p.questoes && p.revisado);
-    });
-    if (inProgress) return inProgress;
-    return activeDisc.assuntos.find(a => !progress[a.id] || (!progress[a.id].estudado && !progress[a.id].questoes && !progress[a.id].revisado));
-  }, [activeDisc, progress]);
-
   // Swipe Action Handlers
   const handleSwipeToSprint = (assunto) => {
      if (isFullyMastered(assunto.id) && !customSprint.some(item => item.assId === assunto.id)) resetProgress(assunto.id);
@@ -1371,8 +1370,8 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                   )}
                   {isEditing && (
                     <div className="flex items-center shrink-0" onClick={(e) => e.stopPropagation()}>
-                      <button onClick={() => handleMoveBloco(bIndex, -1)} disabled={bIndex === 0} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30 cursor-pointer"><ChevronUp className="w-3.5 h-3.5" /></button>
-                      <button onClick={() => handleMoveBloco(bIndex, 1)} disabled={bIndex === edital.length - 1} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30 cursor-pointer"><ChevronDown className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleMoveBloco(bIndex, -1)} disabled={bIndex === 0} className="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-30 cursor-pointer"><ChevronUp className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleMoveBloco(bIndex, 1)} disabled={bIndex === edital.length - 1} className="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-30 cursor-pointer"><ChevronDown className="w-3.5 h-3.5" /></button>
                       <button onClick={() => handleDeleteBlocoClick(bloco.id)} className={`p-1 rounded cursor-pointer ${confirmDeleteId === 'bloco_' + bloco.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600'}`}><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   )}
@@ -1478,26 +1477,6 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                 </div>
               </div>
 
-              {!isEditing && assuntoAtual && (
-                <div className={`mb-6 p-5 rounded-2xl border ${themeColors.border.split(' ')[0]} ${themeColors.lightBg.split(' ')[0]} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm`}>
-                  <div>
-                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1.5 flex items-center gap-1.5"><PlayCircle className={`w-3.5 h-3.5 ${themeColors.text.split(' ')[0]}`}/> Próximo Passo Sugerido</span>
-                    <h4 className="font-bold text-slate-800 dark:text-slate-100 text-lg leading-tight">{assuntoAtual.titulo}</h4>
-                  </div>
-                  <button 
-                     onClick={() => {
-                         if (!customSprint.some(item => item.assId === assuntoAtual.id)) {
-                             toggleSprintItem(activeDisc.id, assuntoAtual.id, activeDisc.nome, assuntoAtual.titulo, assuntoAtual.temp, assuntoAtual.linkTec);
-                         }
-                         if(setActiveTab) setActiveTab('cronograma');
-                     }}
-                     className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm text-white ${themeColors.button.split(' ')[0]} shadow-md transition-all hover:scale-105 hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer shrink-0`}
-                  >
-                    Retomar Estudo <ArrowRight className="w-4 h-4"/>
-                  </button>
-                </div>
-              )}
-
               <div className="flex flex-col xl:flex-row gap-4 mb-4">
                 <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 overflow-x-auto custom-scrollbar flex-1 pb-1">
                   {['todos', 'pendentes', 'sprint', 'dominados'].map(tab => (
@@ -1514,15 +1493,26 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                   ))}
                 </div>
 
-                <div className="relative shrink-0 xl:w-64">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input 
-                    type="text" 
-                    placeholder="Filtrar tópicos..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-200/60 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
-                  />
+                <div className="flex gap-3 shrink-0 xl:w-auto">
+                  <div className="relative flex-1 xl:w-64">
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                    <input 
+                      type="text" 
+                      placeholder="Filtrar tópicos..." 
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-200/60 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                    />
+                  </div>
+                  {/* UX: Botões Modo Zen */}
+                  <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl shrink-0 h-[38px]">
+                    <button onClick={() => setViewMode('detailed')} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${viewMode === 'detailed' ? `bg-white dark:bg-slate-700 shadow-sm ${themeColors.text.split(' ')[0]}` : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+                      Detalhes
+                    </button>
+                    <button onClick={() => setViewMode('compact')} className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${viewMode === 'compact' ? `bg-white dark:bg-slate-700 shadow-sm ${themeColors.text.split(' ')[0]}` : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
+                      Zen
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -1538,8 +1528,9 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                     const isCurrentlyEditing = editingTopicId === assunto.id;
                     const mastered = isFullyMastered(assunto.id);
                     const memoryHealth = getMemoryHealth(assunto.id);
+                    const isCompact = viewMode === 'compact';
                     
-                    const isParent = assunto.indent === 0;
+                    const isParent = (assunto.indent || 0) === 0;
                     const hasChildren = isParent && activeDisc.assuntos[trueIndex + 1]?.indent > 0;
                     const isDragDisabled = isEditing && (!isCurrentlyEditing && (searchTerm !== '' || topicTab !== 'todos'));
                     const isSelectedBulk = selectedAssuntosBulk.has(assunto.id);
@@ -1558,7 +1549,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                           onDragOver={(e) => e.preventDefault()} 
                           onDrop={handleDrop} 
                           style={{ marginLeft: assunto.indent && shouldApplyCollapse ? `${assunto.indent * 1.5}rem` : '0' }} 
-                          className={`group flex flex-col relative transition-all rounded-xl border bg-white dark:bg-slate-900 ${isEditing && !isCurrentlyEditing && !isDragDisabled ? 'cursor-move hover:border-amber-300 dark:hover:border-amber-700' : 'border-slate-200/60 dark:border-slate-700'} ${mastered && !isEditing ? 'opacity-60 bg-slate-50 dark:bg-slate-900/40' : 'hover:shadow-md shadow-sm'} ${isSelectedBulk ? 'border-amber-500 ring-1 ring-amber-500 bg-amber-50 dark:bg-amber-900/10' : ''} p-4`}
+                          className={`group flex flex-col relative transition-all rounded-xl border shadow-sm ${isParent ? 'bg-slate-50 dark:bg-slate-800/40 border-slate-300 dark:border-slate-600 mt-3 mb-1' : 'bg-white dark:bg-slate-900 border-slate-200/60 dark:border-slate-700'} ${isEditing && !isCurrentlyEditing && !isDragDisabled ? 'cursor-move hover:border-amber-300 dark:hover:border-amber-700' : ''} ${mastered && !isEditing ? 'opacity-60' : 'hover:shadow-md'} ${isSelectedBulk ? 'border-amber-500 ring-1 ring-amber-500 bg-amber-50 dark:bg-amber-900/10' : ''} ${isCompact ? 'p-3' : 'p-4'}`}
                         >
                           {isCurrentlyEditing ? (
                             <InlineTopicEditor 
@@ -1582,35 +1573,48 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                                    <input type="checkbox" checked={isSelectedBulk} onChange={() => toggleBulkSelect(assunto.id)} className="w-5 h-5 rounded cursor-pointer border-slate-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 shrink-0" />
                                 ) : (mastered ? <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" /> : checkStatus(assunto.id))}
                                 
-                                <div className="flex-1 flex items-center justify-between gap-3 overflow-hidden">
-                                <div className="flex items-center gap-1.5 overflow-hidden">
-                                  {hasChildren && shouldApplyCollapse && !isEditing && (
-                                    <button 
-                                      onClick={(e) => { e.stopPropagation(); setExpandedTopics(prev => ({...prev, [assunto.id]: !prev[assunto.id]})) }}
-                                      className="mr-1 p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer shrink-0"
-                                    >
-                                      {expandedTopics[assunto.id] ? <ChevronDown className="w-4 h-4"/> : <ChevronRight className="w-4 h-4"/>}
-                                    </button>
-                                  )}
-                                  <span className={`font-semibold truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'} ${assunto.indent > 0 && shouldApplyCollapse ? 'text-sm' : 'text-base'}`}>{assunto.titulo}</span>
-                                </div>
-                                
-                                <div className="flex gap-2 items-center shrink-0 pr-8">
-                                    {!isEditing && memoryHealth && (<div className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded-md font-bold tracking-wider uppercase ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória"><Thermometer className="w-3 h-3"/> <span className="hidden sm:inline">{memoryHealth.label}</span></div>)}
-                                    {assunto.linkTec && <span className="text-[10px] text-blue-500 dark:text-blue-400 font-bold uppercase flex items-center gap-1 border border-blue-200 dark:border-blue-800 px-2 py-1 rounded-md"><Link className="w-3 h-3"/> TEC</span>}
+                                <div 
+                                  className={`flex-1 flex items-center justify-between gap-3 overflow-hidden ${hasChildren && shouldApplyCollapse && !isEditing ? 'cursor-pointer' : ''}`}
+                                  onClick={(e) => {
+                                    if (!isEditing && hasChildren && shouldApplyCollapse) {
+                                      e.stopPropagation();
+                                      setExpandedTopics(prev => ({...prev, [assunto.id]: !prev[assunto.id]}));
+                                    }
+                                  }}
+                                >
+                                  <div className="flex items-center gap-1.5 overflow-hidden">
+                                    {hasChildren && shouldApplyCollapse && !isEditing && (
+                                      <div className={`p-1.5 rounded-lg shrink-0 transition-colors ${expandedTopics[assunto.id] ? themeColors.bg.split(' ')[0] + ' text-white shadow-sm' : 'bg-slate-200 dark:bg-slate-800 text-slate-500'}`}>
+                                        {expandedTopics[assunto.id] ? <ChevronDown className="w-4 h-4"/> : <ChevronRight className="w-4 h-4"/>}
+                                      </div>
+                                    )}
+                                    <span className={`truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : (isParent ? 'font-black text-slate-800 dark:text-white uppercase tracking-tight text-base' : 'font-semibold text-slate-700 dark:text-slate-200 text-sm')}`}>{assunto.titulo}</span>
                                   </div>
+                                  
+                                  {!isCompact && (
+                                    <div className="flex gap-2 items-center shrink-0 pr-8">
+                                      {!isEditing && memoryHealth && (<div className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded-md font-bold tracking-wider uppercase ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória"><Thermometer className="w-3 h-3"/> <span className="hidden sm:inline">{memoryHealth.label}</span></div>)}
+                                      {assunto.linkTec && <span className="text-[10px] text-blue-500 dark:text-blue-400 font-bold uppercase flex items-center gap-1 border border-blue-200 dark:border-blue-800 px-2 py-1 rounded-md" onClick={(e) => e.stopPropagation()}><Link className="w-3 h-3"/> TEC</span>}
+                                    </div>
+                                  )}
                                 </div>
                               </div>
 
-                              {!isEditing && (
+                              {!isEditing && isCompact && (
+                                <button onClick={(e) => { e.stopPropagation(); if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center justify-center w-8 h-8 rounded-lg border shadow-sm cursor-pointer shrink-0 transition-colors ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200' : `bg-white ${themeColors.text.split(' ')[0]} border-indigo-200 dark:bg-slate-800 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40`}`} title={isInSprint ? 'Na Sprint' : 'Adicionar à Sprint'}>
+                                  {isInSprint ? <CheckCircle className="w-4 h-4" /> : (mastered ? <RefreshCcw className="w-4 h-4" /> : <Plus className="w-4 h-4" />)}
+                                </button>
+                              )}
+
+                              {!isCompact && !isEditing && (
                                 <div className="mt-3 flex flex-col sm:flex-row gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
-                                  <button onClick={() => { if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center justify-center sm:justify-start gap-1.5 text-xs font-bold uppercase transition-colors px-3 py-2 rounded-lg border shadow-sm cursor-pointer flex-1 sm:flex-none ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' : `bg-white ${themeColors.text.split(' ')[0]} border-indigo-200 dark:bg-slate-800 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40`}`}>
+                                  <button onClick={(e) => { e.stopPropagation(); if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center justify-center sm:justify-start gap-1.5 text-xs font-bold uppercase transition-colors px-3 py-2 rounded-lg border shadow-sm cursor-pointer flex-1 sm:flex-none ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' : `bg-white ${themeColors.text.split(' ')[0]} border-indigo-200 dark:bg-slate-800 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40`}`}>
                                     {isInSprint ? <CheckCircle className="w-4 h-4" /> : (mastered ? <RefreshCcw className="w-4 h-4" /> : <Target className="w-4 h-4" />)}
                                     <span>{isInSprint ? 'Na Sprint' : (mastered ? 'Refazer' : 'Add Sprint')}</span>
                                   </button>
                                   
                                   {assunto.linkTec && (
-                                    <a href={assunto.linkTec} target="_blank" rel="noopener noreferrer" className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg ${themeColors.button.split(' ')[0]} text-white transition-all shadow-sm cursor-pointer hover:shadow-md flex-1 sm:flex-none`}>
+                                    <a href={assunto.linkTec} onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg ${themeColors.button.split(' ')[0]} text-white transition-all shadow-sm cursor-pointer hover:shadow-md flex-1 sm:flex-none`}>
                                       <ExternalLink className="w-4 h-4" /> Resolver no TEC
                                     </a>
                                   )}
