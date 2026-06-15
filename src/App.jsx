@@ -60,7 +60,7 @@ const initialConfig = {
   levelSound: 'mario',
   appTheme: 'default',
   concurso: 'Base de TI (Iniciantes)', 
-  cargo: 'Núcleo Duro - Qualquer Cargo', 
+  cargo: 'Tribunais', 
   banca: 'Principais (CEBRASPE, FCC, FGV)', 
   horasDia: 4,
   revBom: 7,
@@ -677,42 +677,57 @@ export default function App() {
 
         {/* SIDEBAR DESKTOP */}
         <aside className="hidden md:flex w-72 bg-white dark:bg-slate-900 shadow-xl flex-col z-10 shrink-0 border-r border-slate-200 dark:border-slate-800 sticky top-0 h-screen overflow-hidden">
-          <div className={`p-6 bg-gradient-to-br ${themeColors.sidebar} text-white relative transition-colors duration-500 shrink-0`}>
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className="absolute top-4 right-4 p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer">
-              {isDarkMode ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-white" />}
-            </button>
-            <div className="flex items-center gap-3 mt-2">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center overflow-hidden shrink-0 border border-white/30 backdrop-blur-sm shadow-inner">
-                <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity bg-white p-1" />
-              </div>
-              <h2 className="font-bold text-2xl tracking-tight text-white shadow-sm truncate" title={projectConfig.appName}>{projectConfig.appName}</h2>
-            </div>
-            <div className="mt-5 p-4 bg-white/10 rounded-xl relative">
-              <div className="animate-in fade-in text-left">
-                <p className="text-[10px] text-white/70 uppercase font-black mb-1">{projectConfig.concurso}</p>
-                <p className="font-bold text-lg leading-tight mb-2">{projectConfig.cargo}</p>
-                <div className="flex flex-wrap gap-2 text-xs text-white/90 font-medium">
-                  <span className="bg-black/30 px-2 py-1 rounded border border-white/10">{projectConfig.banca}</span>
-                  <span className="bg-black/30 px-2 py-1 rounded border border-white/10">Meta: {projectConfig.horasDia}h/dia</span>
+          <div className={`p-5 bg-gradient-to-br ${themeColors.sidebar} text-white relative transition-colors duration-500 shrink-0`}>
+            {/* LOGO + APP NAME + THEME TOGGLE (TUDO NA MESMA LINHA) */}
+            <div className="flex justify-between items-center mb-5">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center overflow-hidden shrink-0 border border-white/30 backdrop-blur-sm shadow-inner">
+                  <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity bg-white p-0.5" />
                 </div>
+                <h2 className="font-bold text-xl tracking-tight text-white shadow-sm truncate" title={projectConfig.appName}>{projectConfig.appName}</h2>
+              </div>
+              <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors cursor-pointer shrink-0 ml-2">
+                {isDarkMode ? <Sun className="w-4 h-4 text-amber-300" /> : <Moon className="w-4 h-4 text-white" />}
+              </button>
+            </div>
+            
+            {/* CARTÃO DE TRILHA E STATUS MODERNO (ULTRA-COMPACTO) */}
+            <div className="flex flex-col gap-3">
+              {/* Info Trilha */}
+              <div>
+                <p className="text-[9px] text-white/60 font-bold uppercase tracking-widest leading-tight mb-0.5 truncate">{projectConfig.concurso}</p>
+                <h3 className="text-lg font-black leading-tight text-white truncate mb-2">{projectConfig.cargo}</h3>
                 
-                {/* BLOCÃO DE NÍVEL E STREAK NA SIDEBAR */}
-                <div onClick={() => setShowLevelMap(true)} className="mt-4 pt-4 border-t border-white/20 flex items-center justify-between gap-2 cursor-pointer hover:bg-white/10 p-2 -mx-2 rounded-xl transition-colors group">
-                  <div className="flex items-center gap-2">
-                    <div className="bg-black/40 p-2 rounded-lg group-hover:scale-110 transition-transform"><Award className="w-5 h-5 text-amber-300"/></div>
-                    <div>
-                      <p className="text-xs font-bold text-white">Lvl {userLevel.nivel}</p>
-                      <p className="text-[9px] text-white/80">{gamification.xp} / {userLevel.max} XP</p>
+                {/* Tags Compactas */}
+                <div className="flex flex-wrap gap-1.5">
+                  <span className="flex items-center gap-1 bg-white/10 px-1.5 py-0.5 rounded text-[9px] font-bold text-white/90 border border-white/10 backdrop-blur-sm"><Target size={10} /> {projectConfig.horasDia}h/dia</span>
+                  <span className="flex items-center gap-1 bg-white/10 px-1.5 py-0.5 rounded text-[9px] font-bold text-white/90 border border-white/10 backdrop-blur-sm truncate max-w-[130px]" title={projectConfig.banca}>{projectConfig.banca}</span>
+                </div>
+              </div>
+
+              {/* Nível e Streak Card Moderno */}
+              <div onClick={() => setShowLevelMap(true)} className="group relative overflow-hidden rounded-xl bg-white/[0.05] border border-white/10 p-2.5 transition-all hover:bg-white/[0.1] hover:border-white/20 cursor-pointer backdrop-blur-sm shadow-inner mt-1">
+                <div className="flex justify-between items-center mb-1.5">
+                  <div className="flex items-center gap-2.5">
+                    <Award size={18} className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] group-hover:scale-110 transition-transform duration-300" />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-black text-white leading-none">Lvl {userLevel.nivel}</span>
+                      <span className="text-[8px] text-white/60 font-bold uppercase tracking-widest mt-0.5 truncate max-w-[90px]">{userLevel.titulo}</span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <span className="flex items-center gap-1 text-amber-400 font-black text-lg"><Flame className="w-4 h-4"/> {gamification.streak}</span>
-                    <span className="text-[8px] uppercase font-bold text-white/70 tracking-widest">Dias</span>
+                  <div className="flex items-center gap-1 text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded flex-shrink-0 border border-orange-500/20">
+                    <Flame size={10} className="fill-current animate-pulse" />
+                    <span className="text-[10px] font-black">{gamification.streak}</span>
                   </div>
+                </div>
+                {/* Barra de Progresso Minimalista */}
+                <div className="relative w-full h-1 bg-black/40 rounded-full overflow-hidden">
+                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
                 </div>
               </div>
             </div>
           </div>
+
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar flex flex-col bg-slate-50/50 dark:bg-slate-900">
             {navPhases.map((phaseGroup, pIdx) => (
               <div key={pIdx} className={pIdx > 0 ? "pt-4" : ""}>
@@ -746,7 +761,7 @@ export default function App() {
         {/* CONTENT AREA */}
         <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-28 md:pb-8 text-left">
           <div className="max-w-5xl mx-auto">
-            {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} userProgress={userProgress} edital={edital} activeSubjectIds={activeSubjectIds} onShowLevelMap={() => setShowLevelMap(true)} themeColors={themeColors} reviewStats={reviewStats} />}
+            {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} />}
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} />}
             {activeTab === 'planner' && <TabPlanner customSprint={customSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} />}
             {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} pomodoroTime={pomodoroTime} isPomodoroActive={isPomodoroActive} isPomodoroBreak={isPomodoroBreak} togglePomodoro={togglePomodoro} resetPomodoro={resetPomodoro} triggerConfetti={triggerConfetti} themeColors={themeColors} appTheme={projectConfig.appTheme} />}
@@ -1291,7 +1306,7 @@ function TabPlanner({ customSprint, sprintsCompleted, setActiveTab, themeColors 
   const backlogSprints = sprintGroups.length > 1 ? sprintGroups.slice(1) : [];
 
   return (
-    <div className="space-y-6 animate-in fade-in text-left h-full">
+    <div className="space-y-6 animate-in fade-in text-left h-full pb-10">
       <header className="border-b border-slate-200 dark:border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
           <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2"><LayoutGrid className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`}/> Metas da Semana</h2>
@@ -1358,6 +1373,33 @@ function TabPlanner({ customSprint, sprintsCompleted, setActiveTab, themeColors 
 // ==========================================
 function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, addXP, pomodoroTime, isPomodoroActive, isPomodoroBreak, togglePomodoro, resetPomodoro, triggerConfetti, themeColors, appTheme }) {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [draggedIndex, setDraggedIndex] = useState(null);
+  const dragItem = useRef(null);
+  const dragOverItem = useRef(null);
+
+  const handleDragStart = (e, index) => {
+    dragItem.current = index;
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target);
+  };
+
+  const handleDragEnter = (e, index) => {
+    e.preventDefault();
+    dragOverItem.current = index;
+  };
+
+  const handleDragEnd = () => {
+    if (dragItem.current !== null && dragOverItem.current !== null && dragItem.current !== dragOverItem.current) {
+      const newSprint = [...customSprint];
+      const draggedItemContent = newSprint.splice(dragItem.current, 1)[0];
+      newSprint.splice(dragOverItem.current, 0, draggedItemContent);
+      setCustomSprint(newSprint);
+    }
+    dragItem.current = null;
+    dragOverItem.current = null;
+    setDraggedIndex(null);
+  };
 
   const sprintGroups = [];
   for (let i = 0; i < customSprint.length; i += 2) sprintGroups.push(customSprint.slice(i, i + 2));
@@ -1377,7 +1419,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in text-left">
+    <div className="space-y-6 animate-in fade-in text-left pb-10">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200 dark:border-slate-800 pb-4 gap-4">
         <div>
           <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">Sprints de Estudo</h2>
@@ -1390,7 +1432,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
         </div>
       </header>
 
-      {/* NOVO WIDGET POMODORO (SLIM & MINIMALISTA) */}
+      {/* WIDGET POMODORO (SLIM & MINIMALISTA) */}
       <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl shadow-sm mb-6">
          <div className="flex items-center gap-3">
            <div className={`p-2 rounded-xl transition-colors duration-500 ${isPomodoroActive && !isPomodoroBreak ? `${themeColors.bg.split(' ')[0]} text-white animate-pulse shadow-md` : isPomodoroBreak ? 'bg-emerald-500 text-white animate-pulse shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
@@ -1442,17 +1484,30 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                 </div>
                 
                 <div className="p-5 flex-1 grid grid-cols-1 md:grid-cols-2 gap-5">
-                  {group.map(item => {
+                  {group.map((item, localIdx) => {
+                    const globalIdx = (idx * 2) + localIdx;
+                    const isDragging = draggedIndex === globalIdx;
                     const isEstudado = progress[item.assId]?.estudado || false;
                     const isQuestoes = progress[item.assId]?.questoes || false;
                     const isRevisado = progress[item.assId]?.revisado || false;
 
                     return (
-                      <div key={item.assId} className={`rounded-xl p-5 border flex flex-col relative ${isActive ? `${themeColors.lightBg.split(' ')[0]} ${themeColors.border.split(' ')[0]}` : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'}`}>
+                      <div 
+                        key={item.assId} 
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, globalIdx)}
+                        onDragEnter={(e) => handleDragEnter(e, globalIdx)}
+                        onDragEnd={handleDragEnd}
+                        onDragOver={(e) => e.preventDefault()}
+                        className={`rounded-xl p-5 border flex flex-col relative transition-all cursor-move ${isActive ? `${themeColors.lightBg.split(' ')[0]} ${themeColors.border.split(' ')[0]}` : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'} ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95 z-10' : 'hover:shadow-md'}`}
+                      >
+                        <div className="absolute top-4 right-10 text-slate-300 hover:text-slate-500 transition-colors" title="Arrastar e Soltar">
+                          <GripVertical className="w-4 h-4" />
+                        </div>
                         <button onClick={() => setCustomSprint(p => p.filter(i => i.assId !== item.assId))} className="absolute top-4 right-4 text-slate-300 hover:text-red-500 transition-colors cursor-pointer" title="Remover"><Trash2 className="w-4 h-4"/></button>
                         
-                        <span className={`text-[10px] font-black uppercase tracking-wider ${themeColors.text.split(' ')[0]} mb-1 pr-6`}>{item.discNome}</span>
-                        <p className="font-bold text-lg text-slate-800 dark:text-slate-200 mb-4">{item.assTitulo}</p>
+                        <span className={`text-[10px] font-black uppercase tracking-wider ${themeColors.text.split(' ')[0]} mb-1 pr-12`}>{item.discNome}</span>
+                        <p className="font-bold text-lg text-slate-800 dark:text-slate-200 mb-4 pr-12">{item.assTitulo}</p>
                         
                         <div className="mt-auto space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700/50">
                           <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isEstudado ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200'}`}>
