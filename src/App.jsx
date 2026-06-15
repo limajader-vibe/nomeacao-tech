@@ -190,7 +190,6 @@ export const LEVELS_MAP = [
 // COMPONENTES ISOLADOS (OTIMIZAÇÃO DE PERFORMANCE)
 // ==========================================
 
-// 1. OTIMIZAÇÃO: Isolamento do Pomodoro para não renderizar as Sprints a cada segundo
 function PomodoroWidget({ themeColors, handleAutoLog, addXP, triggerConfetti }) {
   const FOCUS_TIME = 50 * 60; 
   const BREAK_TIME = 10 * 60; 
@@ -255,7 +254,6 @@ function PomodoroWidget({ themeColors, handleAutoLog, addXP, triggerConfetti }) 
   );
 }
 
-// 2. OTIMIZAÇÃO: Isolamento do formulário de edição para evitar re-renderização massiva da lista ao digitar
 const InlineTopicEditor = ({ assunto, onSave, onCancel, themeColors }) => {
   const [titulo, setTitulo] = useState(assunto.titulo || '');
   const [link, setLink] = useState(assunto.linkTec || '');
@@ -831,7 +829,7 @@ export default function App() {
         <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-28 md:pb-8 text-left">
           <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full transition-all duration-500 h-full flex flex-col">
             {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} />}
-            {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} />}
+            {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} setActiveTab={setActiveTab} />}
             {activeTab === 'planner' && <TabPlanner customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} progress={userProgress} toggleProgress={toggleProgress} />}
             {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} triggerConfetti={triggerConfetti} themeColors={themeColors} handleAutoLog={handleAutoLog} />}
             {activeTab === 'revisoes' && <TabRevisaoInteligente progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} />}
@@ -1068,9 +1066,9 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
 }
 
 // ==========================================
-// ABA 1: ARSENAL DE MATÉRIAS
+// ABA 1: ARSENAL DE MATÉRIAS (MASTER-DETAIL)
 // ==========================================
-function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprintItem, resetProgress, themeColors }) {
+function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprintItem, resetProgress, themeColors, setActiveTab }) {
   const [expanded, setExpanded] = useState(() => {
     const initial = {}; edital.forEach(bloco => { initial[bloco.id] = true; }); return initial;
   });
@@ -1079,9 +1077,13 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
   const [editingTopicId, setEditingTopicId] = useState(null);
   const [bulkInput, setBulkInput] = useState({ discId: null, text: '' });
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  
   const [selectedDiscId, setSelectedDiscId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState('detailed');
+  
+  // FASE 2: TABS E ESTADOS DA VISÃO ZEN
+  const [topicTab, setTopicTab] = useState('todos'); // 'todos', 'pendentes', 'sprint', 'dominados'
+  const [collapsedTopics, setCollapsedTopics] = useState({});
 
   useEffect(() => {
     if (!selectedDiscId && edital.length > 0 && edital[0].disciplinas.length > 0) {
@@ -1091,6 +1093,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
 
   const toggleNode = (id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
   
+  // Funções de Gestão de Blocos/Disciplinas (Esquerda)
   const handleEditBlocoNome = (blocoId, newNome) => { setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, nome: newNome } : b)); };
   const handleDeleteBlocoClick = (blocoId) => {
     if (confirmDeleteId === `bloco_${blocoId}`) { setEdital(prev => prev.filter(b => b.id !== blocoId)); setConfirmDeleteId(null); } 
@@ -1121,6 +1124,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
     setEdital(prev => prev.map(b => { if (b.id !== blocoId) return b; if (discIndex + direction < 0 || discIndex + direction >= b.disciplinas.length) return b; const newDisciplinas = [...b.disciplinas]; const temp = newDisciplinas[discIndex]; newDisciplinas[discIndex] = newDisciplinas[discIndex + direction]; newDisciplinas[discIndex + direction] = temp; return { ...b, disciplinas: newDisciplinas }; }));
   };
 
+  // Funções de Gestão de Assuntos (Direita)
   const dragItem = useRef(null); const dragOverItem = useRef(null);
   const handleDragStart = (e, position, discId) => { dragItem.current = { position, discId }; e.dataTransfer.effectAllowed = "move"; };
   const handleDragEnter = (e, position, discId) => { e.preventDefault(); dragOverItem.current = { position, discId }; };
@@ -1160,7 +1164,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
     setEditingTopicId(null);
   };
 
-  const isFullyMastered = (assId) => { const p = progress[assId]; return p?.estudado && p?.questoes && p?.revisado; };
+  const isFullyMastered = useCallback((assId) => { const p = progress[assId]; return p?.estudado && p?.questoes && p?.revisado; }, [progress]);
   const getMemoryHealth = (assId) => {
     const p = progress[assId]; if (!p?.lastReviewedTimestamp) return null; 
     const now = new Date().getTime(); const diffDays = (now - p.lastReviewedTimestamp) / (1000 * 3600 * 24);
@@ -1179,11 +1183,53 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
   const activeDisc = activeBloco?.disciplinas.find(d => d.id === selectedDiscId);
   const isMobileDetailView = !!activeDisc;
   
+  // FASE 2: FILTRAGEM MULTI-TAB E PESQUISA
   const filteredAssuntos = useMemo(() => {
-    return activeDisc?.assuntos.filter(a => 
-      a.titulo.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
-  }, [activeDisc, searchTerm]);
+    if (!activeDisc) return [];
+    return activeDisc.assuntos.filter(a => {
+      const matchesSearch = a.titulo.toLowerCase().includes(searchTerm.toLowerCase());
+      if (!matchesSearch) return false;
+      
+      const mastered = isFullyMastered(a.id);
+      const inSprint = customSprint.some(item => item.assId === a.id);
+      
+      if (topicTab === 'pendentes') return !mastered && !inSprint;
+      if (topicTab === 'sprint') return inSprint;
+      if (topicTab === 'dominados') return mastered;
+      return true; // 'todos'
+    });
+  }, [activeDisc, searchTerm, topicTab, customSprint, isFullyMastered]);
+
+  // FASE 2: TÓPICOS COLAPSÁVEIS (Só colapsa quando vemos "Todos" sem pesquisa)
+  const shouldApplyCollapse = topicTab === 'todos' && searchTerm === '';
+  const displayAssuntos = useMemo(() => {
+    if (!shouldApplyCollapse) return filteredAssuntos;
+    
+    const visible = [];
+    let currentParentId = null;
+    filteredAssuntos.forEach((assunto) => {
+      if (assunto.indent === 0) {
+        currentParentId = assunto.id;
+        visible.push(assunto);
+      } else {
+        if (!collapsedTopics[currentParentId]) {
+          visible.push(assunto);
+        }
+      }
+    });
+    return visible;
+  }, [filteredAssuntos, shouldApplyCollapse, collapsedTopics]);
+
+  // FASE 2: CARTÃO CONTINUAR DE ONDE PAREI (SMART RESUME)
+  const assuntoAtual = useMemo(() => {
+    if (!activeDisc) return null;
+    let inProgress = activeDisc.assuntos.find(a => {
+       const p = progress[a.id];
+       return p && (p.estudado || p.questoes) && !(p.estudado && p.questoes && p.revisado);
+    });
+    if (inProgress) return inProgress;
+    return activeDisc.assuntos.find(a => !progress[a.id] || (!progress[a.id].estudado && !progress[a.id].questoes && !progress[a.id].revisado));
+  }, [activeDisc, progress]);
 
   return (
     <div className="flex flex-col h-full space-y-6 animate-in fade-in pb-10">
@@ -1322,51 +1368,84 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                 </div>
               </div>
 
-              <div className="flex flex-col xl:flex-row gap-3 mb-5">
-                <div className="relative flex-1">
+              {/* FASE 2: CARTÃO CONTINUAR DE ONDE PAREI */}
+              {!isEditing && assuntoAtual && (
+                <div className={`mb-6 p-5 rounded-2xl border ${themeColors.border.split(' ')[0]} ${themeColors.lightBg.split(' ')[0]} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm`}>
+                  <div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 block mb-1.5 flex items-center gap-1.5"><PlayCircle className={`w-3.5 h-3.5 ${themeColors.text.split(' ')[0]}`}/> Próximo Passo Sugerido</span>
+                    <h4 className="font-bold text-slate-800 dark:text-slate-100 text-lg leading-tight">{assuntoAtual.titulo}</h4>
+                  </div>
+                  <button 
+                     onClick={() => {
+                         if (!customSprint.some(item => item.assId === assuntoAtual.id)) {
+                             toggleSprintItem(activeDisc.id, assuntoAtual.id, activeDisc.nome, assuntoAtual.titulo, assuntoAtual.temp, assuntoAtual.linkTec);
+                         }
+                         if(setActiveTab) setActiveTab('cronograma');
+                     }}
+                     className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm text-white ${themeColors.button.split(' ')[0]} shadow-md transition-all hover:scale-105 hover:shadow-lg flex items-center justify-center gap-2 cursor-pointer shrink-0`}
+                  >
+                    Retomar Estudo <ArrowRight className="w-4 h-4"/>
+                  </button>
+                </div>
+              )}
+
+              {/* FASE 2: ABAS DE FOCO E BUSCA "SPOTLIGHT" */}
+              <div className="flex flex-col xl:flex-row gap-4 mb-4">
+                <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 overflow-x-auto custom-scrollbar flex-1 pb-1">
+                  {['todos', 'pendentes', 'sprint', 'dominados'].map(tab => (
+                    <button 
+                      key={tab}
+                      onClick={() => setTopicTab(tab)}
+                      className={`pb-2 px-3 text-sm font-bold border-b-2 transition-all whitespace-nowrap cursor-pointer ${topicTab === tab ? `${themeColors.text.split(' ')[0]} border-current` : 'text-slate-400 border-transparent hover:text-slate-600 dark:hover:text-slate-300'}`}
+                    >
+                      {tab === 'todos' && 'Todos'}
+                      {tab === 'pendentes' && '⏳ Pendentes'}
+                      {tab === 'sprint' && '🔥 Na Sprint'}
+                      {tab === 'dominados' && '✅ Dominados'}
+                    </button>
+                  ))}
+                </div>
+
+                <div className="relative shrink-0 xl:w-64">
                   <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                   <input 
                     type="text" 
-                    placeholder="Filtrar tópicos (ex: Atos Administrativos)..." 
+                    placeholder="Filtrar tópicos..." 
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2.5 text-sm rounded-xl border border-slate-200/60 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                    className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-200/60 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
                   />
-                </div>
-                <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl shrink-0 h-[42px]">
-                  <button onClick={() => setViewMode('detailed')} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${viewMode === 'detailed' ? `bg-white dark:bg-slate-700 shadow-sm ${themeColors.text.split(' ')[0]}` : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
-                    Detalhado
-                  </button>
-                  <button onClick={() => setViewMode('compact')} className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${viewMode === 'compact' ? `bg-white dark:bg-slate-700 shadow-sm ${themeColors.text.split(' ')[0]}` : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}>
-                    Compacto
-                  </button>
                 </div>
               </div>
 
               <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-2 pb-6">
-                {filteredAssuntos.length === 0 ? (
+                {displayAssuntos.length === 0 ? (
                   <div className="text-sm text-slate-500 text-center p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
-                    Nenhum assunto encontrado para "{searchTerm}".
+                    Nenhum assunto encontrado nesta aba ou pesquisa.
                   </div>
                 ) : (
-                  filteredAssuntos.map((assunto) => {
+                  displayAssuntos.map((assunto) => {
                     const trueIndex = activeDisc.assuntos.findIndex(x => x.id === assunto.id);
                     const isInSprint = customSprint.some(item => item.assId === assunto.id);
                     const isCurrentlyEditing = editingTopicId === assunto.id;
                     const mastered = isFullyMastered(assunto.id);
                     const memoryHealth = getMemoryHealth(assunto.id);
-                    const isCompact = viewMode === 'compact';
+                    
+                    // FASE 2: Lógica Colapsável e Indentação Inteligente
+                    const isParent = assunto.indent === 0;
+                    const hasChildren = isParent && activeDisc.assuntos[trueIndex + 1]?.indent > 0;
+                    const isDragDisabled = isEditing && (!isCurrentlyEditing && (searchTerm !== '' || topicTab !== 'todos'));
 
                     return (
                       <div 
                         key={assunto.id} 
-                        draggable={isEditing && !isCurrentlyEditing && !searchTerm} 
+                        draggable={isEditing && !isCurrentlyEditing && !isDragDisabled} 
                         onDragStart={(e) => handleDragStart(e, trueIndex, activeDisc.id)} 
                         onDragEnter={(e) => handleDragEnter(e, trueIndex, activeDisc.id)} 
                         onDragOver={(e) => e.preventDefault()} 
                         onDrop={handleDrop} 
-                        style={{ marginLeft: assunto.indent && !searchTerm ? `${assunto.indent * 1.5}rem` : '0' }} 
-                        className={`group flex flex-col relative transition-all rounded-xl border bg-white dark:bg-slate-900 shadow-sm ${isEditing && !isCurrentlyEditing && !searchTerm ? 'cursor-move hover:border-amber-300 dark:hover:border-amber-700' : 'border-slate-200/60 dark:border-slate-700'} ${mastered && !isEditing ? 'opacity-60 bg-slate-50 dark:bg-slate-900/40' : 'hover:shadow-md'} ${isCompact ? 'p-3' : 'p-4'}`}
+                        style={{ marginLeft: assunto.indent && shouldApplyCollapse ? `${assunto.indent * 1.5}rem` : '0' }} 
+                        className={`group flex flex-col relative transition-all rounded-xl border bg-white dark:bg-slate-900 shadow-sm ${isEditing && !isCurrentlyEditing && !isDragDisabled ? 'cursor-move hover:border-amber-300 dark:hover:border-amber-700' : 'border-slate-200/60 dark:border-slate-700'} ${mastered && !isEditing ? 'opacity-60 bg-slate-50 dark:bg-slate-900/40' : 'hover:shadow-md'} p-4`}
                       >
                         {isCurrentlyEditing ? (
                           <InlineTopicEditor 
@@ -1379,7 +1458,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                           <>
                             {isEditing && (
                               <div className="absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm p-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm z-10">
-                                {!searchTerm && <GripVertical className="w-4 h-4 text-slate-400 cursor-move" title="Arrastar" />}
+                                {!isDragDisabled && <GripVertical className="w-4 h-4 text-slate-400 cursor-move" title="Arrastar" />}
                                 <button onClick={() => handleDeleteClick(activeDisc.id, assunto.id)} className={`p-1.5 rounded-md transition-colors ${confirmDeleteId === assunto.id ? 'bg-red-500 text-white' : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30'} cursor-pointer`} title="Excluir Assunto"><Trash2 className="w-4 h-4"/></button>
                               </div>
                             )}
@@ -1388,24 +1467,27 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                               {!isEditing && (mastered ? <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" /> : checkStatus(assunto.id))}
                               
                               <div className="flex-1 flex items-center justify-between gap-3 overflow-hidden">
-                                <span className={`font-semibold truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'} ${assunto.indent > 0 && !searchTerm ? 'text-sm' : 'text-base'}`}>{assunto.titulo}</span>
+                                <div className="flex items-center gap-1.5 overflow-hidden">
+                                  {/* Botão de Colapsar Pastas */}
+                                  {hasChildren && shouldApplyCollapse && !isEditing && (
+                                    <button 
+                                      onClick={(e) => { e.stopPropagation(); setCollapsedTopics(prev => ({...prev, [assunto.id]: !prev[assunto.id]})) }}
+                                      className="mr-1 p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer shrink-0"
+                                    >
+                                      {collapsedTopics[assunto.id] ? <ChevronRight className="w-4 h-4"/> : <ChevronDown className="w-4 h-4"/>}
+                                    </button>
+                                  )}
+                                  <span className={`font-semibold truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'} ${assunto.indent > 0 && shouldApplyCollapse ? 'text-sm' : 'text-base'}`}>{assunto.titulo}</span>
+                                </div>
                                 
-                                {!isCompact && (
-                                  <div className="flex gap-2 items-center shrink-0 pr-8">
-                                    {!isEditing && memoryHealth && (<div className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded-md font-bold tracking-wider uppercase ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória"><Thermometer className="w-3 h-3"/> <span className="hidden sm:inline">{memoryHealth.label}</span></div>)}
-                                    {assunto.linkTec && <span className="text-[10px] text-blue-500 dark:text-blue-400 font-bold uppercase flex items-center gap-1 border border-blue-200 dark:border-blue-800 px-2 py-1 rounded-md"><Link className="w-3 h-3"/> TEC</span>}
-                                  </div>
-                                )}
+                                <div className="flex gap-2 items-center shrink-0 pr-8">
+                                  {!isEditing && memoryHealth && (<div className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded-md font-bold tracking-wider uppercase ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória"><Thermometer className="w-3 h-3"/> <span className="hidden sm:inline">{memoryHealth.label}</span></div>)}
+                                  {assunto.linkTec && <span className="text-[10px] text-blue-500 dark:text-blue-400 font-bold uppercase flex items-center gap-1 border border-blue-200 dark:border-blue-800 px-2 py-1 rounded-md"><Link className="w-3 h-3"/> TEC</span>}
+                                </div>
                               </div>
-
-                              {!isEditing && isCompact && (
-                                <button onClick={() => { if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center justify-center w-8 h-8 rounded-lg border shadow-sm cursor-pointer shrink-0 transition-colors ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200' : `bg-white ${themeColors.text.split(' ')[0]} border-indigo-200 dark:bg-slate-800 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40`}`} title={isInSprint ? 'Na Sprint' : 'Adicionar à Sprint'}>
-                                  {isInSprint ? <CheckCircle className="w-4 h-4" /> : (mastered ? <RefreshCcw className="w-4 h-4" /> : <Plus className="w-4 h-4" />)}
-                                </button>
-                              )}
                             </div>
 
-                            {!isCompact && !isEditing && (
+                            {!isEditing && (
                               <div className="mt-3 flex flex-col sm:flex-row gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
                                 <button onClick={() => { if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center justify-center sm:justify-start gap-1.5 text-xs font-bold uppercase transition-colors px-3 py-2 rounded-lg border shadow-sm cursor-pointer flex-1 sm:flex-none ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' : `bg-white ${themeColors.text.split(' ')[0]} border-indigo-200 dark:bg-slate-800 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40`}`}>
                                   {isInSprint ? <CheckCircle className="w-4 h-4" /> : (mastered ? <RefreshCcw className="w-4 h-4" /> : <Target className="w-4 h-4" />)}
@@ -1422,10 +1504,10 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
 
                             {isEditing && (
                               <div className="flex gap-2 shrink-0 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                <button onClick={() => handleIndent(activeDisc.id, assunto.id, -1)} disabled={!assunto.indent || !!searchTerm} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer flex items-center gap-1 text-xs font-bold" title="Recuar">
+                                <button onClick={() => handleIndent(activeDisc.id, assunto.id, -1)} disabled={!assunto.indent || !shouldApplyCollapse} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer flex items-center gap-1 text-xs font-bold" title="Recuar">
                                   <ArrowLeft className="w-4 h-4"/> Nível Esq.
                                 </button>
-                                <button onClick={() => handleIndent(activeDisc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3 || !!searchTerm} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer flex items-center gap-1 text-xs font-bold" title="Avançar">
+                                <button onClick={() => handleIndent(activeDisc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3 || !shouldApplyCollapse} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer flex items-center gap-1 text-xs font-bold" title="Avançar">
                                   Nível Dir. <ArrowRight className="w-4 h-4"/>
                                 </button>
                                 <div className="flex-1"></div>
@@ -1461,7 +1543,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                           <input type="text" placeholder="Adicionar assunto manualmente..." value={newTopic.discId === activeDisc.id ? newTopic.titulo : ''} onChange={(e) => setNewTopic({...newTopic, discId: activeDisc.id, titulo: e.target.value})} className="flex-1 w-full p-3 text-sm rounded-lg border border-amber-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500" />
                           <button onClick={() => handleAddTopic(activeDisc.id)} className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-lg text-sm font-bold w-full sm:w-auto transition-colors cursor-pointer shadow-sm">Adicionar</button>
                         </div>
-                        <button onClick={() => setBulkInput({ discId: activeDisc.id, text: '' })} className="w-full border border-dashed border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer mt-1">
+                        <button onClick={() => setBulkInput({ discId: activeDisc.id, text: '' })} className="w-full border border-dashed border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-500 hover:bg-amber-100 dark:bg-amber-900/40 px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer mt-1">
                           <ListPlus className="w-4 h-4"/> Colar Índice Completo
                         </button>
                       </>
