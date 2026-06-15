@@ -657,16 +657,17 @@ export default function App() {
 
         {/* MOBILE TOP HEADER */}
         <div className={`md:hidden flex items-center justify-between p-4 ${themeColors.headerBg} shadow-md border-b ${themeColors.border} z-20 sticky top-0 transition-colors duration-500`}>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 min-w-0 pr-2">
+            {/* LOGÓTIPO ARREDONDADO */}
             <div className={`w-11 h-11 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
               <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest truncate max-w-[150px]">Olá, {projectConfig.userName.split(' ')[0]}</span>
-              <h2 className="font-extrabold text-base text-slate-800 dark:text-white leading-tight tracking-tight truncate max-w-[150px]">{projectConfig.appName}</h2>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest truncate">Olá, {projectConfig.userName.split(' ')[0]}</span>
+              <h2 className="font-extrabold text-base text-slate-800 dark:text-white leading-tight tracking-tight truncate">{projectConfig.appName}</h2>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm`}>
               {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
             </button>
@@ -676,20 +677,22 @@ export default function App() {
         {/* SIDEBAR DESKTOP */}
         <aside className="hidden md:flex w-72 bg-white dark:bg-slate-900 shadow-xl flex-col z-10 shrink-0 border-r border-slate-300 dark:border-slate-800 sticky top-0 h-screen overflow-hidden">
           <div className={`p-6 ${themeColors.headerBg} border-b ${themeColors.border} relative transition-colors duration-500 shrink-0`}>
-            {/* LOGO + APP NAME + THEME TOGGLE */}
-            <div className="flex justify-between items-center mb-6">
-              <div className="flex items-center gap-3 min-w-0">
-                <div className={`w-12 h-12 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
-                  <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest truncate max-w-[120px]">Olá, {projectConfig.userName.split(' ')[0]}</span>
-                  <h2 className="font-extrabold text-xl tracking-tight text-slate-800 dark:text-white truncate" title={projectConfig.appName}>{projectConfig.appName}</h2>
-                </div>
+            
+            {/* BOTÃO DE TEMA - POSIÇÃO ABSOLUTA NO TOPO (Isolado do Texto) */}
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`absolute top-6 right-6 p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-slate-400 z-10`}>
+              {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
+            </button>
+
+            {/* LOGO + APP NAME */}
+            <div className="flex items-center gap-3 min-w-0 mb-6 pr-10 mt-1">
+              {/* LOGÓTIPO ARREDONDADO */}
+              <div className={`w-12 h-12 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
+                <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
               </div>
-              <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-full transition-colors cursor-pointer shrink-0 ml-2 shadow-sm text-slate-500 dark:text-slate-400`}>
-                {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
-              </button>
+              <div className="flex flex-col min-w-0">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest truncate">Olá, {projectConfig.userName.split(' ')[0]}</span>
+                <h2 className="font-extrabold text-xl tracking-tight text-slate-800 dark:text-white truncate" title={projectConfig.appName}>{projectConfig.appName}</h2>
+              </div>
             </div>
             
             {/* INFORMAÇÕES DA TRILHA */}
