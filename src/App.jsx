@@ -1128,7 +1128,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
 // ABA 1: ARSENAL DE MATÉRIAS (MASTER-DETAIL + UX AVANÇADA)
 // ==========================================
 function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSprintItem, customSprint, resetProgress, themeColors, setActiveTab, addXP }) {
-  // Árvore recolhida por padrão
+  // Árvore recolhida por padrão (Inicia como um objeto vazio)
   const [expanded, setExpanded] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [newTopic, setNewTopic] = useState({ discId: '', titulo: '', linkTec: '' });
@@ -1146,11 +1146,8 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
   // UX 4: Seleção em Massa
   const [selectedAssuntosBulk, setSelectedAssuntosBulk] = useState(new Set());
 
-  useEffect(() => {
-    if (!selectedDiscId && edital.length > 0 && edital[0].disciplinas.length > 0) {
-      setSelectedDiscId(edital[0].disciplinas[0].id);
-    }
-  }, [edital, selectedDiscId]);
+  // REMOVIDO o useEffect que forçava a abertura da primeira disciplina
+  // O utilizador entra agora num ecrã limpo e focado.
 
   const toggleNode = (id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
   
@@ -1446,10 +1443,14 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
         <div className={`flex-1 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-4 md:p-6 ${!isMobileDetailView ? 'hidden md:flex' : 'flex'} flex-col min-h-[500px] relative`}>
           
           {!activeDisc ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-center p-8">
-              <BookOpen className="w-16 h-16 mb-4 opacity-20" />
-              <h3 className="text-xl font-bold text-slate-600 dark:text-slate-300 mb-2">Nenhuma disciplina selecionada</h3>
-              <p className="text-sm">Selecione uma matéria no menu lateral para visualizar e gerir os seus assuntos.</p>
+            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-center p-8 bg-slate-50/50 dark:bg-slate-900/50 rounded-2xl border-2 border-dashed border-slate-200/80 dark:border-slate-800 m-2 animate-in fade-in">
+              <div className="w-24 h-24 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mb-6 shadow-sm border border-slate-100 dark:border-slate-700">
+                <BookOpen className={`w-10 h-10 ${themeColors.text.split(' ')[0]} opacity-80`} />
+              </div>
+              <h3 className="text-2xl font-black text-slate-700 dark:text-slate-200 mb-3 tracking-tight">Cockpit de Disciplinas</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+                Navegue pelos <strong className={`font-bold ${themeColors.text.split(' ')[0]}`}>Módulos à esquerda</strong> e selecione uma matéria para explorar o edital, organizar revisões e enviar metas para a sua Sprint Diária.
+              </p>
             </div>
           ) : (
             <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-300">
