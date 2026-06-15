@@ -187,7 +187,7 @@ export const LEVELS_MAP = [
 ];
 
 // ==========================================
-// COMPONENTES ISOLADOS (OTIMIZAÇÃO DE PERFORMANCE)
+// COMPONENTES ISOLADOS E OTIMIZADOS
 // ==========================================
 
 function PomodoroWidget({ themeColors, handleAutoLog, addXP, triggerConfetti }) {
@@ -254,6 +254,65 @@ function PomodoroWidget({ themeColors, handleAutoLog, addXP, triggerConfetti }) 
   );
 }
 
+// 2. UX Avançada: Componente de Arrasto/Swipe (Mobile Friendly)
+const SwipeableItem = ({ children, onSwipeRight, onSwipeLeft, disabled, isCompact }) => {
+  const [offset, setOffset] = useState(0);
+  const startXRef = useRef(0);
+
+  const handleTouchStart = (e) => {
+      if (disabled) return;
+      startXRef.current = e.touches[0].clientX;
+  };
+  const handleTouchMove = (e) => {
+      if (disabled) return;
+      const diff = e.touches[0].clientX - startXRef.current;
+      // Limit swipe boundary
+      if (diff > -80 && diff < 80) setOffset(diff);
+  };
+  const handleTouchEnd = () => {
+      if (disabled) return;
+      if (offset > 50 && onSwipeRight) onSwipeRight();
+      else if (offset < -50 && onSwipeLeft) onSwipeLeft();
+      setOffset(0);
+  };
+
+  return (
+     <div className="relative overflow-hidden rounded-xl">
+        <div className="absolute inset-0 flex items-center justify-between px-4 bg-slate-100 dark:bg-slate-800 rounded-xl">
+           <div className={`text-emerald-500 font-bold flex items-center gap-2 transition-opacity ${offset > 20 ? 'opacity-100' : 'opacity-0'}`}><Target size={18}/> Sprint</div>
+           <div className={`text-blue-500 font-bold flex items-center gap-2 transition-opacity ${offset < -20 ? 'opacity-100' : 'opacity-0'}`}><CheckCircle size={18}/> Dominar</div>
+        </div>
+        <div
+           onTouchStart={handleTouchStart}
+           onTouchMove={handleTouchMove}
+           onTouchEnd={handleTouchEnd}
+           style={{ transform: `translateX(${offset}px)`, transition: offset === 0 ? 'transform 0.3s ease' : 'none' }}
+           className={`relative z-10 w-full ${isCompact ? '' : ''}`}
+        >
+           {children}
+        </div>
+     </div>
+  );
+};
+
+// 3. UX Avançada: Anel de Progresso Circular
+const CircularProgress = ({ percent, themeColors }) => {
+  const radius = 9;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (percent / 100) * circumference;
+  const colorClass = percent === 100 ? 'text-emerald-500' : themeColors.text.split(' ')[0];
+
+  return (
+    <div className="relative flex items-center justify-center w-6 h-6 shrink-0 opacity-80">
+      <svg className="w-6 h-6 transform -rotate-90">
+        <circle cx="12" cy="12" r={radius} stroke="currentColor" strokeWidth="2" fill="transparent" className="text-slate-200 dark:text-slate-700" />
+        <circle cx="12" cy="12" r={radius} stroke="currentColor" strokeWidth="2" fill="transparent" strokeDasharray={circumference} strokeDashoffset={offset} className={`transition-all duration-1000 ${colorClass}`} />
+      </svg>
+      {percent === 100 && <CheckCircle className={`absolute w-3.5 h-3.5 text-emerald-500 bg-white dark:bg-slate-900 rounded-full`} />}
+    </div>
+  );
+};
+
 const InlineTopicEditor = ({ assunto, onSave, onCancel, themeColors }) => {
   const [titulo, setTitulo] = useState(assunto.titulo || '');
   const [link, setLink] = useState(assunto.linkTec || '');
@@ -271,8 +330,8 @@ const InlineTopicEditor = ({ assunto, onSave, onCancel, themeColors }) => {
         </div>
       </div>
       <div className="flex gap-2 mt-1">
-        <button onClick={() => onSave(titulo, link)} className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer">Salvar Alterações</button>
-        <button onClick={onCancel} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer">Cancelar</button>
+        <button onClick={() => onSave(titulo, link)} className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer shadow-sm">Salvar Alterações</button>
+        <button onClick={onCancel} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer shadow-sm">Cancelar</button>
       </div>
     </div>
   );
@@ -829,7 +888,7 @@ export default function App() {
         <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-28 md:pb-8 text-left">
           <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full transition-all duration-500 h-full flex flex-col">
             {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} />}
-            {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} setActiveTab={setActiveTab} />}
+            {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} setUserProgress={setUserProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} setActiveTab={setActiveTab} addXP={addXP} />}
             {activeTab === 'planner' && <TabPlanner customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} progress={userProgress} toggleProgress={toggleProgress} />}
             {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} triggerConfetti={triggerConfetti} themeColors={themeColors} handleAutoLog={handleAutoLog} />}
             {activeTab === 'revisoes' && <TabRevisaoInteligente progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} />}
@@ -1066,12 +1125,11 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
 }
 
 // ==========================================
-// ABA 1: ARSENAL DE MATÉRIAS (MASTER-DETAIL)
+// ABA 1: ARSENAL DE MATÉRIAS (MASTER-DETAIL + UX AVANÇADA)
 // ==========================================
-function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprintItem, resetProgress, themeColors, setActiveTab }) {
-  const [expanded, setExpanded] = useState(() => {
-    const initial = {}; edital.forEach(bloco => { initial[bloco.id] = true; }); return initial;
-  });
+function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSprintItem, customSprint, resetProgress, themeColors, setActiveTab, addXP }) {
+  // Árvore recolhida por padrão
+  const [expanded, setExpanded] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [newTopic, setNewTopic] = useState({ discId: '', titulo: '', linkTec: '' });
   const [editingTopicId, setEditingTopicId] = useState(null);
@@ -1084,6 +1142,9 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
   // FASE 2: TABS E ESTADOS DA VISÃO ZEN
   const [topicTab, setTopicTab] = useState('todos'); // 'todos', 'pendentes', 'sprint', 'dominados'
   const [collapsedTopics, setCollapsedTopics] = useState({});
+  
+  // UX 4: Seleção em Massa
+  const [selectedAssuntosBulk, setSelectedAssuntosBulk] = useState(new Set());
 
   useEffect(() => {
     if (!selectedDiscId && edital.length > 0 && edital[0].disciplinas.length > 0) {
@@ -1093,7 +1154,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
 
   const toggleNode = (id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
   
-  // Funções de Gestão de Blocos/Disciplinas (Esquerda)
+  // Gestão Bloco/Disciplina
   const handleEditBlocoNome = (blocoId, newNome) => { setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, nome: newNome } : b)); };
   const handleDeleteBlocoClick = (blocoId) => {
     if (confirmDeleteId === `bloco_${blocoId}`) { setEdital(prev => prev.filter(b => b.id !== blocoId)); setConfirmDeleteId(null); } 
@@ -1103,7 +1164,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
     const newId = `b_${Date.now()}`; const newBloco = { id: newId, nome: 'Novo Bloco', icone: 'Layers', disciplinas: [] };
     setEdital(prev => [...prev, newBloco]); setExpanded(prev => ({ ...prev, [newId]: true }));
   };
-
   const handleEditDiscNome = (blocoId, discId, newNome) => { setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: b.disciplinas.map(d => d.id === discId ? { ...d, nome: newNome } : d) } : b)); };
   const handleDeleteDisciplinaClick = (blocoId, discId) => {
     if (confirmDeleteId === `disc_${discId}`) { 
@@ -1124,7 +1184,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
     setEdital(prev => prev.map(b => { if (b.id !== blocoId) return b; if (discIndex + direction < 0 || discIndex + direction >= b.disciplinas.length) return b; const newDisciplinas = [...b.disciplinas]; const temp = newDisciplinas[discIndex]; newDisciplinas[discIndex] = newDisciplinas[discIndex + direction]; newDisciplinas[discIndex + direction] = temp; return { ...b, disciplinas: newDisciplinas }; }));
   };
 
-  // Funções de Gestão de Assuntos (Direita)
+  // Gestão de Assuntos
   const dragItem = useRef(null); const dragOverItem = useRef(null);
   const handleDragStart = (e, position, discId) => { dragItem.current = { position, discId }; e.dataTransfer.effectAllowed = "move"; };
   const handleDragEnter = (e, position, discId) => { e.preventDefault(); dragOverItem.current = { position, discId }; };
@@ -1154,16 +1214,41 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
     setBulkInput({ discId: null, text: '' });
   };
 
-  const startEditTopic = (assunto) => { 
-    setEditingTopicId(assunto.id); 
-  };
-  
+  const startEditTopic = (assunto) => { setEditingTopicId(assunto.id); };
   const saveEditTopic = (discId, assId, novoTitulo, novoLink) => {
     if (!novoTitulo) return; 
     setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => { if (d.id === discId) return { ...d, assuntos: d.assuntos.map(a => a.id === assId ? { ...a, titulo: novoTitulo, linkTec: novoLink } : a) }; return d; }) }))); 
     setEditingTopicId(null);
   };
 
+  // Bulk Edit Handlers
+  const toggleBulkSelect = (id) => {
+    const newSet = new Set(selectedAssuntosBulk);
+    if (newSet.has(id)) newSet.delete(id); else newSet.add(id);
+    setSelectedAssuntosBulk(newSet);
+  };
+  const handleBulkDelete = () => {
+    if(window.confirm(`Excluir ${selectedAssuntosBulk.size} itens selecionados?`)){
+       setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => {
+          if (d.id === selectedDiscId) return { ...d, assuntos: d.assuntos.filter(a => !selectedAssuntosBulk.has(a.id)) };
+          return d;
+       })})));
+       setSelectedAssuntosBulk(new Set());
+    }
+  };
+  const handleBulkIndent = (delta) => {
+    setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => {
+       if (d.id === selectedDiscId) {
+          return { ...d, assuntos: d.assuntos.map(a => {
+             if (selectedAssuntosBulk.has(a.id)) return { ...a, indent: Math.max(0, Math.min(3, (a.indent || 0) + delta)) };
+             return a;
+          })};
+       }
+       return d;
+    })})));
+  };
+
+  // Helpers
   const isFullyMastered = useCallback((assId) => { const p = progress[assId]; return p?.estudado && p?.questoes && p?.revisado; }, [progress]);
   const getMemoryHealth = (assId) => {
     const p = progress[assId]; if (!p?.lastReviewedTimestamp) return null; 
@@ -1172,8 +1257,10 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
     if (diffDays <= 7) return { color: 'text-amber-500', bg: 'bg-amber-100 dark:bg-amber-900/30', label: 'Enfraquecer' };
     return { color: 'text-red-500', bg: 'bg-red-100 dark:bg-red-900/30', label: 'Alerta' };
   };
+  
   const checkStatus = (assId) => {
-    const p = progress[assId]; const count = (p?.estudado ? 1 : 0) + (p?.questoes ? 1 : 0) + (p?.revisado ? 1 : 0);
+    const p = progress[assId];
+    const count = (p?.estudado ? 1 : 0) + (p?.questoes ? 1 : 0) + (p?.revisado ? 1 : 0);
     if (count === 3) return <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />;
     if (count > 0) return <PlayCircle className="w-5 h-5 text-blue-400 shrink-0" />;
     return <div className="w-5 h-5 rounded-full border border-slate-300 dark:border-slate-600 shrink-0"></div>;
@@ -1183,7 +1270,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
   const activeDisc = activeBloco?.disciplinas.find(d => d.id === selectedDiscId);
   const isMobileDetailView = !!activeDisc;
   
-  // FASE 2: FILTRAGEM MULTI-TAB E PESQUISA
   const filteredAssuntos = useMemo(() => {
     if (!activeDisc) return [];
     return activeDisc.assuntos.filter(a => {
@@ -1196,11 +1282,10 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
       if (topicTab === 'pendentes') return !mastered && !inSprint;
       if (topicTab === 'sprint') return inSprint;
       if (topicTab === 'dominados') return mastered;
-      return true; // 'todos'
+      return true;
     });
   }, [activeDisc, searchTerm, topicTab, customSprint, isFullyMastered]);
 
-  // FASE 2: TÓPICOS COLAPSÁVEIS (Só colapsa quando vemos "Todos" sem pesquisa)
   const shouldApplyCollapse = topicTab === 'todos' && searchTerm === '';
   const displayAssuntos = useMemo(() => {
     if (!shouldApplyCollapse) return filteredAssuntos;
@@ -1212,15 +1297,12 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
         currentParentId = assunto.id;
         visible.push(assunto);
       } else {
-        if (!collapsedTopics[currentParentId]) {
-          visible.push(assunto);
-        }
+        if (!collapsedTopics[currentParentId]) visible.push(assunto);
       }
     });
     return visible;
   }, [filteredAssuntos, shouldApplyCollapse, collapsedTopics]);
 
-  // FASE 2: CARTÃO CONTINUAR DE ONDE PAREI (SMART RESUME)
   const assuntoAtual = useMemo(() => {
     if (!activeDisc) return null;
     let inProgress = activeDisc.assuntos.find(a => {
@@ -1231,6 +1313,22 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
     return activeDisc.assuntos.find(a => !progress[a.id] || (!progress[a.id].estudado && !progress[a.id].questoes && !progress[a.id].revisado));
   }, [activeDisc, progress]);
 
+  // Swipe Action Handlers
+  const handleSwipeToSprint = (assunto) => {
+     if (isFullyMastered(assunto.id) && !customSprint.some(item => item.assId === assunto.id)) resetProgress(assunto.id);
+     toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec);
+  };
+  const handleSwipeToMaster = (assunto) => {
+     if (!isFullyMastered(assunto.id)) {
+        const now = new Date().getTime();
+        setUserProgress(prev => ({
+           ...prev,
+           [assunto.id]: { estudado: true, questoes: true, revisado: true, lastReviewedTimestamp: now, nextReviewTimestamp: now + (1000 * 60 * 60 * 24 * 15) }
+        }));
+        addXP(25);
+     }
+  };
+
   return (
     <div className="flex flex-col h-full space-y-6 animate-in fade-in pb-10">
       <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
@@ -1240,20 +1338,21 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">A sua Trilha Base. Selecione uma disciplina para ver o edital detalhado.</p>
         </div>
-        <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); }} className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700/50'}`}>
+        <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); setSelectedAssuntosBulk(new Set()); }} className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700/50'}`}>
           {isEditing ? <Save className="w-5 h-5"/> : <Edit className="w-5 h-5"/>}{isEditing ? 'Concluir Gestão' : 'Gerenciar Matérias'}
         </button>
       </header>
 
       {isEditing && (
-        <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 p-4 rounded-xl flex items-center gap-3 shrink-0 shadow-sm">
+        <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 shadow-sm">
           <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
-          <div className="text-sm text-amber-800 dark:text-amber-200/80 leading-relaxed"><strong>Modo Edição Ativo:</strong> Edite nomes, reorganize pastas (menu esquerdo) ou passe o rato por cima dos assuntos (direita) para revelar os botões de editar e arrastar.</div>
+          <div className="text-sm text-amber-800 dark:text-amber-200/80 leading-relaxed flex-1"><strong>Modo Edição Ativo:</strong> Use as caixas de seleção nos cartões para gerir múltiplos assuntos em massa, ou arraste para reordenar.</div>
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row gap-6 items-start flex-1 min-h-[600px]">
+      <div className="flex flex-col md:flex-row gap-6 items-start flex-1 min-h-[600px] relative">
         
+        {/* COLUNA ESQUERDA: MÓDULOS */}
         <div className={`w-full md:w-1/3 lg:w-1/4 flex-shrink-0 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-4 md:sticky md:top-6 ${isMobileDetailView ? 'hidden md:flex' : 'flex'} flex-col max-h-[85vh] overflow-hidden`}>
           <div className="flex items-center gap-2 mb-4 px-2 shrink-0">
             <Menu className="w-5 h-5 text-slate-400" />
@@ -1275,9 +1374,9 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                   )}
                   {isEditing && (
                     <div className="flex items-center shrink-0" onClick={(e) => e.stopPropagation()}>
-                      <button onClick={() => handleMoveBloco(bIndex, -1)} disabled={bIndex === 0} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30 cursor-pointer" title="Sobe"><ChevronUp className="w-3.5 h-3.5" /></button>
-                      <button onClick={() => handleMoveBloco(bIndex, 1)} disabled={bIndex === edital.length - 1} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30 cursor-pointer" title="Desce"><ChevronDown className="w-3.5 h-3.5" /></button>
-                      <button onClick={() => handleDeleteBlocoClick(bloco.id)} className={`p-1 rounded cursor-pointer transition-colors ${confirmDeleteId === 'bloco_' + bloco.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600'}`} title="Excluir Bloco"><Trash2 className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleMoveBloco(bIndex, -1)} disabled={bIndex === 0} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30 cursor-pointer"><ChevronUp className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleMoveBloco(bIndex, 1)} disabled={bIndex === edital.length - 1} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30 cursor-pointer"><ChevronDown className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleDeleteBlocoClick(bloco.id)} className={`p-1 rounded cursor-pointer ${confirmDeleteId === 'bloco_' + bloco.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600'}`}><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   )}
                 </div>
@@ -1288,6 +1387,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                       const totalAssuntosDisc = disc.assuntos.length;
                       const concluidosAssuntosDisc = disc.assuntos.filter(a => isFullyMastered(a.id)).length;
                       const isSelected = selectedDiscId === disc.id;
+                      const progressoCircular = totalAssuntosDisc === 0 ? 0 : Math.round((concluidosAssuntosDisc / totalAssuntosDisc) * 100);
                       
                       return (
                         <div key={disc.id} onClick={() => !isEditing && setSelectedDiscId(disc.id)} className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all ${isSelected && !isEditing ? `${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]} border ${themeColors.border.split(' ')[0]} shadow-sm` : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent text-slate-600 dark:text-slate-400'}`}>
@@ -1298,7 +1398,8 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                             </div>
                           )}
                           
-                          <FolderOpen className={`w-4 h-4 shrink-0 ${isSelected ? '' : 'opacity-60'}`} />
+                          {/* UX 2: Anel de Progresso */}
+                          <CircularProgress percent={progressoCircular} themeColors={themeColors} />
                           
                           {isEditing ? (
                             <input type="text" value={disc.nome} onChange={(e) => handleEditDiscNome(bloco.id, disc.id, e.target.value)} onClick={(e) => e.stopPropagation()} className={`font-bold text-sm text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 outline-none focus:border-indigo-500 w-full`} />
@@ -1313,7 +1414,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                           )}
 
                           {isEditing && (
-                            <button onClick={(e) => { e.stopPropagation(); handleDeleteDisciplinaClick(bloco.id, disc.id); }} className={`p-1 rounded cursor-pointer shrink-0 ${confirmDeleteId === 'disc_' + disc.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Disciplina"><Trash2 className="w-3.5 h-3.5" /></button>
+                            <button onClick={(e) => { e.stopPropagation(); handleDeleteDisciplinaClick(bloco.id, disc.id); }} className={`p-1 rounded cursor-pointer shrink-0 ${confirmDeleteId === 'disc_' + disc.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600'}`}><Trash2 className="w-3.5 h-3.5" /></button>
                           )}
                         </div>
                       )
@@ -1341,7 +1442,8 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
           )}
         </div>
 
-        <div className={`flex-1 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-4 md:p-6 ${!isMobileDetailView ? 'hidden md:flex' : 'flex'} flex-col min-h-[500px]`}>
+        {/* COLUNA DIREITA: PAINEL DE CONTEÚDO */}
+        <div className={`flex-1 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-4 md:p-6 ${!isMobileDetailView ? 'hidden md:flex' : 'flex'} flex-col min-h-[500px] relative`}>
           
           {!activeDisc ? (
             <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-center p-8">
@@ -1357,18 +1459,24 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                   <ArrowLeft className="w-4 h-4" /> Voltar às Matérias
                 </button>
                 
-                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">{activeBloco?.nome}</span>
+                {/* UX 1: Breadcrumbs Contextuais */}
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 flex-wrap">
+                   <Layers className="w-3.5 h-3.5" />
+                   <span className="truncate max-w-[150px]">{activeBloco?.nome}</span>
+                   <ChevronRight className="w-3 h-3 opacity-50 shrink-0" />
+                   <span className={`${themeColors.text.split(' ')[0]} truncate`}>{activeDisc.nome}</span>
+                </div>
+                
                 <div className="flex items-start justify-between gap-4">
                   <h3 className={`text-2xl font-black ${themeColors.text.split(' ')[0]}`}>{activeDisc.nome}</h3>
                   <div className="flex flex-col items-end shrink-0">
-                    <span className="text-sm font-bold text-slate-500">
-                      {activeDisc.assuntos.filter(a => isFullyMastered(a.id)).length} de {activeDisc.assuntos.length} Concluídos
+                    <span className="text-sm font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                      {activeDisc.assuntos.filter(a => isFullyMastered(a.id)).length} de {activeDisc.assuntos.length} Fechados
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* FASE 2: CARTÃO CONTINUAR DE ONDE PAREI */}
               {!isEditing && assuntoAtual && (
                 <div className={`mb-6 p-5 rounded-2xl border ${themeColors.border.split(' ')[0]} ${themeColors.lightBg.split(' ')[0]} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm`}>
                   <div>
@@ -1389,7 +1497,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                 </div>
               )}
 
-              {/* FASE 2: ABAS DE FOCO E BUSCA "SPOTLIGHT" */}
               <div className="flex flex-col xl:flex-row gap-4 mb-4">
                 <div className="flex gap-2 border-b border-slate-200 dark:border-slate-800 overflow-x-auto custom-scrollbar flex-1 pb-1">
                   {['todos', 'pendentes', 'sprint', 'dominados'].map(tab => (
@@ -1420,7 +1527,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
 
               <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-2 pb-6">
                 {displayAssuntos.length === 0 ? (
-                  <div className="text-sm text-slate-500 text-center p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
+                  <div className="text-sm text-slate-500 text-center p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center">
                     Nenhum assunto encontrado nesta aba ou pesquisa.
                   </div>
                 ) : (
@@ -1431,98 +1538,118 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                     const mastered = isFullyMastered(assunto.id);
                     const memoryHealth = getMemoryHealth(assunto.id);
                     
-                    // FASE 2: Lógica Colapsável e Indentação Inteligente
                     const isParent = assunto.indent === 0;
                     const hasChildren = isParent && activeDisc.assuntos[trueIndex + 1]?.indent > 0;
                     const isDragDisabled = isEditing && (!isCurrentlyEditing && (searchTerm !== '' || topicTab !== 'todos'));
+                    const isSelectedBulk = selectedAssuntosBulk.has(assunto.id);
 
                     return (
-                      <div 
-                        key={assunto.id} 
-                        draggable={isEditing && !isCurrentlyEditing && !isDragDisabled} 
-                        onDragStart={(e) => handleDragStart(e, trueIndex, activeDisc.id)} 
-                        onDragEnter={(e) => handleDragEnter(e, trueIndex, activeDisc.id)} 
-                        onDragOver={(e) => e.preventDefault()} 
-                        onDrop={handleDrop} 
-                        style={{ marginLeft: assunto.indent && shouldApplyCollapse ? `${assunto.indent * 1.5}rem` : '0' }} 
-                        className={`group flex flex-col relative transition-all rounded-xl border bg-white dark:bg-slate-900 shadow-sm ${isEditing && !isCurrentlyEditing && !isDragDisabled ? 'cursor-move hover:border-amber-300 dark:hover:border-amber-700' : 'border-slate-200/60 dark:border-slate-700'} ${mastered && !isEditing ? 'opacity-60 bg-slate-50 dark:bg-slate-900/40' : 'hover:shadow-md'} p-4`}
+                      <SwipeableItem 
+                         key={assunto.id} 
+                         disabled={isEditing || isCurrentlyEditing}
+                         onSwipeRight={() => handleSwipeToSprint(assunto)}
+                         onSwipeLeft={() => handleSwipeToMaster(assunto)}
                       >
-                        {isCurrentlyEditing ? (
-                          <InlineTopicEditor 
-                            assunto={assunto} 
-                            onSave={(titulo, link) => saveEditTopic(activeDisc.id, assunto.id, titulo, link)} 
-                            onCancel={() => setEditingTopicId(null)} 
-                            themeColors={themeColors}
-                          />
-                        ) : (
-                          <>
-                            {isEditing && (
-                              <div className="absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm p-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm z-10">
-                                {!isDragDisabled && <GripVertical className="w-4 h-4 text-slate-400 cursor-move" title="Arrastar" />}
-                                <button onClick={() => handleDeleteClick(activeDisc.id, assunto.id)} className={`p-1.5 rounded-md transition-colors ${confirmDeleteId === assunto.id ? 'bg-red-500 text-white' : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30'} cursor-pointer`} title="Excluir Assunto"><Trash2 className="w-4 h-4"/></button>
-                              </div>
-                            )}
-                            
-                            <div className="flex items-center gap-3">
-                              {!isEditing && (mastered ? <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" /> : checkStatus(assunto.id))}
+                        <div 
+                          draggable={isEditing && !isCurrentlyEditing && !isDragDisabled} 
+                          onDragStart={(e) => handleDragStart(e, trueIndex, activeDisc.id)} 
+                          onDragEnter={(e) => handleDragEnter(e, trueIndex, activeDisc.id)} 
+                          onDragOver={(e) => e.preventDefault()} 
+                          onDrop={handleDrop} 
+                          style={{ marginLeft: assunto.indent && shouldApplyCollapse ? `${assunto.indent * 1.5}rem` : '0' }} 
+                          className={`group flex flex-col relative transition-all rounded-xl border bg-white dark:bg-slate-900 ${isEditing && !isCurrentlyEditing && !isDragDisabled ? 'cursor-move hover:border-amber-300 dark:hover:border-amber-700' : 'border-slate-200/60 dark:border-slate-700'} ${mastered && !isEditing ? 'opacity-60 bg-slate-50 dark:bg-slate-900/40' : 'hover:shadow-md shadow-sm'} ${isSelectedBulk ? 'border-amber-500 ring-1 ring-amber-500 bg-amber-50 dark:bg-amber-900/10' : ''} p-4`}
+                        >
+                          {isCurrentlyEditing ? (
+                            <InlineTopicEditor 
+                              assunto={assunto} 
+                              onSave={(titulo, link) => saveEditTopic(activeDisc.id, assunto.id, titulo, link)} 
+                              onCancel={() => setEditingTopicId(null)} 
+                              themeColors={themeColors}
+                            />
+                          ) : (
+                            <>
+                              {isEditing && (
+                                <div className="absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm p-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm z-10">
+                                  {!isDragDisabled && <GripVertical className="w-4 h-4 text-slate-400 cursor-move" title="Arrastar" />}
+                                  <button onClick={() => handleDeleteClick(activeDisc.id, assunto.id)} className={`p-1.5 rounded-md transition-colors ${confirmDeleteId === assunto.id ? 'bg-red-500 text-white' : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30'} cursor-pointer`} title="Excluir Assunto"><Trash2 className="w-4 h-4"/></button>
+                                </div>
+                              )}
                               
-                              <div className="flex-1 flex items-center justify-between gap-3 overflow-hidden">
-                                <div className="flex items-center gap-1.5 overflow-hidden">
-                                  {/* Botão de Colapsar Pastas */}
-                                  {hasChildren && shouldApplyCollapse && !isEditing && (
-                                    <button 
-                                      onClick={(e) => { e.stopPropagation(); setCollapsedTopics(prev => ({...prev, [assunto.id]: !prev[assunto.id]})) }}
-                                      className="mr-1 p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer shrink-0"
-                                    >
-                                      {collapsedTopics[assunto.id] ? <ChevronRight className="w-4 h-4"/> : <ChevronDown className="w-4 h-4"/>}
-                                    </button>
+                              <div className="flex items-center gap-3">
+                                {/* UX 4: Bulk Selection Checkbox (Edit Mode Only) */}
+                                {isEditing ? (
+                                   <input type="checkbox" checked={isSelectedBulk} onChange={() => toggleBulkSelect(assunto.id)} className="w-5 h-5 rounded cursor-pointer border-slate-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 shrink-0" />
+                                ) : (mastered ? <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" /> : checkStatus(assunto.id))}
+                                
+                                <div className="flex-1 flex items-center justify-between gap-3 overflow-hidden">
+                                  <div className="flex items-center gap-1.5 overflow-hidden">
+                                    {hasChildren && shouldApplyCollapse && !isEditing && (
+                                      <button 
+                                        onClick={(e) => { e.stopPropagation(); setCollapsedTopics(prev => ({...prev, [assunto.id]: !prev[assunto.id]})) }}
+                                        className="mr-1 p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer shrink-0"
+                                      >
+                                        {collapsedTopics[assunto.id] ? <ChevronRight className="w-4 h-4"/> : <ChevronDown className="w-4 h-4"/>}
+                                      </button>
+                                    )}
+                                    <span className={`font-semibold truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'} ${assunto.indent > 0 && shouldApplyCollapse ? 'text-sm' : 'text-base'}`}>{assunto.titulo}</span>
+                                  </div>
+                                  
+                                  <div className="flex gap-2 items-center shrink-0 pr-8">
+                                    {!isEditing && memoryHealth && (<div className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded-md font-bold tracking-wider uppercase ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória"><Thermometer className="w-3 h-3"/> <span className="hidden sm:inline">{memoryHealth.label}</span></div>)}
+                                    {assunto.linkTec && <span className="text-[10px] text-blue-500 dark:text-blue-400 font-bold uppercase flex items-center gap-1 border border-blue-200 dark:border-blue-800 px-2 py-1 rounded-md"><Link className="w-3 h-3"/> TEC</span>}
+                                  </div>
+                                </div>
+                              </div>
+
+                              {!isEditing && (
+                                <div className="mt-3 flex flex-col sm:flex-row gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                                  <button onClick={() => { if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center justify-center sm:justify-start gap-1.5 text-xs font-bold uppercase transition-colors px-3 py-2 rounded-lg border shadow-sm cursor-pointer flex-1 sm:flex-none ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' : `bg-white ${themeColors.text.split(' ')[0]} border-indigo-200 dark:bg-slate-800 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40`}`}>
+                                    {isInSprint ? <CheckCircle className="w-4 h-4" /> : (mastered ? <RefreshCcw className="w-4 h-4" /> : <Target className="w-4 h-4" />)}
+                                    <span>{isInSprint ? 'Na Sprint' : (mastered ? 'Refazer' : 'Add Sprint')}</span>
+                                  </button>
+                                  
+                                  {assunto.linkTec && (
+                                    <a href={assunto.linkTec} target="_blank" rel="noopener noreferrer" className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg ${themeColors.button.split(' ')[0]} text-white transition-all shadow-sm cursor-pointer hover:shadow-md flex-1 sm:flex-none`}>
+                                      <ExternalLink className="w-4 h-4" /> Resolver no TEC
+                                    </a>
                                   )}
-                                  <span className={`font-semibold truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'} ${assunto.indent > 0 && shouldApplyCollapse ? 'text-sm' : 'text-base'}`}>{assunto.titulo}</span>
                                 </div>
-                                
-                                <div className="flex gap-2 items-center shrink-0 pr-8">
-                                  {!isEditing && memoryHealth && (<div className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded-md font-bold tracking-wider uppercase ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória"><Thermometer className="w-3 h-3"/> <span className="hidden sm:inline">{memoryHealth.label}</span></div>)}
-                                  {assunto.linkTec && <span className="text-[10px] text-blue-500 dark:text-blue-400 font-bold uppercase flex items-center gap-1 border border-blue-200 dark:border-blue-800 px-2 py-1 rounded-md"><Link className="w-3 h-3"/> TEC</span>}
+                              )}
+
+                              {isEditing && (
+                                <div className="flex gap-2 shrink-0 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                  <button onClick={() => handleIndent(activeDisc.id, assunto.id, -1)} disabled={!assunto.indent || !shouldApplyCollapse} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer flex items-center gap-1 text-xs font-bold" title="Recuar">
+                                    <ArrowLeft className="w-4 h-4"/> Nível Esq.
+                                  </button>
+                                  <button onClick={() => handleIndent(activeDisc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3 || !shouldApplyCollapse} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer flex items-center gap-1 text-xs font-bold" title="Avançar">
+                                    Nível Dir. <ArrowRight className="w-4 h-4"/>
+                                  </button>
+                                  <div className="flex-1"></div>
+                                  <button onClick={() => startEditTopic(assunto)} className={`p-2 ${themeColors.text.split(' ')[0]} bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 rounded-lg transition-colors cursor-pointer flex items-center gap-1 text-xs font-bold`} title="Editar">
+                                    <Pencil className="w-4 h-4"/> Modificar Texto
+                                  </button>
                                 </div>
-                              </div>
-                            </div>
-
-                            {!isEditing && (
-                              <div className="mt-3 flex flex-col sm:flex-row gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
-                                <button onClick={() => { if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center justify-center sm:justify-start gap-1.5 text-xs font-bold uppercase transition-colors px-3 py-2 rounded-lg border shadow-sm cursor-pointer flex-1 sm:flex-none ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' : `bg-white ${themeColors.text.split(' ')[0]} border-indigo-200 dark:bg-slate-800 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40`}`}>
-                                  {isInSprint ? <CheckCircle className="w-4 h-4" /> : (mastered ? <RefreshCcw className="w-4 h-4" /> : <Target className="w-4 h-4" />)}
-                                  <span>{isInSprint ? 'Na Sprint' : (mastered ? 'Refazer' : 'Add Sprint')}</span>
-                                </button>
-                                
-                                {assunto.linkTec && (
-                                  <a href={assunto.linkTec} target="_blank" rel="noopener noreferrer" className={`flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold rounded-lg ${themeColors.button.split(' ')[0]} text-white transition-all shadow-sm cursor-pointer hover:shadow-md flex-1 sm:flex-none`}>
-                                    <ExternalLink className="w-4 h-4" /> Resolver no TEC
-                                  </a>
-                                )}
-                              </div>
-                            )}
-
-                            {isEditing && (
-                              <div className="flex gap-2 shrink-0 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                <button onClick={() => handleIndent(activeDisc.id, assunto.id, -1)} disabled={!assunto.indent || !shouldApplyCollapse} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer flex items-center gap-1 text-xs font-bold" title="Recuar">
-                                  <ArrowLeft className="w-4 h-4"/> Nível Esq.
-                                </button>
-                                <button onClick={() => handleIndent(activeDisc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3 || !shouldApplyCollapse} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer flex items-center gap-1 text-xs font-bold" title="Avançar">
-                                  Nível Dir. <ArrowRight className="w-4 h-4"/>
-                                </button>
-                                <div className="flex-1"></div>
-                                <button onClick={() => startEditTopic(assunto)} className={`p-2 ${themeColors.text.split(' ')[0]} bg-blue-50 hover:bg-blue-100 dark:bg-blue-900/20 dark:hover:bg-blue-900/40 rounded-lg transition-colors cursor-pointer flex items-center gap-1 text-xs font-bold`} title="Editar">
-                                  <Pencil className="w-4 h-4"/> Modificar Texto
-                                </button>
-                              </div>
-                            )}
-                          </>
-                        )}
-                      </div>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </SwipeableItem>
                     );
                   })
                 )}
               </div>
+
+              {/* UX 4: Bulk Actions Floating Bar */}
+              {isEditing && selectedAssuntosBulk.size > 0 && (
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 dark:bg-slate-950 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-4 z-50 animate-in slide-in-from-bottom-8 border border-slate-700">
+                  <span className="font-bold text-xs bg-white/10 px-3 py-1.5 rounded-lg whitespace-nowrap">{selectedAssuntosBulk.size} selecionados</span>
+                  <div className="w-px h-6 bg-slate-600"></div>
+                  <button onClick={() => handleBulkIndent(-1)} className="p-2 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer" title="Recuar Todos"><ArrowLeft className="w-4 h-4"/></button>
+                  <button onClick={() => handleBulkIndent(1)} className="p-2 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer" title="Avançar Todos"><ArrowRight className="w-4 h-4"/></button>
+                  <div className="w-px h-6 bg-slate-600"></div>
+                  <button onClick={handleBulkDelete} className="p-2 hover:bg-red-500 rounded-lg transition-colors text-red-400 hover:text-white cursor-pointer" title="Excluir Selecionados"><Trash2 className="w-4 h-4"/></button>
+                </div>
+              )}
 
               {isEditing && (
                 <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
