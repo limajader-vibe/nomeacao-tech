@@ -841,7 +841,11 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
     const d = new Date(); d.setDate(d.getDate() - (13 - i));
     return { dateObj: d, dateStr: d.toLocaleDateString(), dayLabel: d.toLocaleDateString('pt-BR', { weekday: 'short' }).charAt(0).toUpperCase() };
   });
-  const maxHours = Math.max(...last14Days.map(d => dailyLogs[d.dateStr] || 0), 2); 
+  
+  // CORREÇÃO: Escala do gráfico garante que a Meta (horasDia) cabe perfeitamente sem vazar para cima
+  const maxHoursLogged = Math.max(...last14Days.map(d => dailyLogs[d.dateStr] || 0));
+  const maxHours = Math.max(maxHoursLogged, config.horasDia * 1.2, 2); 
+  
   const totalHours14Days = last14Days.reduce((acc, curr) => acc + (dailyLogs[curr.dateStr] || 0), 0);
   const avgHours = (totalHours14Days / 14).toFixed(1);
 
