@@ -76,7 +76,7 @@ export const THEMES = {
     icon: 'text-indigo-500',
     bg: 'bg-indigo-500',
     lightBg: 'bg-indigo-50 dark:bg-indigo-900/20',
-    headerBg: 'bg-indigo-100/60 dark:bg-indigo-950/40', // Fundo temático harmônico
+    headerBg: 'bg-indigo-200/60 dark:bg-slate-900', 
     border: 'border-indigo-200/60 dark:border-indigo-800/50',
     text: 'text-indigo-600 dark:text-indigo-400',
     solidText: 'text-white'
@@ -89,7 +89,7 @@ export const THEMES = {
     icon: 'text-emerald-500',
     bg: 'bg-emerald-500',
     lightBg: 'bg-emerald-50 dark:bg-emerald-900/20',
-    headerBg: 'bg-emerald-100/60 dark:bg-teal-950/40', // Fundo temático harmônico
+    headerBg: 'bg-emerald-200/60 dark:bg-slate-900', 
     border: 'border-emerald-200/60 dark:border-emerald-800/50',
     text: 'text-emerald-600 dark:text-emerald-400',
     solidText: 'text-white'
@@ -102,7 +102,7 @@ export const THEMES = {
     icon: 'text-amber-500',
     bg: 'bg-amber-500',
     lightBg: 'bg-amber-50 dark:bg-amber-900/20',
-    headerBg: 'bg-amber-100/60 dark:bg-amber-950/40', // Fundo temático harmônico
+    headerBg: 'bg-amber-200/60 dark:bg-slate-900', 
     border: 'border-amber-200/60 dark:border-amber-800/50',
     text: 'text-amber-600 dark:text-amber-400',
     solidText: 'text-slate-900 font-black'
@@ -115,7 +115,7 @@ export const THEMES = {
     icon: 'text-rose-500',
     bg: 'bg-rose-500',
     lightBg: 'bg-rose-50 dark:bg-rose-900/20',
-    headerBg: 'bg-rose-100/60 dark:bg-rose-950/40', // Fundo temático harmônico
+    headerBg: 'bg-rose-200/60 dark:bg-slate-900', 
     border: 'border-rose-200/60 dark:border-rose-800/50',
     text: 'text-rose-600 dark:text-rose-400',
     solidText: 'text-white'
@@ -656,19 +656,18 @@ export default function App() {
         {showLevelMap && <LevelMapModal currentXp={gamification.xp} onClose={() => setShowLevelMap(false)} />}
 
         {/* MOBILE TOP HEADER */}
-        <div className={`md:hidden flex items-center justify-between p-4 ${themeColors.headerBg} text-slate-800 dark:text-white shadow-md border-b ${themeColors.border} z-20 sticky top-0 transition-colors duration-500`}>
+        <div className={`md:hidden flex items-center justify-between p-4 ${themeColors.headerBg} shadow-md border-b ${themeColors.border} z-20 sticky top-0 transition-colors duration-500`}>
           <div className="flex items-center gap-3">
-            {/* LOGÓTIPO ARREDONDADO */}
-            <div className={`w-11 h-11 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-300 dark:border-slate-700 shadow-sm`}>
+            <div className={`w-11 h-11 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
               <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1" />
             </div>
             <div className="flex flex-col">
-              <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest truncate max-w-[150px]">Olá, {projectConfig.userName}</span>
-              <h2 className="font-extrabold text-base leading-tight tracking-tight truncate max-w-[150px]">{projectConfig.appName}</h2>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest truncate max-w-[150px]">Olá, {projectConfig.userName.split(' ')[0]}</span>
+              <h2 className="font-extrabold text-base text-slate-800 dark:text-white leading-tight tracking-tight truncate max-w-[150px]">{projectConfig.appName}</h2>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm`}>
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm`}>
               {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
             </button>
           </div>
@@ -680,8 +679,7 @@ export default function App() {
             {/* LOGO + APP NAME + THEME TOGGLE */}
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-3 min-w-0">
-                {/* LOGÓTIPO ARREDONDADO */}
-                <div className={`w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-300 dark:border-slate-700 shadow-sm`}>
+                <div className={`w-12 h-12 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
                   <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
                 </div>
                 <div className="flex flex-col">
@@ -689,7 +687,7 @@ export default function App() {
                   <h2 className="font-extrabold text-xl tracking-tight text-slate-800 dark:text-white truncate" title={projectConfig.appName}>{projectConfig.appName}</h2>
                 </div>
               </div>
-              <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shrink-0 ml-2 shadow-sm text-slate-500 dark:text-slate-400`}>
+              <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-full transition-colors cursor-pointer shrink-0 ml-2 shadow-sm text-slate-500 dark:text-slate-400`}>
                 {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
               </button>
             </div>
@@ -698,10 +696,20 @@ export default function App() {
             <div className="flex flex-col gap-3">
               <div>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest leading-tight mb-1.5 truncate">{projectConfig.concurso}</p>
-                <h3 className="text-xl font-black leading-tight text-slate-800 dark:text-white truncate">{projectConfig.cargo}</h3>
+                <h3 className="text-xl font-black leading-tight text-slate-800 dark:text-white truncate mb-2">{projectConfig.cargo}</h3>
+                
+                {/* TAGS DE BANCA E HORAS ACIMA */}
+                <div className="flex flex-col xl:flex-row gap-2 w-full mb-1">
+                  <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm truncate`} title={projectConfig.banca}>
+                    {projectConfig.banca}
+                  </span>
+                  <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm`}>
+                    <Target size={12} /> {projectConfig.horasDia}h/dia
+                  </span>
+                </div>
               </div>
 
-              {/* CARTÃO DE NÍVEL E STREAK (Subiu) */}
+              {/* CARTÃO DE NÍVEL E STREAK ABAIXO */}
               <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 p-4 transition-all hover:shadow-md cursor-pointer shadow-sm`}>
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-3">
@@ -711,25 +719,17 @@ export default function App() {
                       <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1 truncate max-w-[90px]">{userLevel.titulo}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/10 px-2 py-1 rounded-md flex-shrink-0 border border-orange-200 dark:border-orange-500/20">
-                    <Flame size={12} className="fill-current animate-pulse" />
-                    <span className="text-[11px] font-black">{gamification.streak}</span>
+                  <div className="flex flex-col items-end">
+                    <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/10 px-2 py-1 rounded-md flex-shrink-0 border border-orange-200 dark:border-orange-500/20">
+                      <Flame size={12} className="fill-current animate-pulse" />
+                      <span className="text-[11px] font-black">{gamification.streak}</span>
+                    </div>
                   </div>
                 </div>
                 {/* Barra de Progresso */}
-                <div className="relative w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
+                <div className="relative w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                   <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
                 </div>
-              </div>
-
-              {/* TAGS DE BANCA E HORAS (Desceram e ficaram mais sofisticadas) */}
-              <div className="flex flex-col xl:flex-row gap-2 w-full mt-1">
-                <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm truncate`} title={projectConfig.banca}>
-                  {projectConfig.banca}
-                </span>
-                <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm`}>
-                  <Target size={12} /> {projectConfig.horasDia}h/dia
-                </span>
               </div>
             </div>
           </div>
@@ -1390,7 +1390,7 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
         <div className={`w-full lg:w-1/3 ${themeColors.lightBg.split(' ')[0]} rounded-2xl p-4 border ${themeColors.border.split(' ')[0]} min-h-[400px]`}>
            <h3 className={`font-black ${themeColors.text.split(' ')[0]} uppercase tracking-wider mb-3 flex items-center gap-2 text-sm`}><PlayCircle className="w-4 h-4"/> Em Curso (Hoje)</h3>
            {activeSprint ? (
-             <div className={`bg-white dark:bg-slate-900 p-3.5 rounded-xl shadow-md border ${themeColors.border.split(' ')[0]}`}>
+             <div className={`bg-white dark:bg-slate-900 p-3.5 rounded-xl shadow-md border-2 ${themeColors.border.split(' ')[0]}`}>
                  <div className={`text-xs font-bold ${themeColors.text.split(' ')[0]} mb-2 uppercase`}>Sprint {sprintsCompleted + 1}</div>
                  {activeSprint.map((item, localIdx) => {
                    const globalIdx = localIdx;
@@ -1403,12 +1403,12 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
                        onDragEnter={(e) => handleDragEnter(e, globalIdx)}
                        onDragEnd={handleDragEnd}
                        onDragOver={(e) => e.preventDefault()}
-                       className={`mb-1.5 last:mb-0 flex items-start gap-1.5 cursor-move hover:bg-slate-50 dark:hover:bg-slate-800 p-1.5 rounded-lg transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700 ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95' : ''}`}
+                       className={`mb-1.5 last:mb-0 flex items-start gap-1.5 cursor-move bg-white dark:bg-slate-800 p-2 rounded-lg transition-all border border-slate-200 dark:border-slate-700 hover:border-indigo-400 ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95' : 'shadow-sm'}`}
                      >
                        <GripVertical className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${themeColors.text.split(' ')[0]} opacity-50`} />
                        <div>
-                         <span className={`block text-[10px] font-bold ${themeColors.text.split(' ')[0]} uppercase truncate`}>{item.discNome}</span>
-                         <span className="block text-sm font-bold text-slate-800 dark:text-slate-200 leading-tight">{item.assTitulo}</span>
+                         <span className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase truncate">{item.discNome}</span>
+                         <span className="block text-sm font-bold text-slate-800 dark:text-slate-100 leading-tight">{item.assTitulo}</span>
                        </div>
                      </div>
                    )
@@ -1568,14 +1568,14 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                         onDragEnter={(e) => handleDragEnter(e, globalIdx)}
                         onDragEnd={handleDragEnd}
                         onDragOver={(e) => e.preventDefault()}
-                        className={`rounded-lg p-3 border flex flex-col relative transition-all cursor-move ${isActive ? `${themeColors.lightBg.split(' ')[0]} ${themeColors.border.split(' ')[0]}` : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800'} ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95 z-10' : 'hover:shadow-sm'}`}
+                        className={`rounded-lg p-3 flex flex-col relative transition-all cursor-move ${isActive ? `bg-white dark:bg-slate-800 border-2 ${themeColors.border.split(' ')[0]} shadow-sm` : 'bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700'} ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95 z-10' : 'hover:shadow-md'}`}
                       >
                         <div className="absolute top-2 right-8 text-slate-300 hover:text-slate-500 transition-colors" title="Arrastar e Soltar">
                           <GripVertical className="w-3.5 h-3.5" />
                         </div>
                         <button onClick={() => setCustomSprint(p => p.filter(i => i.assId !== item.assId))} className="absolute top-2 right-2 text-slate-300 hover:text-red-500 transition-colors cursor-pointer" title="Remover"><Trash2 className="w-3.5 h-3.5"/></button>
                         
-                        <span className={`text-[9px] font-black uppercase tracking-wider ${themeColors.text.split(' ')[0]} mb-1 pr-8`}>{item.discNome}</span>
+                        <span className="text-[9px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 pr-8">{item.discNome}</span>
                         <p className="font-bold text-sm text-slate-800 dark:text-slate-100 mb-2 pr-8 leading-tight">{item.assTitulo}</p>
                         
                         {/* Checkboxes Super Compactas e Legíveis */}
