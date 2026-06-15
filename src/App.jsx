@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { 
   PieChart, Calendar, CheckCircle, Clock, Target, BookOpen, 
   Layers, FileText, ChevronDown, Folder, FolderOpen, ChevronRight, PlayCircle, 
@@ -187,8 +187,93 @@ export const LEVELS_MAP = [
 ];
 
 // ==========================================
-// COMPONENTES DE EFEITO (DOPAMINA & MAPAS)
+// COMPONENTES ISOLADOS (OTIMIZAÇÃO DE PERFORMANCE)
 // ==========================================
+
+// 1. OTIMIZAÇÃO: Isolamento do Pomodoro para não renderizar as Sprints a cada segundo
+function PomodoroWidget({ themeColors, handleAutoLog, addXP, triggerConfetti }) {
+  const FOCUS_TIME = 50 * 60; 
+  const BREAK_TIME = 10 * 60; 
+  const [pomodoroTime, setPomodoroTime] = useState(FOCUS_TIME);
+  const [isPomodoroActive, setIsPomodoroActive] = useState(false);
+  const [isPomodoroBreak, setIsPomodoroBreak] = useState(false);
+
+  useEffect(() => {
+    let interval = null;
+    if (isPomodoroActive && pomodoroTime > 0) {
+      interval = setInterval(() => { setPomodoroTime((time) => time - 1); }, 1000);
+    } else if (isPomodoroActive && pomodoroTime === 0) {
+      if (!isPomodoroBreak) {
+         handleAutoLog(50 / 60); 
+         addXP(20);
+         triggerConfetti(); 
+         setIsPomodoroBreak(true);
+         setPomodoroTime(BREAK_TIME);
+      } else {
+         setIsPomodoroBreak(false);
+         setPomodoroTime(FOCUS_TIME);
+         setIsPomodoroActive(false);
+      }
+    }
+    return () => clearInterval(interval);
+  }, [isPomodoroActive, pomodoroTime, isPomodoroBreak, handleAutoLog, addXP, triggerConfetti]);
+
+  const togglePomodoro = () => setIsPomodoroActive(!isPomodoroActive);
+  const resetPomodoro = () => { setIsPomodoroActive(false); setIsPomodoroBreak(false); setPomodoroTime(FOCUS_TIME); };
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
+  return (
+    <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 p-4 rounded-2xl shadow-sm mb-8">
+       <div className="flex items-center gap-4">
+         <div className={`p-3 rounded-xl transition-colors duration-500 ${isPomodoroActive && !isPomodoroBreak ? `${themeColors.bg.split(' ')[0]} text-white animate-pulse shadow-md` : isPomodoroBreak ? 'bg-emerald-500 text-white animate-pulse shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
+           {isPomodoroBreak ? <Coffee className="w-6 h-6" /> : <Clock className="w-6 h-6" />}
+         </div>
+         <div className="hidden sm:block">
+           <h3 className="font-bold text-base text-slate-800 dark:text-white leading-none mb-1">{isPomodoroBreak ? 'Pausa' : 'Modo Foco'}</h3>
+           <span className="text-xs text-slate-500 font-medium">50min Estudo / 10min Pausa</span>
+         </div>
+       </div>
+       
+       <div className="flex items-center gap-5 pr-2">
+         <span className={`font-mono text-4xl font-black tracking-tighter w-28 text-center transition-colors duration-500 ${isPomodoroActive && !isPomodoroBreak ? themeColors.text.split(' ')[0] : isPomodoroBreak ? 'text-emerald-500' : 'text-slate-800 dark:text-white'}`}>
+           {formatTime(pomodoroTime)}
+         </span>
+         <div className="flex gap-2">
+           <button onClick={togglePomodoro} className={`p-3 rounded-xl shadow-sm transition-transform hover:scale-105 cursor-pointer ${isPomodoroActive ? 'bg-slate-800 text-white dark:bg-slate-700' : `${themeColors.button.split(' ')[0]} text-white`}`}>
+             {isPomodoroActive ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
+           </button>
+           <button onClick={resetPomodoro} className="p-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl transition-transform hover:scale-105 cursor-pointer shadow-sm" title="Reiniciar">
+             <RefreshCcw className="w-5 h-5" />
+           </button>
+         </div>
+       </div>
+    </div>
+  );
+}
+
+// 2. OTIMIZAÇÃO: Isolamento do formulário de edição para evitar re-renderização massiva da lista ao digitar
+const InlineTopicEditor = ({ assunto, onSave, onCancel, themeColors }) => {
+  const [titulo, setTitulo] = useState(assunto.titulo || '');
+  const [link, setLink] = useState(assunto.linkTec || '');
+  
+  return (
+    <div className="flex-1 flex flex-col gap-3 p-1 animate-in fade-in">
+      <div className="grid md:grid-cols-2 gap-3 w-full">
+        <div><input type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Título do Assunto" autoFocus /></div>
+        <div><input type="text" value={link} onChange={(e) => setLink(e.target.value)} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Link Caderno TEC (Opcional)" /></div>
+      </div>
+      <div className="flex gap-2">
+        <button onClick={() => onSave(titulo, link)} className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer">Salvar Alterações</button>
+        <button onClick={onCancel} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer">Cancelar</button>
+      </div>
+    </div>
+  );
+};
+
 const ConfettiOverlay = ({ fire }) => {
   const [particles, setParticles] = useState([]);
   useEffect(() => {
@@ -504,47 +589,24 @@ export default function App() {
   }, [gamification.lastActiveDate, gamification.streak]);
 
   const triggerConfetti = () => setConfettiFire(f => f + 1);
-  const addXP = (amount) => { setGamification(prev => ({ ...prev, xp: prev.xp + amount })); };
+  const addXP = useCallback((amount) => { setGamification(prev => ({ ...prev, xp: prev.xp + amount })); }, []);
 
-  const handleAutoLog = (hoursToAdd) => {
+  const handleAutoLog = useCallback((hoursToAdd) => {
     const today = new Date().toLocaleDateString();
-    const currentHours = dailyLogs[today] || 0;
-    setDailyLogs(prev => ({ ...prev, [today]: currentHours + hoursToAdd }));
-    if ((currentHours + hoursToAdd) >= projectConfig.horasDia && gamification.lastActiveDate !== today) {
-      setGamification(prev => ({ ...prev, streak: prev.streak + 1, lastActiveDate: today }));
-    } else if (gamification.lastActiveDate !== today) {
-      setGamification(prev => ({ ...prev, lastActiveDate: today }));
-    }
-  };
-
-  const FOCUS_TIME = 50 * 60; 
-  const BREAK_TIME = 10 * 60; 
-  const [pomodoroTime, setPomodoroTime] = useState(FOCUS_TIME);
-  const [isPomodoroActive, setIsPomodoroActive] = useState(false);
-  const [isPomodoroBreak, setIsPomodoroBreak] = useState(false);
-
-  useEffect(() => {
-    let interval = null;
-    if (isPomodoroActive && pomodoroTime > 0) {
-      interval = setInterval(() => { setPomodoroTime((time) => time - 1); }, 1000);
-    } else if (isPomodoroActive && pomodoroTime === 0) {
-      if (!isPomodoroBreak) {
-         handleAutoLog(50 / 60); 
-         addXP(20);
-         triggerConfetti(); 
-         setIsPomodoroBreak(true);
-         setPomodoroTime(BREAK_TIME);
-      } else {
-         setIsPomodoroBreak(false);
-         setPomodoroTime(FOCUS_TIME);
-         setIsPomodoroActive(false);
+    setDailyLogs(prev => {
+      const currentHours = prev[today] || 0;
+      return { ...prev, [today]: currentHours + hoursToAdd };
+    });
+    setGamification(prev => {
+      const currentHours = dailyLogs[today] || 0;
+      if ((currentHours + hoursToAdd) >= projectConfig.horasDia && prev.lastActiveDate !== today) {
+        return { ...prev, streak: prev.streak + 1, lastActiveDate: today };
+      } else if (prev.lastActiveDate !== today) {
+        return { ...prev, lastActiveDate: today };
       }
-    }
-    return () => clearInterval(interval);
-  }, [isPomodoroActive, pomodoroTime, isPomodoroBreak]);
-
-  const togglePomodoro = () => setIsPomodoroActive(!isPomodoroActive);
-  const resetPomodoro = () => { setIsPomodoroActive(false); setIsPomodoroBreak(false); setPomodoroTime(FOCUS_TIME); };
+      return prev;
+    });
+  }, [dailyLogs, projectConfig.horasDia]);
 
   const toggleProgress = (assId, type) => {
     setUserProgress(prev => {
@@ -677,12 +739,10 @@ export default function App() {
         <aside className="hidden md:flex w-72 bg-white dark:bg-slate-900 shadow-xl flex-col z-10 shrink-0 border-r border-slate-300 dark:border-slate-800 sticky top-0 h-screen overflow-hidden">
           <div className={`p-6 ${themeColors.headerBg} border-b ${themeColors.border} relative transition-colors duration-500 shrink-0`}>
             
-            {/* BOTÃO DE TEMA - POSIÇÃO ABSOLUTA NO TOPO */}
             <button onClick={() => setIsDarkMode(!isDarkMode)} className={`absolute top-6 right-6 p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-slate-400 z-10`}>
               {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
             </button>
 
-            {/* LOGO + APP NAME */}
             <div className="flex items-center gap-3 min-w-0 mb-6 pr-10 mt-1">
               <div className={`w-12 h-12 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
                 <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
@@ -693,13 +753,11 @@ export default function App() {
               </div>
             </div>
             
-            {/* INFORMAÇÕES DA TRILHA */}
             <div className="flex flex-col gap-3">
               <div>
                 <p className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest leading-tight mb-1.5 truncate`}>{projectConfig.concurso}</p>
                 <h3 className={`text-xl font-black leading-tight truncate mb-2 ${themeColors.headerText}`}>{projectConfig.cargo}</h3>
                 
-                {/* TAGS DE BANCA E HORAS ACIMA */}
                 <div className="flex flex-col xl:flex-row gap-2 w-full mb-1">
                   <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm truncate`} title={projectConfig.banca}>
                     {projectConfig.banca}
@@ -710,7 +768,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* CARTÃO DE NÍVEL E STREAK ABAIXO */}
               <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 p-4 transition-all hover:shadow-md cursor-pointer shadow-sm`}>
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-3">
@@ -727,7 +784,6 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-                {/* Barra de Progresso */}
                 <div className="relative w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
                   <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
                 </div>
@@ -771,7 +827,7 @@ export default function App() {
             {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} />}
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} />}
             {activeTab === 'planner' && <TabPlanner customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} progress={userProgress} toggleProgress={toggleProgress} />}
-            {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} pomodoroTime={pomodoroTime} isPomodoroActive={isPomodoroActive} isPomodoroBreak={isPomodoroBreak} togglePomodoro={togglePomodoro} resetPomodoro={resetPomodoro} triggerConfetti={triggerConfetti} themeColors={themeColors} appTheme={projectConfig.appTheme} />}
+            {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} triggerConfetti={triggerConfetti} themeColors={themeColors} handleAutoLog={handleAutoLog} />}
             {activeTab === 'revisoes' && <TabRevisaoInteligente progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} />}
             {activeTab === 'admin' && <TabAdmin auth={auth} config={projectConfig} setConfig={setProjectConfig} userProgress={userProgress} setUserProgress={setUserProgress} gamification={gamification} setGamification={setGamification} edital={edital} setEdital={setEdital} customSprint={customSprint} setCustomSprint={setCustomSprint} initialEdital={initialEdital} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} reviewStats={reviewStats} themeColors={themeColors} playLevelUpSound={playLevelUpSound} />}
           </div>
@@ -1006,7 +1062,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
 }
 
 // ==========================================
-// ABA 1: ARSENAL DE MATÉRIAS (MASTER-DETAIL)
+// ABA 1: ARSENAL DE MATÉRIAS
 // ==========================================
 function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprintItem, resetProgress, themeColors }) {
   const [expanded, setExpanded] = useState(() => {
@@ -1015,18 +1071,12 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
   const [isEditing, setIsEditing] = useState(false);
   const [newTopic, setNewTopic] = useState({ discId: '', titulo: '', linkTec: '' });
   const [editingTopicId, setEditingTopicId] = useState(null);
-  const [editTopicData, setEditTopicData] = useState({ titulo: '', linkTec: '', pergunta: '', resposta: '', indent: 0 });
   const [bulkInput, setBulkInput] = useState({ discId: null, text: '' });
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-  
-  // FASE 1: MASTER-DETAIL STATE
   const [selectedDiscId, setSelectedDiscId] = useState(null);
-  
-  // FASE 2: BARRA DE PESQUISA E MODO ZEN
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState('detailed'); // 'detailed' | 'compact'
+  const [viewMode, setViewMode] = useState('detailed');
 
-  // Auto-selecionar a primeira disciplina se nenhuma estiver selecionada
   useEffect(() => {
     if (!selectedDiscId && edital.length > 0 && edital[0].disciplinas.length > 0) {
       setSelectedDiscId(edital[0].disciplinas[0].id);
@@ -1035,7 +1085,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
 
   const toggleNode = (id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
   
-  // Funções de Gestão de Blocos/Disciplinas (Esquerda)
   const handleEditBlocoNome = (blocoId, newNome) => { setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, nome: newNome } : b)); };
   const handleDeleteBlocoClick = (blocoId) => {
     if (confirmDeleteId === `bloco_${blocoId}`) { setEdital(prev => prev.filter(b => b.id !== blocoId)); setConfirmDeleteId(null); } 
@@ -1066,7 +1115,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
     setEdital(prev => prev.map(b => { if (b.id !== blocoId) return b; if (discIndex + direction < 0 || discIndex + direction >= b.disciplinas.length) return b; const newDisciplinas = [...b.disciplinas]; const temp = newDisciplinas[discIndex]; newDisciplinas[discIndex] = newDisciplinas[discIndex + direction]; newDisciplinas[discIndex + direction] = temp; return { ...b, disciplinas: newDisciplinas }; }));
   };
 
-  // Funções de Gestão de Assuntos (Direita)
   const dragItem = useRef(null); const dragOverItem = useRef(null);
   const handleDragStart = (e, position, discId) => { dragItem.current = { position, discId }; e.dataTransfer.effectAllowed = "move"; };
   const handleDragEnter = (e, position, discId) => { e.preventDefault(); dragOverItem.current = { position, discId }; };
@@ -1096,11 +1144,10 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
     setBulkInput({ discId: null, text: '' });
   };
 
-  const startEditTopic = (assunto) => { 
-    setEditingTopicId(assunto.id); setEditTopicData({ titulo: assunto.titulo || '', linkTec: assunto.linkTec || '', pergunta: assunto.pergunta || '', resposta: assunto.resposta || '', indent: assunto.indent || 0 }); 
-  };
-  const saveEditTopic = (discId, assId) => {
-    if (!editTopicData.titulo) return; setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => { if (d.id === discId) return { ...d, assuntos: d.assuntos.map(a => a.id === assId ? { ...a, ...editTopicData } : a) }; return d; }) }))); setEditingTopicId(null);
+  const saveEditTopic = (discId, assId, novoTitulo, novoLink) => {
+    if (!novoTitulo) return; 
+    setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => { if (d.id === discId) return { ...d, assuntos: d.assuntos.map(a => a.id === assId ? { ...a, titulo: novoTitulo, linkTec: novoLink } : a) }; return d; }) }))); 
+    setEditingTopicId(null);
   };
 
   const isFullyMastered = (assId) => { const p = progress[assId]; return p?.estudado && p?.questoes && p?.revisado; };
@@ -1118,21 +1165,18 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
     return <div className="w-5 h-5 rounded-full border border-slate-300 dark:border-slate-600 shrink-0"></div>;
   };
 
-  // Identificar a disciplina e bloco ativos para renderização do painel direito
   const activeBloco = edital.find(b => b.disciplinas.some(d => d.id === selectedDiscId));
   const activeDisc = activeBloco?.disciplinas.find(d => d.id === selectedDiscId);
-
-  // Lógica responsiva (Mobile esconde lista se houver disc selecionada)
   const isMobileDetailView = !!activeDisc;
   
-  // Lógica da Barra de Busca "Spotlight"
-  const filteredAssuntos = activeDisc?.assuntos.filter(a => 
-    a.titulo.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
+  const filteredAssuntos = useMemo(() => {
+    return activeDisc?.assuntos.filter(a => 
+      a.titulo.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
+  }, [activeDisc, searchTerm]);
 
   return (
     <div className="flex flex-col h-full space-y-6 animate-in fade-in pb-10">
-      {/* HEADER DA ABA */}
       <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
         <div>
           <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
@@ -1152,10 +1196,8 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
         </div>
       )}
 
-      {/* LAYOUT MASTER-DETAIL (Duas Colunas) */}
       <div className="flex flex-col md:flex-row gap-6 items-start flex-1 min-h-[600px]">
         
-        {/* COLUNA ESQUERDA: NAVEGAÇÃO (Menu de Blocos e Disciplinas) */}
         <div className={`w-full md:w-1/3 lg:w-1/4 flex-shrink-0 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-4 md:sticky md:top-6 ${isMobileDetailView ? 'hidden md:flex' : 'flex'} flex-col max-h-[85vh] overflow-hidden`}>
           <div className="flex items-center gap-2 mb-4 px-2 shrink-0">
             <Menu className="w-5 h-5 text-slate-400" />
@@ -1165,7 +1207,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
           <div className="overflow-y-auto custom-scrollbar flex-1 pr-2 space-y-4">
             {edital.map((bloco, bIndex) => (
               <div key={bloco.id} className="mb-2">
-                {/* Cabeçalho do Bloco */}
                 <div onClick={() => !isEditing && toggleNode(bloco.id)} className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${!isEditing ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50' : ''}`}>
                   <div onClick={(e) => { if(isEditing) { e.stopPropagation(); toggleNode(bloco.id); } }} className="cursor-pointer shrink-0">
                     {expanded[bloco.id] ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
@@ -1185,7 +1226,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                   )}
                 </div>
 
-                {/* Lista de Disciplinas do Bloco */}
                 {expanded[bloco.id] && (
                   <div className="pl-6 pr-1 space-y-1 mt-1 border-l-2 border-slate-100 dark:border-slate-800/60 ml-4">
                     {bloco.disciplinas.map((disc, dIndex) => {
@@ -1223,7 +1263,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                       )
                     })}
                     
-                    {/* Botão Nova Disciplina */}
                     {isEditing && (
                       <div className="pt-1">
                         <button onClick={() => handleAddDisciplina(bloco.id)} className={`w-full flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:${themeColors.text.split(' ')[0]} p-1.5 rounded-lg transition-colors cursor-pointer`}>
@@ -1237,7 +1276,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
             ))}
           </div>
 
-          {/* Botão Novo Bloco */}
           {isEditing && (
             <div className="pt-4 border-t border-slate-100 dark:border-slate-800/60 mt-auto shrink-0">
               <button onClick={handleAddBloco} className={`w-full flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest text-slate-500 hover:${themeColors.text.split(' ')[0]} bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl transition-colors border-2 border-dashed border-slate-300 dark:border-slate-700 cursor-pointer`}>
@@ -1247,7 +1285,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
           )}
         </div>
 
-        {/* COLUNA DIREITA: PAINEL DE CONTEÚDO (Assuntos da Disciplina) */}
         <div className={`flex-1 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-4 md:p-6 ${!isMobileDetailView ? 'hidden md:flex' : 'flex'} flex-col min-h-[500px]`}>
           
           {!activeDisc ? (
@@ -1259,9 +1296,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
           ) : (
             <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-300">
               
-              {/* Header do Painel Direito */}
               <div className="mb-5 border-b border-slate-100 dark:border-slate-800 pb-4">
-                {/* Mobile Back Button */}
                 <button onClick={() => setSelectedDiscId(null)} className="md:hidden flex items-center gap-1.5 text-sm font-bold text-blue-500 mb-4 cursor-pointer hover:underline">
                   <ArrowLeft className="w-4 h-4" /> Voltar às Matérias
                 </button>
@@ -1277,7 +1312,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                 </div>
               </div>
 
-              {/* FASE 2: BARRA DE BUSCA "SPOTLIGHT" E TOGGLE DE MODO ZEN */}
               <div className="flex flex-col xl:flex-row gap-3 mb-5">
                 <div className="relative flex-1">
                   <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -1299,7 +1333,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                 </div>
               </div>
 
-              {/* Lista de Assuntos */}
               <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-2 pb-6">
                 {filteredAssuntos.length === 0 ? (
                   <div className="text-sm text-slate-500 text-center p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
@@ -1307,7 +1340,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                   </div>
                 ) : (
                   filteredAssuntos.map((assunto) => {
-                    // O índice real para o drag and drop funcionar perfeitamente mesmo com pesquisa ativa
                     const trueIndex = activeDisc.assuntos.findIndex(x => x.id === assunto.id);
                     const isInSprint = customSprint.some(item => item.assId === assunto.id);
                     const isCurrentlyEditing = editingTopicId === assunto.id;
@@ -1318,7 +1350,7 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                     return (
                       <div 
                         key={assunto.id} 
-                        draggable={isEditing && !isCurrentlyEditing && !searchTerm} // Desativa drag se estiver pesquisando para evitar bugs
+                        draggable={isEditing && !isCurrentlyEditing && !searchTerm} 
                         onDragStart={(e) => handleDragStart(e, trueIndex, activeDisc.id)} 
                         onDragEnter={(e) => handleDragEnter(e, trueIndex, activeDisc.id)} 
                         onDragOver={(e) => e.preventDefault()} 
@@ -1327,19 +1359,14 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                         className={`group flex flex-col relative transition-all rounded-xl border bg-white dark:bg-slate-900 shadow-sm ${isEditing && !isCurrentlyEditing && !searchTerm ? 'cursor-move hover:border-amber-300 dark:hover:border-amber-700' : 'border-slate-200/60 dark:border-slate-700'} ${mastered && !isEditing ? 'opacity-60 bg-slate-50 dark:bg-slate-900/40' : 'hover:shadow-md'} ${isCompact ? 'p-3' : 'p-4'}`}
                       >
                         {isCurrentlyEditing ? (
-                          <div className="flex-1 flex flex-col gap-3 p-1 animate-in fade-in">
-                            <div className="grid md:grid-cols-2 gap-3 w-full">
-                              <div><input type="text" value={editTopicData.titulo} onChange={(e) => setEditTopicData({...editTopicData, titulo: e.target.value})} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Título do Assunto" /></div>
-                              <div><input type="text" value={editTopicData.linkTec} onChange={(e) => setEditTopicData({...editTopicData, linkTec: e.target.value})} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Link Caderno TEC (Opcional)" /></div>
-                            </div>
-                            <div className="flex gap-2">
-                              <button onClick={() => saveEditTopic(activeDisc.id, assunto.id)} className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer">Salvar Alterações</button>
-                              <button onClick={() => setEditingTopicId(null)} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer">Cancelar</button>
-                            </div>
-                          </div>
+                          <InlineTopicEditor 
+                            assunto={assunto} 
+                            onSave={(titulo, link) => saveEditTopic(activeDisc.id, assunto.id, titulo, link)} 
+                            onCancel={() => setEditingTopicId(null)} 
+                            themeColors={themeColors}
+                          />
                         ) : (
                           <>
-                            {/* PROGRESSIVE DISCLOSURE: Botões flutuantes de edição aparecem apenas no Hover */}
                             {isEditing && (
                               <div className="absolute top-3 right-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm p-1 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm z-10">
                                 {!searchTerm && <GripVertical className="w-4 h-4 text-slate-400 cursor-move" title="Arrastar" />}
@@ -1361,7 +1388,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                                 )}
                               </div>
 
-                              {/* Botão de Sprint visível sempre na lateral se for compacto, ou escondido se for detalhado (já que aparece em baixo) */}
                               {!isEditing && isCompact && (
                                 <button onClick={() => { if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center justify-center w-8 h-8 rounded-lg border shadow-sm cursor-pointer shrink-0 transition-colors ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200' : `bg-white ${themeColors.text.split(' ')[0]} border-indigo-200 dark:bg-slate-800 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40`}`} title={isInSprint ? 'Na Sprint' : 'Adicionar à Sprint'}>
                                   {isInSprint ? <CheckCircle className="w-4 h-4" /> : (mastered ? <RefreshCcw className="w-4 h-4" /> : <Plus className="w-4 h-4" />)}
@@ -1369,7 +1395,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                               )}
                             </div>
 
-                            {/* Botões Extras (Ocultos no modo Compacto) - REMOVIDAS AS CHECKBOXES DAQUI */}
                             {!isCompact && !isEditing && (
                               <div className="mt-3 flex flex-col sm:flex-row gap-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
                                 <button onClick={() => { if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center justify-center sm:justify-start gap-1.5 text-xs font-bold uppercase transition-colors px-3 py-2 rounded-lg border shadow-sm cursor-pointer flex-1 sm:flex-none ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' : `bg-white ${themeColors.text.split(' ')[0]} border-indigo-200 dark:bg-slate-800 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40`}`}>
@@ -1385,7 +1410,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                               </div>
                             )}
 
-                            {/* PROGRESSIVE DISCLOSURE: Ferramentas Extras de Edição (Apenas no Hover e no Modo Edição) */}
                             {isEditing && (
                               <div className="flex gap-2 shrink-0 mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                                 <button onClick={() => handleIndent(activeDisc.id, assunto.id, -1)} disabled={!assunto.indent || !!searchTerm} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer flex items-center gap-1 text-xs font-bold" title="Recuar">
@@ -1408,7 +1432,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                 )}
               </div>
 
-              {/* Inserção de Novos Assuntos (Rodapé do Painel Direito) */}
               {isEditing && (
                 <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
                   <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50 rounded-xl p-4 flex flex-col gap-3 shadow-inner">
@@ -1578,7 +1601,7 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
 // ==========================================
 // ABA 4: SPRINTS DE ESTUDO DIÁRIA
 // ==========================================
-function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, addXP, pomodoroTime, isPomodoroActive, isPomodoroBreak, togglePomodoro, resetPomodoro, triggerConfetti, themeColors, appTheme }) {
+function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, addXP, triggerConfetti, themeColors, handleAutoLog }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState(null);
   const dragItem = useRef(null);
@@ -1611,12 +1634,6 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
   const sprintGroups = [];
   for (let i = 0; i < customSprint.length; i += 2) sprintGroups.push(customSprint.slice(i, i + 2));
 
-  const formatTime = (seconds) => {
-    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-    const s = (seconds % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
-  };
-
   const handleCompleteSprint = () => {
     if (!showConfirm) {
       setShowConfirm(true); setTimeout(() => setShowConfirm(false), 3000); return;
@@ -1639,32 +1656,8 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
         </div>
       </header>
 
-      {/* WIDGET POMODORO */}
-      <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 p-4 rounded-2xl shadow-sm mb-8">
-         <div className="flex items-center gap-4">
-           <div className={`p-3 rounded-xl transition-colors duration-500 ${isPomodoroActive && !isPomodoroBreak ? `${themeColors.bg.split(' ')[0]} text-white animate-pulse shadow-md` : isPomodoroBreak ? 'bg-emerald-500 text-white animate-pulse shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
-             {isPomodoroBreak ? <Coffee className="w-6 h-6" /> : <Clock className="w-6 h-6" />}
-           </div>
-           <div className="hidden sm:block">
-             <h3 className="font-bold text-base text-slate-800 dark:text-white leading-none mb-1">{isPomodoroBreak ? 'Pausa' : 'Modo Foco'}</h3>
-             <span className="text-xs text-slate-500 font-medium">50min Estudo / 10min Pausa</span>
-           </div>
-         </div>
-         
-         <div className="flex items-center gap-5 pr-2">
-           <span className={`font-mono text-4xl font-black tracking-tighter w-28 text-center transition-colors duration-500 ${isPomodoroActive && !isPomodoroBreak ? themeColors.text.split(' ')[0] : isPomodoroBreak ? 'text-emerald-500' : 'text-slate-800 dark:text-white'}`}>
-             {formatTime(pomodoroTime)}
-           </span>
-           <div className="flex gap-2">
-             <button onClick={togglePomodoro} className={`p-3 rounded-xl shadow-sm transition-transform hover:scale-105 cursor-pointer ${isPomodoroActive ? 'bg-slate-800 text-white dark:bg-slate-700' : `${themeColors.button.split(' ')[0]} text-white`}`}>
-               {isPomodoroActive ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
-             </button>
-             <button onClick={resetPomodoro} className="p-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl transition-transform hover:scale-105 cursor-pointer shadow-sm" title="Reiniciar">
-               <RefreshCcw className="w-5 h-5" />
-             </button>
-           </div>
-         </div>
-      </div>
+      {/* WIDGET POMODORO (AGORA ISOLADO PARA PERFORMANCE) */}
+      <PomodoroWidget themeColors={themeColors} handleAutoLog={handleAutoLog} addXP={addXP} triggerConfetti={triggerConfetti} />
 
       {/* SPRINTS: CARDS RESTAURADOS À LEITURA CONFORTÁVEL */}
       {sprintGroups.length === 0 ? (
