@@ -76,8 +76,10 @@ export const THEMES = {
     icon: 'text-indigo-500',
     bg: 'bg-indigo-500',
     lightBg: 'bg-indigo-50 dark:bg-indigo-900/20',
-    headerBg: 'bg-indigo-200/60 dark:bg-slate-900', 
-    border: 'border-indigo-200/60 dark:border-indigo-800/50',
+    headerBg: 'bg-indigo-600 dark:bg-indigo-950', // Azul principal e imersivo
+    headerText: 'text-white', // Texto branco para contrastar com o fundo azul
+    headerSubtext: 'text-indigo-100 dark:text-indigo-300', // Texto de subtítulo suavizado
+    border: 'border-indigo-600 dark:border-indigo-800/50',
     text: 'text-indigo-600 dark:text-indigo-400',
     solidText: 'text-white'
   },
@@ -89,7 +91,9 @@ export const THEMES = {
     icon: 'text-emerald-500',
     bg: 'bg-emerald-500',
     lightBg: 'bg-emerald-50 dark:bg-emerald-900/20',
-    headerBg: 'bg-emerald-200/60 dark:bg-slate-900', 
+    headerBg: 'bg-emerald-100/60 dark:bg-teal-950/40',
+    headerText: 'text-slate-800 dark:text-white',
+    headerSubtext: 'text-slate-500 dark:text-slate-400',
     border: 'border-emerald-200/60 dark:border-emerald-800/50',
     text: 'text-emerald-600 dark:text-emerald-400',
     solidText: 'text-white'
@@ -102,7 +106,9 @@ export const THEMES = {
     icon: 'text-amber-500',
     bg: 'bg-amber-500',
     lightBg: 'bg-amber-50 dark:bg-amber-900/20',
-    headerBg: 'bg-amber-200/60 dark:bg-slate-900', 
+    headerBg: 'bg-amber-100/60 dark:bg-amber-950/40',
+    headerText: 'text-slate-800 dark:text-white',
+    headerSubtext: 'text-slate-500 dark:text-slate-400',
     border: 'border-amber-200/60 dark:border-amber-800/50',
     text: 'text-amber-600 dark:text-amber-400',
     solidText: 'text-slate-900 font-black'
@@ -115,7 +121,9 @@ export const THEMES = {
     icon: 'text-rose-500',
     bg: 'bg-rose-500',
     lightBg: 'bg-rose-50 dark:bg-rose-900/20',
-    headerBg: 'bg-rose-200/60 dark:bg-slate-900', 
+    headerBg: 'bg-rose-100/60 dark:bg-rose-950/40',
+    headerText: 'text-slate-800 dark:text-white',
+    headerSubtext: 'text-slate-500 dark:text-slate-400',
     border: 'border-rose-200/60 dark:border-rose-800/50',
     text: 'text-rose-600 dark:text-rose-400',
     solidText: 'text-white'
@@ -658,17 +666,16 @@ export default function App() {
         {/* MOBILE TOP HEADER */}
         <div className={`md:hidden flex items-center justify-between p-4 ${themeColors.headerBg} shadow-md border-b ${themeColors.border} z-20 sticky top-0 transition-colors duration-500`}>
           <div className="flex items-center gap-3 min-w-0 pr-2">
-            {/* LOGÓTIPO ARREDONDADO */}
             <div className={`w-11 h-11 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
               <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1" />
             </div>
             <div className="flex flex-col min-w-0">
-              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest truncate">Olá, {projectConfig.userName.split(' ')[0]}</span>
-              <h2 className="font-extrabold text-base text-slate-800 dark:text-white leading-tight tracking-tight truncate">{projectConfig.appName}</h2>
+              <span className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[150px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
+              <h2 className={`font-extrabold text-base leading-tight tracking-tight truncate max-w-[150px] ${themeColors.headerText}`}>{projectConfig.appName}</h2>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm`}>
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm`}>
               {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
             </button>
           </div>
@@ -690,16 +697,16 @@ export default function App() {
                 <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest truncate">Olá, {projectConfig.userName.split(' ')[0]}</span>
-                <h2 className="font-extrabold text-xl tracking-tight text-slate-800 dark:text-white truncate" title={projectConfig.appName}>{projectConfig.appName}</h2>
+                <span className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[120px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
+                <h2 className={`font-extrabold text-xl tracking-tight truncate ${themeColors.headerText}`} title={projectConfig.appName}>{projectConfig.appName}</h2>
               </div>
             </div>
             
             {/* INFORMAÇÕES DA TRILHA */}
             <div className="flex flex-col gap-3">
               <div>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest leading-tight mb-1.5 truncate">{projectConfig.concurso}</p>
-                <h3 className="text-xl font-black leading-tight text-slate-800 dark:text-white truncate mb-2">{projectConfig.cargo}</h3>
+                <p className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest leading-tight mb-1.5 truncate`}>{projectConfig.concurso}</p>
+                <h3 className={`text-xl font-black leading-tight truncate mb-2 ${themeColors.headerText}`}>{projectConfig.cargo}</h3>
                 
                 {/* TAGS DE BANCA E HORAS ACIMA */}
                 <div className="flex flex-col xl:flex-row gap-2 w-full mb-1">
@@ -730,7 +737,7 @@ export default function App() {
                   </div>
                 </div>
                 {/* Barra de Progresso */}
-                <div className="relative w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                <div className="relative w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
                   <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
                 </div>
               </div>
