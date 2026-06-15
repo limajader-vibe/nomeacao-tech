@@ -76,10 +76,8 @@ export const THEMES = {
     icon: 'text-indigo-500',
     bg: 'bg-indigo-500',
     lightBg: 'bg-indigo-50 dark:bg-indigo-900/20',
-    headerBg: 'bg-indigo-600 dark:bg-indigo-950', // Azul principal e imersivo
-    headerText: 'text-white', // Texto branco para contrastar com o fundo azul
-    headerSubtext: 'text-indigo-100 dark:text-indigo-300', // Texto de subtítulo suavizado
-    border: 'border-indigo-600 dark:border-indigo-800/50',
+    headerBg: 'bg-indigo-100/60 dark:bg-indigo-950/40',
+    border: 'border-indigo-200/60 dark:border-indigo-800/50',
     text: 'text-indigo-600 dark:text-indigo-400',
     solidText: 'text-white'
   },
@@ -92,8 +90,6 @@ export const THEMES = {
     bg: 'bg-emerald-500',
     lightBg: 'bg-emerald-50 dark:bg-emerald-900/20',
     headerBg: 'bg-emerald-100/60 dark:bg-teal-950/40',
-    headerText: 'text-slate-800 dark:text-white',
-    headerSubtext: 'text-slate-500 dark:text-slate-400',
     border: 'border-emerald-200/60 dark:border-emerald-800/50',
     text: 'text-emerald-600 dark:text-emerald-400',
     solidText: 'text-white'
@@ -107,8 +103,6 @@ export const THEMES = {
     bg: 'bg-amber-500',
     lightBg: 'bg-amber-50 dark:bg-amber-900/20',
     headerBg: 'bg-amber-100/60 dark:bg-amber-950/40',
-    headerText: 'text-slate-800 dark:text-white',
-    headerSubtext: 'text-slate-500 dark:text-slate-400',
     border: 'border-amber-200/60 dark:border-amber-800/50',
     text: 'text-amber-600 dark:text-amber-400',
     solidText: 'text-slate-900 font-black'
@@ -122,8 +116,6 @@ export const THEMES = {
     bg: 'bg-rose-500',
     lightBg: 'bg-rose-50 dark:bg-rose-900/20',
     headerBg: 'bg-rose-100/60 dark:bg-rose-950/40',
-    headerText: 'text-slate-800 dark:text-white',
-    headerSubtext: 'text-slate-500 dark:text-slate-400',
     border: 'border-rose-200/60 dark:border-rose-800/50',
     text: 'text-rose-600 dark:text-rose-400',
     solidText: 'text-white'
@@ -238,7 +230,7 @@ const LevelUpModal = ({ data, onClose }) => {
           <h2 className="text-4xl font-black text-amber-600 dark:text-amber-500 mb-2 drop-shadow-sm">Nível {data.nivel}!</h2>
           <p className="text-slate-600 dark:text-slate-300 mb-6 font-medium">A sua persistência foi recompensada.</p>
           <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm p-4 rounded-xl border border-amber-200 dark:border-amber-800/50 mb-8 shadow-inner">
-            <span className="block text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-500 mb-1">Nova Patente Adquirida</span>
+            <span className="block text-xs font-black uppercase tracking-widest text-amber-600 dark:text-amber-500 mb-1">Nova Patente Adquirida</span>
             <span className="text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight">{data.titulo}</span>
           </div>
           <button onClick={onClose} className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white rounded-xl font-black transition-all shadow-lg hover:shadow-orange-500/40 text-lg flex items-center justify-center gap-2 cursor-pointer">
@@ -268,9 +260,9 @@ const LevelMapModal = ({ onClose, currentXp }) => {
                 </div>
                 <div className="flex-1">
                   <h4 className={`font-bold ${isCurrent ? 'text-amber-700 dark:text-amber-400' : isPast ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400'}`}>{lvl.titulo}</h4>
-                  <p className="text-[10px] uppercase font-bold text-slate-400">{lvl.min} a {lvl.max} XP</p>
+                  <p className="text-xs uppercase font-bold text-slate-400">{lvl.min} a {lvl.max} XP</p>
                 </div>
-                {isCurrent && <div className="text-[10px] font-black uppercase text-amber-500 bg-amber-100 dark:bg-amber-900/40 px-2 py-1 rounded-md">Atual</div>}
+                {isCurrent && <div className="text-xs font-black uppercase text-amber-500 bg-amber-100 dark:bg-amber-900/40 px-2 py-1 rounded-md">Atual</div>}
               </div>
             )
           })}
@@ -339,7 +331,7 @@ const AuthScreen = ({ auth }) => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block ml-1">O seu E-mail</label>
+            <label className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5 block ml-1">O seu E-mail</label>
             <input 
               type="email" required value={email} onChange={e => setEmail(e.target.value)} 
               className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-white outline-none focus:border-indigo-500 transition-colors shadow-inner" 
@@ -347,7 +339,7 @@ const AuthScreen = ({ auth }) => {
             />
           </div>
           <div>
-            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1.5 block ml-1">Palavra-passe</label>
+            <label className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5 block ml-1">Palavra-passe</label>
             <input 
               type="password" required minLength="6" value={password} onChange={e => setPassword(e.target.value)} 
               className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-white outline-none focus:border-indigo-500 transition-colors shadow-inner font-black tracking-widest" 
@@ -357,7 +349,7 @@ const AuthScreen = ({ auth }) => {
           
           {!isLogin && (
             <div className="animate-in fade-in slide-in-from-top-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-amber-500 mb-1.5 block ml-1 flex items-center gap-1"><ShieldAlert className="w-3 h-3"/> Código de Convite (Acesso Restrito)</label>
+              <label className="text-xs font-bold uppercase tracking-widest text-amber-500 mb-1.5 block ml-1 flex items-center gap-1"><ShieldAlert className="w-4 h-4"/> Código de Convite (Acesso Restrito)</label>
               <input 
                 type="text" required={!isLogin} value={accessCode} onChange={e => setAccessCode(e.target.value)} 
                 className="w-full p-4 rounded-xl bg-slate-950 border border-amber-500/50 text-amber-500 outline-none focus:border-amber-400 transition-colors shadow-inner font-black tracking-widest uppercase" 
@@ -366,7 +358,7 @@ const AuthScreen = ({ auth }) => {
             </div>
           )}
           
-          {error && <p className="text-red-400 text-xs font-bold bg-red-400/10 p-3 rounded-lg flex items-center gap-2"><AlertTriangle className="w-4 h-4"/>{error}</p>}
+          {error && <p className="text-red-400 text-sm font-bold bg-red-400/10 p-3 rounded-lg flex items-center gap-2"><AlertTriangle className="w-5 h-5"/>{error}</p>}
 
           <button type="submit" disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-4 rounded-xl transition-colors mt-4 shadow-lg disabled:opacity-50 cursor-pointer">
             {loading ? 'A sincronizar com a Nuvem...' : (isLogin ? 'Entrar no Sistema' : 'Criar a Minha Conta')}
@@ -658,6 +650,7 @@ export default function App() {
 
   return (
     <div className={isDarkMode ? 'dark' : ''}>
+      {/* MUDANÇA: Fundo central bg-slate-200 no modo claro garante profundidade em relação aos cartões brancos */}
       <div className="min-h-screen bg-slate-200 dark:bg-slate-950 text-slate-800 dark:text-slate-200 flex flex-col md:flex-row font-sans transition-colors duration-300 relative">
         <ConfettiOverlay fire={confettiFire} />
         <LevelUpModal data={levelUpData} onClose={() => setLevelUpData(null)} />
@@ -666,17 +659,17 @@ export default function App() {
         {/* MOBILE TOP HEADER */}
         <div className={`md:hidden flex items-center justify-between p-4 ${themeColors.headerBg} shadow-md border-b ${themeColors.border} z-20 sticky top-0 transition-colors duration-500`}>
           <div className="flex items-center gap-3 min-w-0 pr-2">
-            <div className={`w-11 h-11 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
-              <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1" />
+            <div className={`w-12 h-12 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
+              <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
             </div>
             <div className="flex flex-col min-w-0">
-              <span className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[150px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
-              <h2 className={`font-extrabold text-base leading-tight tracking-tight truncate max-w-[150px] ${themeColors.headerText}`}>{projectConfig.appName}</h2>
+              <span className={`text-xs ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[150px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
+              <h2 className={`font-extrabold text-lg leading-tight tracking-tight truncate max-w-[150px] ${themeColors.headerText}`}>{projectConfig.appName}</h2>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm`}>
-              {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm`}>
+              {isDarkMode ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`} />}
             </button>
           </div>
         </div>
@@ -685,19 +678,18 @@ export default function App() {
         <aside className="hidden md:flex w-72 bg-white dark:bg-slate-900 shadow-xl flex-col z-10 shrink-0 border-r border-slate-300 dark:border-slate-800 sticky top-0 h-screen overflow-hidden">
           <div className={`p-6 ${themeColors.headerBg} border-b ${themeColors.border} relative transition-colors duration-500 shrink-0`}>
             
-            {/* BOTÃO DE TEMA - POSIÇÃO ABSOLUTA NO TOPO (Isolado do Texto) */}
+            {/* BOTÃO DE TEMA */}
             <button onClick={() => setIsDarkMode(!isDarkMode)} className={`absolute top-6 right-6 p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-slate-400 z-10`}>
               {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
             </button>
 
             {/* LOGO + APP NAME */}
-            <div className="flex items-center gap-3 min-w-0 mb-6 pr-10 mt-1">
-              {/* LOGÓTIPO ARREDONDADO */}
-              <div className={`w-12 h-12 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
-                <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
+            <div className="flex items-center gap-4 min-w-0 mb-6 pr-10 mt-1">
+              <div className={`w-14 h-14 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
+                <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-2" />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[120px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
+                <span className={`text-xs ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[120px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
                 <h2 className={`font-extrabold text-xl tracking-tight truncate ${themeColors.headerText}`} title={projectConfig.appName}>{projectConfig.appName}</h2>
               </div>
             </div>
@@ -705,16 +697,16 @@ export default function App() {
             {/* INFORMAÇÕES DA TRILHA */}
             <div className="flex flex-col gap-3">
               <div>
-                <p className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest leading-tight mb-1.5 truncate`}>{projectConfig.concurso}</p>
-                <h3 className={`text-xl font-black leading-tight truncate mb-2 ${themeColors.headerText}`}>{projectConfig.cargo}</h3>
+                <p className={`text-xs ${themeColors.headerSubtext} font-bold uppercase tracking-widest leading-tight mb-1.5 truncate`}>{projectConfig.concurso}</p>
+                <h3 className={`text-2xl font-black leading-tight truncate mb-2 ${themeColors.headerText}`}>{projectConfig.cargo}</h3>
                 
                 {/* TAGS DE BANCA E HORAS ACIMA */}
                 <div className="flex flex-col xl:flex-row gap-2 w-full mb-1">
-                  <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm truncate`} title={projectConfig.banca}>
+                  <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-3 py-2 rounded-xl text-xs font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm truncate`} title={projectConfig.banca}>
                     {projectConfig.banca}
                   </span>
-                  <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm`}>
-                    <Target size={12} /> {projectConfig.horasDia}h/dia
+                  <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-3 py-2 rounded-xl text-xs font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm`}>
+                    <Target size={14} /> {projectConfig.horasDia}h/dia
                   </span>
                 </div>
               </div>
@@ -723,40 +715,40 @@ export default function App() {
               <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 p-4 transition-all hover:shadow-md cursor-pointer shadow-sm`}>
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-3">
-                    <Award size={22} className="text-amber-500 dark:text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)] group-hover:scale-110 transition-transform duration-300" />
+                    <Award size={24} className="text-amber-500 dark:text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)] group-hover:scale-110 transition-transform duration-300" />
                     <div className="flex flex-col">
-                      <span className="text-sm font-black text-slate-800 dark:text-white leading-none">Lvl {userLevel.nivel}</span>
-                      <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1 truncate max-w-[90px]">{userLevel.titulo}</span>
+                      <span className="text-base font-black text-slate-800 dark:text-white leading-none">Lvl {userLevel.nivel}</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1.5 truncate max-w-[90px]">{userLevel.titulo}</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
-                    <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/10 px-2 py-1 rounded-md flex-shrink-0 border border-orange-200 dark:border-orange-500/20">
-                      <Flame size={12} className="fill-current animate-pulse" />
-                      <span className="text-[11px] font-black">{gamification.streak}</span>
+                    <div className="flex items-center gap-1.5 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/10 px-2.5 py-1.5 rounded-lg flex-shrink-0 border border-orange-200 dark:border-orange-500/20">
+                      <Flame size={14} className="fill-current animate-pulse" />
+                      <span className="text-sm font-black">{gamification.streak}</span>
                     </div>
                   </div>
                 </div>
                 {/* Barra de Progresso */}
-                <div className="relative w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
+                <div className="relative w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-3">
                   <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar flex flex-col bg-slate-50/50 dark:bg-slate-900">
+          <nav className="flex-1 p-4 space-y-3 overflow-y-auto custom-scrollbar flex flex-col bg-slate-50/50 dark:bg-slate-900">
             {navPhases.map((phaseGroup, pIdx) => (
               <div key={pIdx} className={pIdx > 0 ? "pt-4" : ""}>
-                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-4 text-left">{phaseGroup.phase}</h3>
-                <div className="space-y-1">
+                <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-4 text-left">{phaseGroup.phase}</h3>
+                <div className="space-y-1.5">
                   {phaseGroup.items.map((item) => {
                     const IconComponent = item.icon;
                     return (
-                      <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all font-medium cursor-pointer ${activeTab === item.id ? themeColors.activeTab + ' shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                      <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all font-medium cursor-pointer ${activeTab === item.id ? themeColors.activeTab + ' shadow-sm text-sm' : 'text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
                         <IconComponent className={`w-5 h-5 ${activeTab === item.id ? 'opacity-100' : 'opacity-70'}`} />
                         <span className="flex-1 text-left">{item.label}</span>
-                        {item.id === 'cronograma' && customSprint.length > 0 && <span className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{customSprint.length}</span>}
-                        {item.badge > 0 && <span className="bg-red-500 animate-pulse text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">{item.badge}</span>}
+                        {item.id === 'cronograma' && customSprint.length > 0 && <span className="bg-emerald-500 text-white text-xs font-black px-2.5 py-0.5 rounded-full">{customSprint.length}</span>}
+                        {item.badge > 0 && <span className="bg-red-500 animate-pulse text-white text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm">{item.badge}</span>}
                       </button>
                     );
                   })}
@@ -768,7 +760,7 @@ export default function App() {
           {user && (
             <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 mt-auto shrink-0">
               <button onClick={() => { if(window.confirm('Tem certeza que deseja sair do sistema?')) { auth && signOut(auth); } }} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors font-bold text-sm cursor-pointer">
-                <LogOut className="w-4 h-4" /> Sair do Sistema
+                <LogOut className="w-5 h-5" /> Sair do Sistema
               </button>
             </div>
           )}
@@ -776,7 +768,7 @@ export default function App() {
 
         {/* CONTENT AREA */}
         <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-28 md:pb-8 text-left">
-          {/* MUDANÇA AQUI: Alterado de max-w-5xl para max-w-7xl 2xl:max-w-[1600px] w-full para se expandir em monitores grandes */}
+          {/* MAX-WIDTH ESTENDIDO PARA MONITORES GRANDES */}
           <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full transition-all duration-500">
             {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} />}
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} />}
@@ -799,13 +791,13 @@ export default function App() {
                 className={`flex flex-col items-center justify-center w-full py-1 gap-1 relative transition-colors ${isActive ? themeColors.text.split(' ')[0] : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
               >
                 <div className={`p-1.5 rounded-xl transition-all duration-300 ${isActive ? `${themeColors.lightBg.split(' ')[0]} scale-110` : ''}`}>
-                  <IconComponent className={`w-5 h-5 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
+                  <IconComponent className={`w-6 h-6 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
                 </div>
-                <span className={`text-[9px] font-bold tracking-tight transition-all duration-300 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 h-0 overflow-hidden translate-y-2'}`}>
+                <span className={`text-xs font-bold tracking-tight transition-all duration-300 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 h-0 overflow-hidden translate-y-2'}`}>
                   {item.label}
                 </span>
                 {item.badge > 0 && (
-                  <span className="absolute top-0 right-1/4 translate-x-1/2 -translate-y-1/4 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full border-2 border-white dark:border-slate-900 shadow-sm">
+                  <span className="absolute top-0 right-1/4 translate-x-1/2 -translate-y-1/4 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full border-2 border-white dark:border-slate-900 shadow-sm">
                     {item.badge > 9 ? '9+' : item.badge}
                   </span>
                 )}
@@ -882,63 +874,63 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in pb-10">
-      <header className="border-b border-slate-200/60 dark:border-slate-800 pb-3">
-        <h2 className="text-2xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2">
-          <Activity className={`w-6 h-6 ${themeColors.text.split(' ')[0]}`} /> Painel Geral
+    <div className="space-y-6 animate-in fade-in pb-10">
+      <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4">
+        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
+          <Activity className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Painel Geral
         </h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">Central de comando. Zero distrações, máximo desempenho.</p>
+        <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">Central de comando. Zero distrações, máximo desempenho.</p>
       </header>
 
       {/* LINHA 1: OS 3 INDICADORES VITAIS (KPIs) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col justify-center items-center text-center">
-          <div className={`p-2 ${themeColors.lightBg.split(' ')[0]} rounded-full mb-2`}><TrendingUp className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/></div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Domínio da Trilha</p>
-          <span className="text-2xl font-black text-slate-800 dark:text-white mt-0.5 mb-1.5">{progressPerc}%</span>
-          <div className="w-full max-w-[120px] h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col justify-center items-center text-center">
+          <div className={`p-3 ${themeColors.lightBg.split(' ')[0]} rounded-2xl mb-3`}><TrendingUp className={`w-6 h-6 ${themeColors.text.split(' ')[0]}`}/></div>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Domínio da Trilha</p>
+          <span className="text-3xl font-black text-slate-800 dark:text-white mt-1 mb-2">{progressPerc}%</span>
+          <div className="w-full max-w-[140px] h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
             <div className={`h-full transition-all duration-1000 ${themeColors.bg.split(' ')[0]}`} style={{ width: `${progressPerc}%` }}></div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col justify-center items-center text-center">
-          <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full mb-2"><Clock className="w-5 h-5 text-blue-500"/></div>
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Horas de Hoje</p>
-          <div className="flex items-end gap-1 mt-0.5 mb-1.5">
-            <span className="text-2xl font-black text-slate-800 dark:text-white">{todayHours.toFixed(1)}</span>
-            <span className="text-xs font-bold text-slate-400 mb-0.5">/ {config.horasDia}h</span>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col justify-center items-center text-center">
+          <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-2xl mb-3"><Clock className="w-6 h-6 text-blue-500"/></div>
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Horas de Hoje</p>
+          <div className="flex items-end gap-1.5 mt-1 mb-2">
+            <span className="text-3xl font-black text-slate-800 dark:text-white">{todayHours.toFixed(1)}</span>
+            <span className="text-sm font-bold text-slate-400 mb-1">/ {config.horasDia}h</span>
           </div>
-          <div className="w-full max-w-[120px] h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+          <div className="w-full max-w-[140px] h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
             <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${Math.min((todayHours / config.horasDia) * 100, 100)}%` }}></div>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-4 shadow-md text-white flex flex-col justify-center items-center text-center relative overflow-hidden">
-          <div className="absolute -right-2 -top-2 opacity-20"><Trophy className="w-16 h-16"/></div>
-          <div className="p-2 bg-white/20 rounded-full mb-2 z-10"><Award className="w-5 h-5 text-amber-200"/></div>
-          <p className="text-[10px] font-bold text-amber-200 uppercase tracking-widest z-10">XP Acumulado</p>
-          <span className="text-2xl font-black text-white mt-0.5 mb-1.5 z-10">{gamification.xp.toLocaleString()}</span>
-          <p className="text-[9px] uppercase font-bold text-amber-200 z-10">Nível {userLevel.nivel} • {userLevel.titulo}</p>
+        <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-5 shadow-md text-white flex flex-col justify-center items-center text-center relative overflow-hidden">
+          <div className="absolute -right-4 -top-4 opacity-20"><Trophy className="w-24 h-24"/></div>
+          <div className="p-3 bg-white/20 rounded-2xl mb-3 z-10"><Award className="w-6 h-6 text-amber-200"/></div>
+          <p className="text-xs font-bold text-amber-200 uppercase tracking-widest z-10">XP Acumulado</p>
+          <span className="text-3xl font-black text-white mt-1 mb-2 z-10">{gamification.xp.toLocaleString()}</span>
+          <p className="text-xs uppercase font-bold text-amber-200 z-10">Nível {userLevel.nivel} • {userLevel.titulo}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col h-full min-h-[240px]">
-          <div className="flex justify-between items-start mb-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col h-full min-h-[260px]">
+          <div className="flex justify-between items-start mb-5">
             <div>
-              <h3 className="font-bold text-base text-slate-800 dark:text-white flex items-center gap-1.5"><BarChart2 className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`}/> Esforço Diário</h3>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400">Média: <strong className="text-slate-700 dark:text-slate-300">{avgHours}h/dia</strong></p>
+              <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><BarChart2 className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Esforço Diário</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Média: <strong className="text-slate-700 dark:text-slate-300">{avgHours}h/dia</strong></p>
             </div>
             
-            <form onSubmit={handleLogHours} className="flex gap-1 bg-slate-50 dark:bg-slate-800 p-1 rounded-lg border border-slate-200/60 dark:border-slate-700">
-              <input type="number" step="0.5" placeholder="+ Hrs" value={loggedHoursToday} onChange={(e) => setLoggedHoursToday(e.target.value)} className="w-14 p-1.5 rounded-md bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none text-[10px] font-bold text-center border border-slate-200/60 dark:border-slate-700 focus:border-blue-500 transition-colors" />
-              <button type="submit" className={`${themeColors.bg.split(' ')[0]} hover:opacity-80 text-white px-2 py-1.5 rounded-md font-bold transition-colors text-[10px] flex items-center justify-center cursor-pointer`} title="Adicionar Horas"><Plus className="w-3 h-3"/></button>
+            <form onSubmit={handleLogHours} className="flex gap-1.5 bg-slate-50 dark:bg-slate-800 p-1.5 rounded-xl border border-slate-200/60 dark:border-slate-700">
+              <input type="number" step="0.5" placeholder="+ Hrs" value={loggedHoursToday} onChange={(e) => setLoggedHoursToday(e.target.value)} className="w-16 p-2 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none text-xs font-bold text-center border border-slate-200/60 dark:border-slate-700 focus:border-blue-500 transition-colors" />
+              <button type="submit" className={`${themeColors.bg.split(' ')[0]} hover:opacity-80 text-white px-3 py-2 rounded-lg font-bold transition-colors text-xs flex items-center justify-center cursor-pointer`} title="Adicionar Horas"><Plus className="w-4 h-4"/></button>
             </form>
           </div>
           
-          <div className="flex-1 flex items-end justify-between gap-1 mt-auto pt-2 relative">
+          <div className="flex-1 flex items-end justify-between gap-1.5 mt-auto pt-4 relative">
             <div className="absolute w-full border-t border-dashed border-emerald-500/50 flex items-center justify-end pr-1" style={{ bottom: `${(config.horasDia / maxHours) * 100}%` }}>
-              <span className="text-[8px] font-bold text-emerald-500 bg-white dark:bg-slate-900 px-1 -translate-y-1/2">Meta: {config.horasDia}h</span>
+              <span className="text-[10px] font-bold text-emerald-500 bg-white dark:bg-slate-900 px-1.5 -translate-y-1/2">Meta: {config.horasDia}h</span>
             </div>
             {last14Days.map((day, i) => {
               const hours = dailyLogs[day.dateStr] || 0;
@@ -946,68 +938,68 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
               const isToday = i === 13;
               return (
                 <div key={i} className="flex flex-col items-center flex-1 group">
-                  <div className="w-full h-24 flex items-end justify-center relative">
-                    <div className={`w-full max-w-[16px] rounded-t-sm transition-all duration-700 ease-out hover:opacity-80 ${isToday ? themeColors.bg.split(' ')[0] : 'bg-slate-200 dark:bg-slate-700'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '4px' : '0' }}>
-                      <span className="opacity-0 group-hover:opacity-100 absolute -top-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] font-bold px-1.5 py-0.5 rounded pointer-events-none transition-opacity z-10">{hours > 0 ? `${hours}h` : '0h'}</span>
+                  <div className="w-full h-32 flex items-end justify-center relative">
+                    <div className={`w-full max-w-[20px] rounded-t-md transition-all duration-700 ease-out hover:opacity-80 ${isToday ? themeColors.bg.split(' ')[0] : 'bg-slate-200 dark:bg-slate-700'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '6px' : '0' }}>
+                      <span className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded pointer-events-none transition-opacity z-10 shadow-sm">{hours > 0 ? `${hours}h` : '0h'}</span>
                     </div>
                   </div>
-                  <span className={`text-[8px] font-bold mt-1.5 uppercase ${isToday ? themeColors.text.split(' ')[0] : 'text-slate-400'}`}>{day.dayLabel}</span>
+                  <span className={`text-[10px] font-bold mt-2 uppercase ${isToday ? themeColors.text.split(' ')[0] : 'text-slate-400'}`}>{day.dayLabel}</span>
                 </div>
               );
             })}
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col h-full min-h-[240px]">
-          <h3 className="font-bold text-base text-slate-800 dark:text-white flex items-center gap-1.5 mb-1"><BrainCircuit className="w-4 h-4 text-emerald-500"/> Retenção de Memória</h3>
-          <p className="text-[10px] text-slate-500 dark:text-slate-400 mb-4">Precisão do seu cérebro no Deck de Combate (Anki).</p>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col h-full min-h-[260px]">
+          <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2 mb-1"><BrainCircuit className="w-5 h-5 text-emerald-500"/> Retenção de Memória</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">Precisão do seu cérebro no Deck de Combate (Anki).</p>
           {totalReviews === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-xs">
-              <PieChart className="w-8 h-8 mb-2 opacity-30"/>
+            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-sm">
+              <PieChart className="w-10 h-10 mb-3 opacity-30"/>
               <p>Faça revisões para gerar o gráfico.</p>
             </div>
           ) : (
-            <div className="flex flex-row items-center justify-center gap-6 flex-1">
-              <div className="relative w-28 h-28 shrink-0">
+            <div className="flex flex-row items-center justify-center gap-8 flex-1">
+              <div className="relative w-32 h-32 shrink-0">
                 <div className="w-full h-full rounded-full shadow-inner" style={{ background: `conic-gradient(#10b981 0% ${facilPerc}%, #f59e0b ${facilPerc}% ${facilPerc + bomPerc}%, #ef4444 ${facilPerc + bomPerc}% 100%)` }}></div>
-                <div className="absolute inset-0 m-auto w-20 h-20 bg-white dark:bg-slate-900 rounded-full flex flex-col items-center justify-center shadow-[inset_0_0_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]">
-                  <span className="text-xl font-black text-slate-800 dark:text-white leading-none">{successRate}%</span>
-                  <span className="text-[8px] uppercase font-bold text-slate-400 mt-0.5">De Acerto</span>
+                <div className="absolute inset-0 m-auto w-24 h-24 bg-white dark:bg-slate-900 rounded-full flex flex-col items-center justify-center shadow-[inset_0_0_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]">
+                  <span className="text-2xl font-black text-slate-800 dark:text-white leading-none">{successRate}%</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-400 mt-1">De Acerto</span>
                 </div>
               </div>
-              <div className="space-y-3 w-full max-w-[120px]">
-                <div className="flex items-center justify-between gap-2"><div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm"></div><span className="text-xs font-bold text-slate-700 dark:text-slate-300">Fácil</span></div><span className="font-black text-sm text-slate-800 dark:text-white">{facilPerc}%</span></div>
-                <div className="flex items-center justify-between gap-2"><div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm"></div><span className="text-xs font-bold text-slate-700 dark:text-slate-300">Bom</span></div><span className="font-black text-sm text-slate-800 dark:text-white">{bomPerc}%</span></div>
-                <div className="flex items-center justify-between gap-2"><div className="flex items-center gap-1.5"><div className="w-2.5 h-2.5 rounded-full bg-red-500 shadow-sm"></div><span className="text-xs font-bold text-slate-700 dark:text-slate-300">Difícil</span></div><span className="font-black text-sm text-slate-800 dark:text-white">{dificilPerc}%</span></div>
+              <div className="space-y-4 w-full max-w-[140px]">
+                <div className="flex items-center justify-between gap-3"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm"></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300">Fácil</span></div><span className="font-black text-base text-slate-800 dark:text-white">{facilPerc}%</span></div>
+                <div className="flex items-center justify-between gap-3"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-amber-500 shadow-sm"></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300">Bom</span></div><span className="font-black text-base text-slate-800 dark:text-white">{bomPerc}%</span></div>
+                <div className="flex items-center justify-between gap-3"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-red-500 shadow-sm"></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300">Difícil</span></div><span className="font-black text-base text-slate-800 dark:text-white">{dificilPerc}%</span></div>
               </div>
             </div>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4 items-stretch">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-5 mt-0 flex flex-col">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 gap-2">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5 items-stretch">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-6 mt-0 flex flex-col">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-3">
             <div>
-              <h3 className="font-bold text-base text-slate-800 dark:text-white flex items-center gap-1.5"><CalendarDays className="w-4 h-4 text-emerald-500"/> Mapa de Constância</h3>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Últimos 3 meses.</p>
+              <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><CalendarDays className="w-5 h-5 text-emerald-500"/> Mapa de Constância</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Últimos 3 meses.</p>
             </div>
-            <div className="flex items-center gap-1.5 text-[9px] font-bold uppercase text-slate-400">
-              <span>Menos</span><div className="w-2.5 h-2.5 rounded-sm bg-slate-100 dark:bg-slate-800"></div><div className="w-2.5 h-2.5 rounded-sm bg-emerald-200 dark:bg-emerald-900/40"></div><div className="w-2.5 h-2.5 rounded-sm bg-emerald-300 dark:bg-emerald-700/60"></div><div className="w-2.5 h-2.5 rounded-sm bg-emerald-500 dark:bg-emerald-500"></div><div className="w-2.5 h-2.5 rounded-sm bg-emerald-700 dark:bg-emerald-400"></div><span>Mais</span>
+            <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-400">
+              <span>Menos</span><div className="w-3 h-3 rounded-sm bg-slate-100 dark:bg-slate-800"></div><div className="w-3 h-3 rounded-sm bg-emerald-200 dark:bg-emerald-900/40"></div><div className="w-3 h-3 rounded-sm bg-emerald-300 dark:bg-emerald-700/60"></div><div className="w-3 h-3 rounded-sm bg-emerald-500 dark:bg-emerald-500"></div><div className="w-3 h-3 rounded-sm bg-emerald-700 dark:bg-emerald-400"></div><span>Mais</span>
             </div>
           </div>
-          <div className="overflow-x-auto custom-scrollbar pb-1 flex-1 flex items-center">
-            <div className="min-w-max flex gap-1.5 mx-auto">
-              <div className="grid grid-rows-7 gap-1 text-[8px] font-bold text-slate-400 pr-1 text-right"><div className="h-3 flex items-center justify-end">D</div><div className="h-3 flex items-center justify-end">S</div><div className="h-3 flex items-center justify-end">T</div><div className="h-3 flex items-center justify-end">Q</div><div className="h-3 flex items-center justify-end">Q</div><div className="h-3 flex items-center justify-end">S</div><div className="h-3 flex items-center justify-end">S</div></div>
-              <div className="grid grid-rows-7 grid-flow-col gap-1">{heatmapDays.map((day, idx) => (<div key={idx} title={`${day.date}: ${day.hours.toFixed(1)}h estudadas`} className={`w-3 h-3 rounded-[2px] transition-all hover:scale-125 cursor-pointer relative ${day.colorClass}`}></div>))}</div>
+          <div className="overflow-x-auto custom-scrollbar pb-2 flex-1 flex items-center">
+            <div className="min-w-max flex gap-2 mx-auto">
+              <div className="grid grid-rows-7 gap-1.5 text-[10px] font-bold text-slate-400 pr-2 text-right"><div className="h-3.5 flex items-center justify-end">D</div><div className="h-3.5 flex items-center justify-end">S</div><div className="h-3.5 flex items-center justify-end">T</div><div className="h-3.5 flex items-center justify-end">Q</div><div className="h-3.5 flex items-center justify-end">Q</div><div className="h-3.5 flex items-center justify-end">S</div><div className="h-3.5 flex items-center justify-end">S</div></div>
+              <div className="grid grid-rows-7 grid-flow-col gap-1.5">{heatmapDays.map((day, idx) => (<div key={idx} title={`${day.date}: ${day.hours.toFixed(1)}h estudadas`} className={`w-3.5 h-3.5 rounded-sm transition-all hover:scale-125 cursor-pointer relative ${day.colorClass}`}></div>))}</div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-5 flex flex-col h-full max-h-[220px]">
-          <h3 className="font-bold text-base text-slate-800 dark:text-white mb-3 flex items-center gap-1.5 shrink-0"><Filter className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`}/> Raio-X por Disciplina</h3>
-          <div className="space-y-3.5 flex-1 overflow-y-auto pr-3 custom-scrollbar">
-            {radarData.length === 0 ? <div className="text-[10px] text-slate-400 flex items-center justify-center h-full">Nenhuma disciplina cadastrada.</div> : radarData.map(disc => (<div key={disc.id} className="group"><div className="flex justify-between items-end mb-1.5"><span className={`text-xs font-bold text-slate-700 dark:text-slate-300 truncate pr-2 hover:${themeColors.text.split(' ')[0]} transition-colors`}>{disc.nome}</span><span className="text-xs font-black text-slate-800 dark:text-white shrink-0">{disc.perc}%</span></div><div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div className={`h-full transition-all duration-1000 rounded-full ${disc.perc === 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : themeColors.bg.split(' ')[0]}`} style={{width: `${disc.perc}%`}}></div></div></div>))}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-6 flex flex-col h-full max-h-[280px]">
+          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-4 flex items-center gap-2 shrink-0"><Filter className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Raio-X por Disciplina</h3>
+          <div className="space-y-4 flex-1 overflow-y-auto pr-4 custom-scrollbar">
+            {radarData.length === 0 ? <div className="text-sm text-slate-400 flex items-center justify-center h-full">Nenhuma disciplina cadastrada.</div> : radarData.map(disc => (<div key={disc.id} className="group"><div className="flex justify-between items-end mb-2"><span className={`text-sm font-bold text-slate-700 dark:text-slate-300 truncate pr-3 hover:${themeColors.text.split(' ')[0]} transition-colors`}>{disc.nome}</span><span className="text-sm font-black text-slate-800 dark:text-white shrink-0">{disc.perc}%</span></div><div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div className={`h-full transition-all duration-1000 rounded-full ${disc.perc === 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : themeColors.bg.split(' ')[0]}`} style={{width: `${disc.perc}%`}}></div></div></div>))}
           </div>
         </div>
       </div>
@@ -1109,62 +1101,63 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
   };
   const checkStatus = (assId) => {
     const p = progress[assId]; const count = (p?.estudado ? 1 : 0) + (p?.questoes ? 1 : 0) + (p?.revisado ? 1 : 0);
-    if (count === 3) return <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" />;
-    if (count > 0) return <PlayCircle className="w-3.5 h-3.5 text-blue-400 shrink-0" />;
-    return <div className="w-3.5 h-3.5 rounded-full border border-slate-300 dark:border-slate-600 shrink-0"></div>;
+    if (count === 3) return <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />;
+    if (count > 0) return <PlayCircle className="w-4 h-4 text-blue-400 shrink-0" />;
+    return <div className="w-4 h-4 rounded-full border border-slate-300 dark:border-slate-600 shrink-0"></div>;
   };
 
   return (
-    <div className="space-y-4 animate-in fade-in text-left pb-10">
-      <header className="border-b border-slate-200/60 dark:border-slate-800 pb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+    <div className="space-y-6 animate-in fade-in text-left pb-10">
+      {/* HEADER PADRONIZADO */}
+      <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-extrabold text-slate-800 dark:text-white leading-tight">Arsenal de Matérias</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-0.5 text-[11px] uppercase tracking-wider font-bold">A sua Trilha Base. Assuntos dominados ficam riscados.</p>
+          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white leading-tight">Arsenal de Matérias</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">A sua Trilha Base. Assuntos dominados ficam riscados.</p>
         </div>
-        <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); }} className={`flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg font-bold text-xs transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700/50'}`}>
-          {isEditing ? <Save className="w-3.5 h-3.5"/> : <Edit className="w-3.5 h-3.5"/>}{isEditing ? 'Concluir Gestão' : 'Gerenciar Matérias'}
+        <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); }} className={`flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700/50'}`}>
+          {isEditing ? <Save className="w-4 h-4"/> : <Edit className="w-4 h-4"/>}{isEditing ? 'Concluir Gestão' : 'Gerenciar Matérias'}
         </button>
       </header>
 
       {isEditing && (
-        <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 p-2.5 rounded-lg flex items-center gap-2">
-          <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
-          <div className="text-[10px] text-amber-800 dark:text-amber-200/80 leading-tight"><strong>Modo Edição:</strong> Arraste itens para reordenar, clique no lápis para editar ou exclua conforme necessário.</div>
+        <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 p-4 rounded-xl flex items-center gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
+          <div className="text-xs text-amber-800 dark:text-amber-200/80 leading-relaxed"><strong>Modo Edição:</strong> Arraste itens para reordenar, clique no lápis para editar ou exclua conforme necessário.</div>
         </div>
       )}
 
-      <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-3 md:p-4">
-        <div className="flex justify-start mb-3">
-          <button onClick={toggleExpandAll} className="flex items-center gap-1 text-[10px] font-bold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/50 dark:hover:bg-blue-900/20 px-2.5 py-1.5 rounded-md border border-slate-200/60 dark:border-slate-700 shadow-sm cursor-pointer">
-            {isAllExpanded ? <ChevronUp className="w-3 h-3"/> : <ChevronDown className="w-3 h-3"/>}{isAllExpanded ? 'Recolher Tudo' : 'Expandir Tudo'}
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-4 md:p-6">
+        <div className="flex justify-start mb-4">
+          <button onClick={toggleExpandAll} className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/50 dark:hover:bg-blue-900/20 px-3 py-2 rounded-lg border border-slate-200/60 dark:border-slate-700 shadow-sm cursor-pointer">
+            {isAllExpanded ? <ChevronUp className="w-4 h-4"/> : <ChevronDown className="w-4 h-4"/>}{isAllExpanded ? 'Recolher Tudo' : 'Expandir Tudo'}
           </button>
         </div>
 
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           {edital.map((bloco, bIndex) => (
-            <div key={bloco.id} className="border-b border-slate-100 dark:border-slate-800/60 pb-3 mb-1 last:border-0 last:pb-0">
+            <div key={bloco.id} className="border-b border-slate-100 dark:border-slate-800/60 pb-4 mb-2 last:border-0 last:pb-0">
               
-              <div onClick={() => !isEditing && toggleNode(bloco.id)} className={`flex items-center gap-2 p-2 rounded-lg bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 mb-2 group transition-colors ${!isEditing ? 'cursor-pointer hover:bg-slate-200/60 dark:hover:bg-slate-700' : ''}`}>
+              <div onClick={() => !isEditing && toggleNode(bloco.id)} className={`flex items-center gap-3 p-3 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 mb-3 group transition-colors ${!isEditing ? 'cursor-pointer hover:bg-slate-200/60 dark:hover:bg-slate-700' : ''}`}>
                 <div onClick={(e) => { if(isEditing) { e.stopPropagation(); toggleNode(bloco.id); } }} className="cursor-pointer flex items-center justify-center shrink-0">
-                  {expanded[bloco.id] ? <ChevronDown className="w-4 h-4 text-slate-500" /> : <ChevronRight className="w-4 h-4 text-slate-500" />}
+                  {expanded[bloco.id] ? <ChevronDown className="w-5 h-5 text-slate-500" /> : <ChevronRight className="w-5 h-5 text-slate-500" />}
                 </div>
-                <Layers className={`w-4 h-4 ${themeColors.text.split(' ')[0]} shrink-0`}/>
+                <Layers className={`w-5 h-5 ${themeColors.text.split(' ')[0]} shrink-0`}/>
                 {isEditing ? (
-                  <input type="text" value={bloco.nome} onClick={(e) => e.stopPropagation()} onChange={(e) => handleEditBlocoNome(bloco.id, e.target.value)} className={`flex-1 font-black text-sm text-slate-800 dark:text-slate-200 uppercase tracking-tight bg-white dark:bg-slate-900 border ${themeColors.border.split(' ')[0]} rounded px-1.5 py-0.5 outline-none focus:ring-1 focus:ring-indigo-500 w-full`} />
+                  <input type="text" value={bloco.nome} onClick={(e) => e.stopPropagation()} onChange={(e) => handleEditBlocoNome(bloco.id, e.target.value)} className={`flex-1 font-black text-base text-slate-800 dark:text-slate-200 uppercase tracking-tight bg-white dark:bg-slate-900 border ${themeColors.border.split(' ')[0]} rounded-md px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500 w-full`} />
                 ) : (
-                  <span className="flex-1 font-black text-sm text-slate-800 dark:text-slate-200 uppercase tracking-tight truncate">{bloco.nome}</span>
+                  <span className="flex-1 font-black text-base text-slate-800 dark:text-slate-200 uppercase tracking-tight truncate">{bloco.nome}</span>
                 )}
                 {isEditing && (
-                  <div className="flex items-center gap-0.5 shrink-0" onClick={(e) => e.stopPropagation()}>
-                    <button onClick={() => handleMoveBloco(bIndex, -1)} disabled={bIndex === 0} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded transition-colors disabled:opacity-30 cursor-pointer" title="Sobe"><ChevronUp className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => handleMoveBloco(bIndex, 1)} disabled={bIndex === edital.length - 1} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded transition-colors disabled:opacity-30 cursor-pointer" title="Desce"><ChevronDown className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => handleDeleteBlocoClick(bloco.id)} className={`p-1.5 rounded cursor-pointer transition-colors flex items-center ${confirmDeleteId === 'bloco_' + bloco.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Bloco"><Trash2 className="w-3.5 h-3.5" /></button>
+                  <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
+                    <button onClick={() => handleMoveBloco(bIndex, -1)} disabled={bIndex === 0} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded transition-colors disabled:opacity-30 cursor-pointer" title="Sobe"><ChevronUp className="w-4 h-4" /></button>
+                    <button onClick={() => handleMoveBloco(bIndex, 1)} disabled={bIndex === edital.length - 1} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded transition-colors disabled:opacity-30 cursor-pointer" title="Desce"><ChevronDown className="w-4 h-4" /></button>
+                    <button onClick={() => handleDeleteBlocoClick(bloco.id)} className={`p-2 rounded cursor-pointer transition-colors flex items-center ${confirmDeleteId === 'bloco_' + bloco.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Bloco"><Trash2 className="w-4 h-4" /></button>
                   </div>
                 )}
               </div>
 
               {expanded[bloco.id] && (
-                <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                <div className="space-y-2 animate-in fade-in slide-in-from-top-1 duration-200">
                   {bloco.disciplinas.map((disc, dIndex) => {
                     const totalAssuntosDisc = disc.assuntos.length;
                     const concluidosAssuntosDisc = disc.assuntos.filter(a => isFullyMastered(a.id)).length;
@@ -1173,37 +1166,37 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
 
                     return (
                       <div key={disc.id}>
-                        <div className="flex items-center gap-1.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-md select-none border border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-900 transition-colors">
+                        <div className="flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-2 rounded-lg select-none border border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-900 transition-colors">
                           {isEditing && (
                             <div className="flex flex-col gap-0 shrink-0">
-                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, -1); }} disabled={dIndex === 0} className="text-slate-400 hover:text-slate-600 disabled:opacity-30 cursor-pointer"><ChevronUp className="w-3 h-3" /></button>
-                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, 1); }} disabled={dIndex === bloco.disciplinas.length - 1} className="text-slate-400 hover:text-slate-600 disabled:opacity-30 cursor-pointer"><ChevronDown className="w-3 h-3" /></button>
+                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, -1); }} disabled={dIndex === 0} className="text-slate-400 hover:text-slate-600 disabled:opacity-30 cursor-pointer"><ChevronUp className="w-4 h-4" /></button>
+                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, 1); }} disabled={dIndex === bloco.disciplinas.length - 1} className="text-slate-400 hover:text-slate-600 disabled:opacity-30 cursor-pointer"><ChevronDown className="w-4 h-4" /></button>
                             </div>
                           )}
-                          <div onClick={() => !isEditing && toggleNode(disc.id)} className={`flex flex-1 items-center gap-1.5 ${!isEditing ? 'cursor-pointer' : ''} overflow-hidden`}>
+                          <div onClick={() => !isEditing && toggleNode(disc.id)} className={`flex flex-1 items-center gap-2.5 ${!isEditing ? 'cursor-pointer' : ''} overflow-hidden`}>
                             <div onClick={(e) => { if(isEditing) { e.stopPropagation(); toggleNode(disc.id); } }} className="cursor-pointer flex items-center justify-center">
-                              {expanded[disc.id] ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
+                              {expanded[disc.id] ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
                             </div>
-                            <FolderOpen className={`w-4 h-4 shrink-0 ${disc.cor?.split(' ')[0] || 'text-slate-500'}`} />
+                            <FolderOpen className={`w-5 h-5 shrink-0 ${disc.cor?.split(' ')[0] || 'text-slate-500'}`} />
                             {isEditing ? (
-                              <input type="text" value={disc.nome} onChange={(e) => handleEditDiscNome(bloco.id, disc.id, e.target.value)} className={`font-bold text-xs text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 border ${themeColors.border.split(' ')[0]} rounded px-1.5 py-0.5 outline-none focus:ring-1 focus:ring-indigo-500 w-full`} />
+                              <input type="text" value={disc.nome} onChange={(e) => handleEditDiscNome(bloco.id, disc.id, e.target.value)} className={`font-bold text-sm text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 border ${themeColors.border.split(' ')[0]} rounded px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500 w-full`} />
                             ) : (
-                              <span className="font-bold text-xs text-slate-700 dark:text-slate-300 flex-1 truncate">{disc.nome}</span>
+                              <span className="font-bold text-sm text-slate-700 dark:text-slate-300 flex-1 truncate">{disc.nome}</span>
                             )}
                           </div>
                           
-                          <div className="flex items-center gap-1.5 bg-white dark:bg-slate-950 px-2 py-1 rounded border border-slate-200/60 dark:border-slate-700 shadow-sm shrink-0">
-                            <span className={`text-[9px] font-black tracking-wider ${isDiscMastered ? 'text-emerald-500' : 'text-slate-500'}`}>{concluidosAssuntosDisc}/{totalAssuntosDisc}</span>
-                            <div className="w-10 h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden hidden sm:block"><div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${percConcluidoDisc}%` }}></div></div>
+                          <div className="flex items-center gap-2 bg-white dark:bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-200/60 dark:border-slate-700 shadow-sm shrink-0">
+                            <span className={`text-xs font-black tracking-wider ${isDiscMastered ? 'text-emerald-500' : 'text-slate-500'}`}>{concluidosAssuntosDisc}/{totalAssuntosDisc}</span>
+                            <div className="w-12 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden hidden sm:block"><div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${percConcluidoDisc}%` }}></div></div>
                           </div>
                           
                           {isEditing && (
-                            <button onClick={(e) => { e.stopPropagation(); handleDeleteDisciplinaClick(bloco.id, disc.id); }} className={`ml-1 p-1 rounded cursor-pointer transition-colors shrink-0 ${confirmDeleteId === 'disc_' + disc.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Disciplina"><Trash2 className="w-3.5 h-3.5" /></button>
+                            <button onClick={(e) => { e.stopPropagation(); handleDeleteDisciplinaClick(bloco.id, disc.id); }} className={`ml-2 p-1.5 rounded cursor-pointer transition-colors shrink-0 ${confirmDeleteId === 'disc_' + disc.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Disciplina"><Trash2 className="w-4 h-4" /></button>
                           )}
                         </div>
 
                         {expanded[disc.id] && (
-                          <div className="mt-1 space-y-1">
+                          <div className="mt-1.5 space-y-1.5">
                             {disc.assuntos.map((assunto, index) => {
                               const isInSprint = customSprint.some(item => item.assId === assunto.id);
                               const isCurrentlyEditing = editingTopicId === assunto.id;
@@ -1211,43 +1204,43 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                               const memoryHealth = getMemoryHealth(assunto.id);
 
                               return (
-                                <div key={assunto.id} draggable={isEditing && !isCurrentlyEditing} onDragStart={(e) => handleDragStart(e, index, disc.id)} onDragEnter={(e) => handleDragEnter(e, index, disc.id)} onDragOver={(e) => e.preventDefault()} onDrop={handleDrop} style={{ marginLeft: assunto.indent ? `${assunto.indent * 0.75}rem` : '0' }} className={`flex items-center gap-2 py-1.5 px-2.5 rounded-md border transition-colors bg-white dark:bg-slate-900 shadow-sm ${isEditing && !isCurrentlyEditing ? 'border-dashed border-amber-300 cursor-move hover:bg-amber-50 dark:hover:bg-amber-900/10' : 'border-slate-200/60 dark:border-slate-800/80'} ${mastered && !isEditing ? 'opacity-60 bg-slate-50 dark:bg-slate-900/40' : ''}`}>
+                                <div key={assunto.id} draggable={isEditing && !isCurrentlyEditing} onDragStart={(e) => handleDragStart(e, index, disc.id)} onDragEnter={(e) => handleDragEnter(e, index, disc.id)} onDragOver={(e) => e.preventDefault()} onDrop={handleDrop} style={{ marginLeft: assunto.indent ? `${assunto.indent * 1}rem` : '0' }} className={`flex items-center gap-3 py-2.5 px-3 rounded-lg border transition-colors bg-white dark:bg-slate-900 shadow-sm ${isEditing && !isCurrentlyEditing ? 'border-dashed border-amber-300 cursor-move hover:bg-amber-50 dark:hover:bg-amber-900/10' : 'border-slate-200/60 dark:border-slate-800/80'} ${mastered && !isEditing ? 'opacity-60 bg-slate-50 dark:bg-slate-900/40' : ''}`}>
                                   {isCurrentlyEditing ? (
-                                    <div className="flex-1 flex flex-col gap-2 p-1 animate-in fade-in">
-                                      <div className="grid md:grid-cols-2 gap-2 w-full">
-                                        <div><input type="text" value={editTopicData.titulo} onChange={(e) => setEditTopicData({...editTopicData, titulo: e.target.value})} className="w-full p-1.5 text-xs rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Título do Assunto" /></div>
-                                        <div><input type="text" value={editTopicData.linkTec} onChange={(e) => setEditTopicData({...editTopicData, linkTec: e.target.value})} className="w-full p-1.5 text-xs rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Link Caderno TEC (Opcional)" /></div>
+                                    <div className="flex-1 flex flex-col gap-3 p-2 animate-in fade-in">
+                                      <div className="grid md:grid-cols-2 gap-3 w-full">
+                                        <div><input type="text" value={editTopicData.titulo} onChange={(e) => setEditTopicData({...editTopicData, titulo: e.target.value})} className="w-full p-2 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Título do Assunto" /></div>
+                                        <div><input type="text" value={editTopicData.linkTec} onChange={(e) => setEditTopicData({...editTopicData, linkTec: e.target.value})} className="w-full p-2 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Link Caderno TEC (Opcional)" /></div>
                                       </div>
-                                      <div className="flex gap-1.5">
-                                        <button onClick={() => saveEditTopic(disc.id, assunto.id)} className="bg-emerald-500 hover:bg-emerald-600 text-white px-3 py-1 rounded text-[10px] font-bold transition-colors cursor-pointer">Salvar</button>
-                                        <button onClick={() => setEditingTopicId(null)} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-1 rounded text-[10px] font-bold transition-colors cursor-pointer">Cancelar</button>
+                                      <div className="flex gap-2">
+                                        <button onClick={() => saveEditTopic(disc.id, assunto.id)} className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer">Salvar Alterações</button>
+                                        <button onClick={() => setEditingTopicId(null)} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer">Cancelar</button>
                                       </div>
                                     </div>
                                   ) : (
                                     <>
-                                      {isEditing ? (<GripVertical className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 cursor-move shrink-0" />) : (mastered ? <CheckCircle className="w-3.5 h-3.5 text-emerald-500 shrink-0" /> : checkStatus(assunto.id))}
+                                      {isEditing ? (<GripVertical className="w-4 h-4 text-slate-300 dark:text-slate-600 cursor-move shrink-0" />) : (mastered ? <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" /> : checkStatus(assunto.id))}
                                       
-                                      <div className="flex-1 flex items-center justify-between gap-2 overflow-hidden">
-                                        <span className={`font-semibold truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-300'} ${assunto.indent > 0 ? 'text-[11px]' : 'text-xs'}`}>{assunto.titulo}</span>
-                                        <div className="flex gap-1 items-center shrink-0">
-                                          {!isEditing && memoryHealth && (<div className={`flex items-center gap-0.5 text-[8px] px-1.5 py-0.5 rounded font-bold tracking-wider ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória"><Thermometer className="w-2.5 h-2.5"/> <span className="hidden sm:inline">{memoryHealth.label}</span></div>)}
-                                          {isEditing && assunto.linkTec && <span className="text-[8px] text-blue-500 dark:text-blue-400 flex items-center gap-0.5 border border-blue-200 dark:border-blue-800 px-1 rounded"><Link className="w-2.5 h-2.5"/> TEC</span>}
+                                      <div className="flex-1 flex items-center justify-between gap-3 overflow-hidden">
+                                        <span className={`font-semibold truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-300'} ${assunto.indent > 0 ? 'text-sm' : 'text-base'}`}>{assunto.titulo}</span>
+                                        <div className="flex gap-1.5 items-center shrink-0">
+                                          {!isEditing && memoryHealth && (<div className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded-md font-bold tracking-wider uppercase ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória"><Thermometer className="w-3 h-3"/> <span className="hidden sm:inline">{memoryHealth.label}</span></div>)}
+                                          {isEditing && assunto.linkTec && <span className="text-[10px] text-blue-500 dark:text-blue-400 font-bold uppercase flex items-center gap-1 border border-blue-200 dark:border-blue-800 px-2 py-1 rounded-md"><Link className="w-3 h-3"/> TEC</span>}
                                         </div>
                                       </div>
 
                                       {!isEditing && (
-                                        <button onClick={() => { if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(disc.id, assunto.id, disc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center gap-1 text-[9px] font-black uppercase transition-colors px-2 py-1 rounded border shadow-sm cursor-pointer shrink-0 ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' : `bg-white ${themeColors.text.split(' ')[0]} border-indigo-200 dark:bg-slate-800 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40`}`}>
-                                          {isInSprint ? <CheckCircle className="w-3 h-3" /> : (mastered ? <RefreshCcw className="w-3 h-3" /> : <Target className="w-3 h-3" />)}
+                                        <button onClick={() => { if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(disc.id, assunto.id, disc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center gap-1.5 text-xs font-bold uppercase transition-colors px-3 py-1.5 rounded-lg border shadow-sm cursor-pointer shrink-0 ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' : `bg-white ${themeColors.text.split(' ')[0]} border-indigo-200 dark:bg-slate-800 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40`}`}>
+                                          {isInSprint ? <CheckCircle className="w-4 h-4" /> : (mastered ? <RefreshCcw className="w-4 h-4" /> : <Target className="w-4 h-4" />)}
                                           <span className="hidden md:inline">{isInSprint ? 'Na Sprint' : (mastered ? 'Refazer' : 'Add Sprint')}</span>
                                         </button>
                                       )}
                                       
                                       {isEditing && (
-                                        <div className="flex gap-1 shrink-0">
-                                          <button onClick={() => handleIndent(disc.id, assunto.id, -1)} disabled={!assunto.indent} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer" title="Recuar"><ArrowLeft className="w-3.5 h-3.5"/></button>
-                                          <button onClick={() => handleIndent(disc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer" title="Avançar"><ArrowRight className="w-3.5 h-3.5"/></button>
-                                          <button onClick={() => startEditTopic(assunto)} className={`p-1 ${themeColors.text.split(' ')[0]} hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded transition-colors cursor-pointer`} title="Editar"><Pencil className="w-3.5 h-3.5"/></button>
-                                          <button onClick={() => handleDeleteClick(disc.id, assunto.id)} className={`p-1 rounded transition-colors ${confirmDeleteId === assunto.id ? 'bg-red-500 text-white' : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30'} cursor-pointer`} title="Excluir"><Trash2 className="w-3.5 h-3.5"/></button>
+                                        <div className="flex gap-1.5 shrink-0">
+                                          <button onClick={() => handleIndent(disc.id, assunto.id, -1)} disabled={!assunto.indent} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer" title="Recuar"><ArrowLeft className="w-4 h-4"/></button>
+                                          <button onClick={() => handleIndent(disc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer" title="Avançar"><ArrowRight className="w-4 h-4"/></button>
+                                          <button onClick={() => startEditTopic(assunto)} className={`p-1.5 ${themeColors.text.split(' ')[0]} hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors cursor-pointer`} title="Editar"><Pencil className="w-4 h-4"/></button>
+                                          <button onClick={() => handleDeleteClick(disc.id, assunto.id)} className={`p-1.5 rounded-md transition-colors ${confirmDeleteId === assunto.id ? 'bg-red-500 text-white' : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30'} cursor-pointer`} title="Excluir"><Trash2 className="w-4 h-4"/></button>
                                         </div>
                                       )}
                                     </>
@@ -1258,25 +1251,25 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                             
                             {/* CAIXA DE IMPORTAÇÃO / ADIÇÃO (COMPACTA) */}
                             {isEditing && (
-                              <div className="mt-2 p-2.5 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50 rounded-lg flex flex-col gap-2 shadow-inner">
+                              <div className="mt-3 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50 rounded-xl flex flex-col gap-3 shadow-inner">
                                 {bulkInput.discId === disc.id ? (
-                                  <div className="flex flex-col gap-2 animate-in fade-in">
-                                    <h4 className="text-[10px] font-black uppercase text-amber-700 dark:text-amber-500 flex items-center gap-1.5"><ListPlus className="w-3.5 h-3.5"/> Importação Rápida</h4>
-                                    <textarea rows="4" placeholder="Exemplo:&#10;Modelagem de Dados&#10;Normalização" value={bulkInput.text} onChange={(e) => setBulkInput({ discId: disc.id, text: e.target.value })} className="w-full p-2 text-xs rounded border border-amber-300 dark:border-amber-700/50 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500 resize-none" />
-                                    <div className="flex gap-1.5">
-                                      <button onClick={() => handleBulkAdd(disc.id)} className="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded text-[10px] font-bold flex items-center justify-center gap-1 transition-colors cursor-pointer">Gerar</button>
-                                      <button onClick={() => setBulkInput({ discId: null, text: '' })} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-3 py-1.5 rounded text-[10px] font-bold transition-colors cursor-pointer">Cancelar</button>
+                                  <div className="flex flex-col gap-3 animate-in fade-in">
+                                    <h4 className="text-xs font-black uppercase text-amber-700 dark:text-amber-500 flex items-center gap-2"><ListPlus className="w-4 h-4"/> Importação Rápida</h4>
+                                    <textarea rows="4" placeholder="Exemplo:&#10;Modelagem de Dados&#10;Normalização" value={bulkInput.text} onChange={(e) => setBulkInput({ discId: disc.id, text: e.target.value })} className="w-full p-3 text-sm rounded-lg border border-amber-300 dark:border-amber-700/50 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500 resize-none" />
+                                    <div className="flex gap-2">
+                                      <button onClick={() => handleBulkAdd(disc.id)} className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer">Gerar Assuntos</button>
+                                      <button onClick={() => setBulkInput({ discId: null, text: '' })} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer">Cancelar</button>
                                     </div>
                                   </div>
                                 ) : (
                                   <>
-                                    <div className="flex flex-col sm:flex-row gap-1.5 items-center">
-                                      <Plus className="w-3.5 h-3.5 text-amber-600 shrink-0 hidden sm:block"/>
-                                      <input type="text" placeholder="Adicionar assunto..." value={newTopic.discId === disc.id ? newTopic.titulo : ''} onChange={(e) => setNewTopic({...newTopic, discId: disc.id, titulo: e.target.value})} className="flex-1 w-full p-1.5 text-xs rounded border border-amber-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500" />
-                                      <button onClick={() => handleAddTopic(disc.id)} className="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded text-[10px] font-bold w-full sm:w-auto transition-colors cursor-pointer">Add</button>
+                                    <div className="flex flex-col sm:flex-row gap-2 items-center">
+                                      <Plus className="w-5 h-5 text-amber-600 shrink-0 hidden sm:block"/>
+                                      <input type="text" placeholder="Adicionar assunto manualmente..." value={newTopic.discId === disc.id ? newTopic.titulo : ''} onChange={(e) => setNewTopic({...newTopic, discId: disc.id, titulo: e.target.value})} className="flex-1 w-full p-2.5 text-sm rounded-lg border border-amber-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500" />
+                                      <button onClick={() => handleAddTopic(disc.id)} className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-lg text-xs font-bold w-full sm:w-auto transition-colors cursor-pointer shadow-sm">Adicionar</button>
                                     </div>
-                                    <button onClick={() => setBulkInput({ discId: disc.id, text: '' })} className="w-full mt-1 border border-dashed border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 px-2 py-1.5 rounded text-[9px] font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer">
-                                      <ListPlus className="w-3.5 h-3.5"/> Colar Índice
+                                    <button onClick={() => setBulkInput({ discId: disc.id, text: '' })} className="w-full mt-2 border border-dashed border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 px-3 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer">
+                                      <ListPlus className="w-4 h-4"/> Colar Índice Completo
                                     </button>
                                   </>
                                 )}
@@ -1289,9 +1282,9 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                   })}
                   
                   {isEditing && (
-                    <div className="mt-2">
-                      <button onClick={() => handleAddDisciplina(bloco.id)} className={`w-full flex items-center justify-center gap-1.5 text-xs font-bold ${themeColors.text.split(' ')[0]} ${themeColors.lightBg.split(' ')[0]} px-3 py-2 rounded-lg transition-colors border ${themeColors.border.split(' ')[0]} border-dashed cursor-pointer`}>
-                        <Plus className="w-3.5 h-3.5"/> Nova Disciplina
+                    <div className="mt-3">
+                      <button onClick={() => handleAddDisciplina(bloco.id)} className={`w-full flex items-center justify-center gap-2 text-sm font-bold ${themeColors.text.split(' ')[0]} ${themeColors.lightBg.split(' ')[0]} px-4 py-3 rounded-xl transition-colors border ${themeColors.border.split(' ')[0]} border-dashed cursor-pointer hover:opacity-80`}>
+                        <Plus className="w-4 h-4"/> Nova Disciplina
                       </button>
                     </div>
                   )}
@@ -1301,9 +1294,9 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
           ))}
           
           {isEditing && (
-            <div className="pt-2 mt-1">
-              <button onClick={handleAddBloco} className={`w-full flex items-center justify-center gap-1.5 text-xs font-black uppercase tracking-widest text-slate-500 hover:${themeColors.text.split(' ')[0]} bg-slate-50 hover:${themeColors.lightBg.split(' ')[0]} dark:bg-slate-800/50 px-4 py-3 rounded-lg transition-colors border border-dashed border-slate-300 hover:${themeColors.border.split(' ')[0]} dark:border-slate-700 cursor-pointer`}>
-                <Layers className="w-4 h-4"/> Novo Bloco
+            <div className="pt-3 mt-2">
+              <button onClick={handleAddBloco} className={`w-full flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest text-slate-500 hover:${themeColors.text.split(' ')[0]} bg-slate-50 hover:${themeColors.lightBg.split(' ')[0]} dark:bg-slate-800/50 px-5 py-4 rounded-xl transition-colors border-2 border-dashed border-slate-300 hover:${themeColors.border.split(' ')[0]} dark:border-slate-700 cursor-pointer`}>
+                <Layers className="w-5 h-5"/> Criar Novo Bloco
               </button>
             </div>
           )}
@@ -1355,18 +1348,18 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
     <div className="space-y-6 animate-in fade-in text-left h-full pb-10">
       <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2"><LayoutGrid className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`}/> Metas da Semana</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">A sua visão estratégica. O que for agendado aqui será executado na Sprint Diária.</p>
+          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3"><LayoutGrid className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`}/> Metas da Semana</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">A sua visão estratégica. O que for agendado aqui será executado na Sprint Diária.</p>
         </div>
       </header>
 
-      <div className="flex flex-col lg:flex-row gap-5 items-start">
-        <div className="w-full lg:w-1/3 bg-slate-100/80 dark:bg-slate-800/50 rounded-2xl p-4 border border-slate-200/60 dark:border-slate-700 min-h-[400px]">
-          <h3 className="font-black text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2 text-sm"><ListPlus className="w-4 h-4"/> Fila de Sprints ({backlogSprints.length})</h3>
-          <div className="space-y-3">
+      <div className="flex flex-col lg:flex-row gap-6 items-start">
+        <div className="w-full lg:w-1/3 bg-slate-100/80 dark:bg-slate-800/50 rounded-3xl p-5 border border-slate-200/60 dark:border-slate-700 min-h-[400px]">
+          <h3 className="font-black text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2 text-sm"><ListPlus className="w-5 h-5"/> Fila de Sprints ({backlogSprints.length})</h3>
+          <div className="space-y-4">
             {backlogSprints.map((group, groupIdx) => (
-              <div key={groupIdx} className="bg-white dark:bg-slate-900 p-3 rounded-xl shadow-sm border border-slate-200/60 dark:border-slate-700 transition-colors opacity-90">
-                 <div className="text-[10px] font-bold text-slate-400 mb-2 uppercase flex justify-between"><span>Sprint {sprintsCompleted + groupIdx + 2}</span></div>
+              <div key={groupIdx} className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 transition-colors opacity-90">
+                 <div className="text-xs font-bold text-slate-400 mb-3 uppercase flex justify-between"><span>Sprint {sprintsCompleted + groupIdx + 2}</span></div>
                  {group.map((item, localIdx) => {
                    const globalIdx = 2 + (groupIdx * 2) + localIdx;
                    const isDragging = draggedIndex === globalIdx;
@@ -1378,12 +1371,12 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
                        onDragEnter={(e) => handleDragEnter(e, globalIdx)}
                        onDragEnd={handleDragEnd}
                        onDragOver={(e) => e.preventDefault()}
-                       className={`mb-1.5 last:mb-0 flex items-start gap-1.5 pl-1 cursor-move hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-lg transition-all border-l-2 border-transparent hover:border-slate-300 dark:hover:border-slate-600 ${isDragging ? 'opacity-40 border-dashed scale-95' : ''}`}
+                       className={`mb-2 last:mb-0 flex items-start gap-2 pl-1 cursor-move hover:bg-slate-50 dark:hover:bg-slate-800/50 p-2 rounded-xl transition-all border-l-2 border-transparent hover:border-slate-300 dark:hover:border-slate-600 ${isDragging ? 'opacity-40 border-dashed scale-95' : ''}`}
                      >
-                       <GripVertical className="w-3.5 h-3.5 shrink-0 text-slate-300 mt-0.5" />
+                       <GripVertical className="w-4 h-4 shrink-0 text-slate-300 mt-0.5" />
                        <div>
-                         <span className="block text-[10px] font-bold text-slate-400 uppercase truncate">{item.discNome}</span>
-                         <span className="block text-sm font-bold text-slate-700 dark:text-slate-200 leading-tight">{item.assTitulo}</span>
+                         <span className="block text-xs font-bold text-slate-400 uppercase tracking-wider truncate">{item.discNome}</span>
+                         <span className="block text-sm font-bold text-slate-700 dark:text-slate-200 leading-tight mt-0.5">{item.assTitulo}</span>
                        </div>
                      </div>
                    )
@@ -1391,18 +1384,18 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
               </div>
             ))}
             {backlogSprints.length === 0 && (
-              <div className="text-xs text-slate-400 p-4 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl flex flex-col items-center gap-2 text-center">
-                <p>O seu Backlog está vazio.</p><p className="text-[10px]">Vá ao Arsenal de Matérias para organizar a semana.</p>
+              <div className="text-sm text-slate-400 p-6 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl flex flex-col items-center gap-2 text-center">
+                <p>O seu Backlog está vazio.</p><p className="text-xs">Vá ao Arsenal de Matérias para organizar a semana.</p>
               </div>
             )}
           </div>
         </div>
 
-        <div className={`w-full lg:w-1/3 ${themeColors.lightBg.split(' ')[0]} rounded-2xl p-4 border ${themeColors.border.split(' ')[0]} min-h-[400px]`}>
-           <h3 className={`font-black ${themeColors.text.split(' ')[0]} uppercase tracking-wider mb-3 flex items-center gap-2 text-sm`}><PlayCircle className="w-4 h-4"/> Em Curso (Hoje)</h3>
+        <div className={`w-full lg:w-1/3 ${themeColors.lightBg.split(' ')[0]} rounded-3xl p-5 border ${themeColors.border.split(' ')[0]} min-h-[400px]`}>
+           <h3 className={`font-black ${themeColors.text.split(' ')[0]} uppercase tracking-wider mb-4 flex items-center gap-2 text-sm`}><PlayCircle className="w-5 h-5"/> Em Curso (Hoje)</h3>
            {activeSprint ? (
-             <div className={`bg-white dark:bg-slate-900 p-3.5 rounded-xl shadow-md border-2 ${themeColors.border.split(' ')[0]}`}>
-                 <div className={`text-xs font-bold ${themeColors.text.split(' ')[0]} mb-2 uppercase`}>Sprint {sprintsCompleted + 1}</div>
+             <div className={`bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-md border-2 ${themeColors.border.split(' ')[0]}`}>
+                 <div className={`text-xs font-bold ${themeColors.text.split(' ')[0]} mb-3 uppercase tracking-wider`}>Sprint {sprintsCompleted + 1}</div>
                  {activeSprint.map((item, localIdx) => {
                    const globalIdx = localIdx;
                    const isDragging = draggedIndex === globalIdx;
@@ -1414,29 +1407,29 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
                        onDragEnter={(e) => handleDragEnter(e, globalIdx)}
                        onDragEnd={handleDragEnd}
                        onDragOver={(e) => e.preventDefault()}
-                       className={`mb-1.5 last:mb-0 flex items-start gap-1.5 cursor-move bg-white dark:bg-slate-800 p-2 rounded-lg transition-all border border-slate-200 dark:border-slate-700 hover:border-indigo-400 ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95' : 'shadow-sm'}`}
+                       className={`mb-3 last:mb-0 flex items-start gap-2.5 cursor-move bg-white dark:bg-slate-800 p-3 rounded-xl transition-all border border-slate-200 dark:border-slate-700 hover:border-indigo-400 shadow-sm ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95' : ''}`}
                      >
-                       <GripVertical className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${themeColors.text.split(' ')[0]} opacity-50`} />
+                       <GripVertical className={`w-4 h-4 shrink-0 mt-0.5 ${themeColors.text.split(' ')[0]} opacity-50`} />
                        <div>
-                         <span className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase truncate">{item.discNome}</span>
-                         <span className="block text-sm font-bold text-slate-800 dark:text-slate-100 leading-tight">{item.assTitulo}</span>
+                         <span className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">{item.discNome}</span>
+                         <span className="block text-base font-bold text-slate-800 dark:text-slate-100 leading-tight mt-1">{item.assTitulo}</span>
                        </div>
                      </div>
                    )
                  })}
-                 <button onClick={() => setActiveTab('cronograma')} className={`mt-3 w-full ${themeColors.button.split(' ')[0]} font-bold text-xs py-1.5 rounded-lg transition-colors cursor-pointer text-white`}>Ir para Execução</button>
+                 <button onClick={() => setActiveTab('cronograma')} className={`mt-5 w-full ${themeColors.button.split(' ')[0]} font-bold text-sm py-2.5 rounded-xl transition-colors cursor-pointer text-white shadow-sm`}>Ir para Execução</button>
               </div>
            ) : (
-             <div className={`text-xs ${themeColors.text.split(' ')[0]} p-6 border-2 border-dashed ${themeColors.border.split(' ')[0]} rounded-xl flex items-center justify-center text-center`}>Nenhuma Sprint ativada hoje.</div>
+             <div className={`text-sm ${themeColors.text.split(' ')[0]} p-8 border-2 border-dashed ${themeColors.border.split(' ')[0]} rounded-2xl flex items-center justify-center text-center`}>Nenhuma Sprint ativada hoje.</div>
            )}
         </div>
 
-        <div className="w-full lg:w-1/3 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl p-4 border border-emerald-200/60 dark:border-emerald-900/30 min-h-[400px]">
-           <h3 className="font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-3 flex items-center gap-2 text-sm"><CheckCircle className="w-4 h-4"/> Vitórias</h3>
-           <div className="bg-white dark:bg-slate-900 p-5 rounded-xl shadow-sm border border-emerald-200/60 dark:border-emerald-800 flex flex-col items-center justify-center h-32">
-             <Trophy className="w-8 h-8 text-emerald-500 mb-2" />
-             <span className="text-3xl font-black text-emerald-600 dark:text-emerald-400 leading-none">{sprintsCompleted}</span>
-             <span className="text-[10px] font-bold text-slate-500 uppercase mt-1">Sprints Fechadas</span>
+        <div className="w-full lg:w-1/3 bg-emerald-50 dark:bg-emerald-900/10 rounded-3xl p-5 border border-emerald-200/60 dark:border-emerald-900/30 min-h-[400px]">
+           <h3 className="font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-4 flex items-center gap-2 text-sm"><CheckCircle className="w-5 h-5"/> Vitórias</h3>
+           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-emerald-200/60 dark:border-emerald-800 flex flex-col items-center justify-center h-40">
+             <Trophy className="w-10 h-10 text-emerald-500 mb-3" />
+             <span className="text-4xl font-black text-emerald-600 dark:text-emerald-400 leading-none">{sprintsCompleted}</span>
+             <span className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-2">Sprints Fechadas</span>
            </div>
         </div>
       </div>
@@ -1496,74 +1489,74 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
 
   return (
     <div className="space-y-6 animate-in fade-in text-left pb-10">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200/60 dark:border-slate-800 pb-4 gap-4">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200/60 dark:border-slate-800 pb-5 gap-4">
         <div>
           <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">Sprints de Estudo</h2>
-          <p className="text-slate-500 mt-1">Marque os passos. Bater a Sprint rende <strong className={`${themeColors.text.split(' ')[0]}`}>+50 XP</strong>.</p>
+          <p className="text-slate-500 mt-2 text-base">Marque os passos. Bater a Sprint rende <strong className={`${themeColors.text.split(' ')[0]}`}>+50 XP</strong>.</p>
         </div>
         <div className="flex gap-3 items-center w-full md:w-auto">
-          <button disabled={sprintGroups.length === 0} onClick={handleCompleteSprint} className={`w-full md:w-auto px-6 py-3 rounded-xl font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${showConfirm ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white disabled:opacity-50 shadow-sm'}`}>
+          <button disabled={sprintGroups.length === 0} onClick={handleCompleteSprint} className={`w-full md:w-auto px-8 py-3.5 rounded-2xl font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${showConfirm ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white disabled:opacity-50 shadow-md hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/20'}`}>
             <CheckCircle className="w-5 h-5" /> {showConfirm ? 'Confirmar Fecho (+50 XP)' : 'Concluir Sprint'}
           </button>
         </div>
       </header>
 
-      {/* WIDGET POMODORO (SLIM & MINIMALISTA) */}
-      <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 p-3 rounded-2xl shadow-sm mb-6">
-         <div className="flex items-center gap-3">
-           <div className={`p-2 rounded-xl transition-colors duration-500 ${isPomodoroActive && !isPomodoroBreak ? `${themeColors.bg.split(' ')[0]} text-white animate-pulse shadow-md` : isPomodoroBreak ? 'bg-emerald-500 text-white animate-pulse shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
-             {isPomodoroBreak ? <Coffee className="w-5 h-5" /> : <Clock className="w-5 h-5" />}
+      {/* WIDGET POMODORO */}
+      <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 p-4 rounded-2xl shadow-sm mb-8">
+         <div className="flex items-center gap-4">
+           <div className={`p-3 rounded-xl transition-colors duration-500 ${isPomodoroActive && !isPomodoroBreak ? `${themeColors.bg.split(' ')[0]} text-white animate-pulse shadow-md` : isPomodoroBreak ? 'bg-emerald-500 text-white animate-pulse shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
+             {isPomodoroBreak ? <Coffee className="w-6 h-6" /> : <Clock className="w-6 h-6" />}
            </div>
            <div className="hidden sm:block">
-             <h3 className="font-bold text-sm text-slate-800 dark:text-white leading-none">{isPomodoroBreak ? 'Pausa' : 'Modo Foco'}</h3>
-             <span className="text-[10px] text-slate-500 font-medium">50min Estudo / 10min Pausa</span>
+             <h3 className="font-bold text-base text-slate-800 dark:text-white leading-none mb-1">{isPomodoroBreak ? 'Pausa' : 'Modo Foco'}</h3>
+             <span className="text-xs text-slate-500 font-medium">50min Estudo / 10min Pausa</span>
            </div>
          </div>
          
-         <div className="flex items-center gap-4 pr-1">
-           <span className={`font-mono text-3xl font-black tracking-tighter w-24 text-center transition-colors duration-500 ${isPomodoroActive && !isPomodoroBreak ? themeColors.text.split(' ')[0] : isPomodoroBreak ? 'text-emerald-500' : 'text-slate-800 dark:text-white'}`}>
+         <div className="flex items-center gap-5 pr-2">
+           <span className={`font-mono text-4xl font-black tracking-tighter w-28 text-center transition-colors duration-500 ${isPomodoroActive && !isPomodoroBreak ? themeColors.text.split(' ')[0] : isPomodoroBreak ? 'text-emerald-500' : 'text-slate-800 dark:text-white'}`}>
              {formatTime(pomodoroTime)}
            </span>
            <div className="flex gap-2">
-             <button onClick={togglePomodoro} className={`p-2.5 rounded-xl shadow-sm transition-transform hover:scale-105 cursor-pointer ${isPomodoroActive ? 'bg-slate-800 text-white dark:bg-slate-700' : `${themeColors.button.split(' ')[0]} text-white`}`}>
-               {isPomodoroActive ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current" />}
+             <button onClick={togglePomodoro} className={`p-3 rounded-xl shadow-sm transition-transform hover:scale-105 cursor-pointer ${isPomodoroActive ? 'bg-slate-800 text-white dark:bg-slate-700' : `${themeColors.button.split(' ')[0]} text-white`}`}>
+               {isPomodoroActive ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
              </button>
-             <button onClick={resetPomodoro} className="p-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl transition-transform hover:scale-105 cursor-pointer shadow-sm" title="Reiniciar">
-               <RefreshCcw className="w-4 h-4" />
+             <button onClick={resetPomodoro} className="p-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl transition-transform hover:scale-105 cursor-pointer shadow-sm" title="Reiniciar">
+               <RefreshCcw className="w-5 h-5" />
              </button>
            </div>
          </div>
       </div>
 
-      {/* SPRINTS: CARDS MINIMALISTAS E LIPOASPIRADOS */}
+      {/* SPRINTS: CARDS RESTAURADOS À LEITURA CONFORTÁVEL */}
       {sprintGroups.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-10 flex flex-col items-center justify-center mt-6">
-          <ShoppingCart className="w-10 h-10 text-slate-300 dark:text-slate-600 mb-3" />
-          <h3 className="text-xl font-bold text-slate-700 dark:text-slate-300 mb-1">Fila Vazia!</h3>
-          <p className="text-sm text-slate-500 mb-5 text-center">Planeje a sua semana adicionando matérias.</p>
+        <div className="bg-white dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-3xl p-12 flex flex-col items-center justify-center mt-8">
+          <ShoppingCart className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-4" />
+          <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">Fila Vazia!</h3>
+          <p className="text-base text-slate-500 mb-6 text-center">Planeje a sua semana adicionando matérias.</p>
           <div className="flex gap-3">
-            <button onClick={() => setActiveTab('disciplinas')} className="bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-5 py-2.5 rounded-xl text-sm font-bold cursor-pointer">
+            <button onClick={() => setActiveTab('disciplinas')} className="bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-6 py-3 rounded-xl text-base font-bold cursor-pointer transition-colors shadow-sm">
               Ir para o Arsenal de Matérias
             </button>
           </div>
         </div>
       ) : (
-        <div className="grid gap-4 mt-4">
+        <div className="grid gap-6 mt-6">
           {sprintGroups.map((group, idx) => {
             const sprintNum = sprintsCompleted + idx + 1;
             const isActive = idx === 0;
 
             return (
-              <div key={sprintNum} className={`bg-white dark:bg-slate-900 rounded-xl overflow-hidden flex flex-col md:flex-row border border-slate-200/80 dark:border-slate-800 shadow-sm transition-all ${isActive ? `ring-2 ${themeColors.border.split(' ')[0].replace(/border-/g, 'ring-')} shadow-md` : 'opacity-90'}`}>
+              <div key={sprintNum} className={`bg-white dark:bg-slate-900 rounded-2xl overflow-hidden flex flex-col md:flex-row border border-slate-200/80 dark:border-slate-800 shadow-sm transition-all ${isActive ? `ring-2 ${themeColors.border.split(' ')[0].replace(/border-/g, 'ring-')} shadow-lg scale-[1.01]` : 'opacity-90'}`}>
                 
                 {/* Lado Laranja / Marcação da Sprint */}
-                <div className={`p-2 w-full md:w-14 shrink-0 flex flex-col items-center justify-center font-black border-b md:border-b-0 md:border-r border-slate-200/80 dark:border-slate-800 ${isActive ? `${themeColors.bg.split(' ')[0]} ${themeColors.solidText.split(' ')[0]}` : 'bg-slate-50 dark:bg-slate-800/40 text-slate-400'}`}>
-                  <span className="text-[8px] uppercase tracking-widest">Sprint</span><span className="text-2xl mt-0.5">{sprintNum}</span>
-                  {isActive && <span className="text-[7px] bg-white/20 px-1.5 py-0.5 rounded mt-1 font-bold tracking-wider text-white">HOJE</span>}
+                <div className={`p-4 w-full md:w-20 shrink-0 flex flex-col items-center justify-center font-black border-b md:border-b-0 md:border-r border-slate-200/80 dark:border-slate-800 ${isActive ? `${themeColors.bg.split(' ')[0]} ${themeColors.solidText.split(' ')[0]}` : 'bg-slate-50 dark:bg-slate-800/40 text-slate-400'}`}>
+                  <span className="text-[10px] uppercase tracking-widest">Sprint</span><span className="text-4xl mt-1">{sprintNum}</span>
+                  {isActive && <span className="text-[10px] bg-white/20 px-2 py-1 rounded mt-2 font-bold tracking-wider text-white">HOJE</span>}
                 </div>
                 
-                {/* Cartões das Matérias LIPOASPIRADOS */}
-                <div className="p-2 flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                {/* Cartões das Matérias LIPOASPIRADOS MAS LEGÍVEIS */}
+                <div className="p-4 flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                   {group.map((item, localIdx) => {
                     const globalIdx = (idx * 2) + localIdx;
                     const isDragging = draggedIndex === globalIdx;
@@ -1579,36 +1572,36 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                         onDragEnter={(e) => handleDragEnter(e, globalIdx)}
                         onDragEnd={handleDragEnd}
                         onDragOver={(e) => e.preventDefault()}
-                        className={`rounded-lg p-3 flex flex-col relative transition-all cursor-move ${isActive ? `bg-white dark:bg-slate-800 border-2 ${themeColors.border.split(' ')[0]} shadow-sm` : 'bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700'} ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95 z-10' : 'hover:shadow-md'}`}
+                        className={`rounded-xl p-5 flex flex-col relative transition-all cursor-move ${isActive ? `bg-white dark:bg-slate-800 border-2 ${themeColors.border.split(' ')[0]} shadow-sm` : 'bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700'} ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95 z-10' : 'hover:shadow-md'}`}
                       >
-                        <div className="absolute top-2 right-8 text-slate-300 hover:text-slate-500 transition-colors" title="Arrastar e Soltar">
-                          <GripVertical className="w-3.5 h-3.5" />
+                        <div className="absolute top-4 right-10 text-slate-300 hover:text-slate-500 transition-colors" title="Arrastar e Soltar">
+                          <GripVertical className="w-5 h-5" />
                         </div>
-                        <button onClick={() => setCustomSprint(p => p.filter(i => i.assId !== item.assId))} className="absolute top-2 right-2 text-slate-300 hover:text-red-500 transition-colors cursor-pointer" title="Remover"><Trash2 className="w-3.5 h-3.5"/></button>
+                        <button onClick={() => setCustomSprint(p => p.filter(i => i.assId !== item.assId))} className="absolute top-4 right-3 text-slate-300 hover:text-red-500 transition-colors cursor-pointer" title="Remover"><Trash2 className="w-5 h-5"/></button>
                         
-                        <span className="text-[9px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1 pr-8">{item.discNome}</span>
-                        <p className="font-bold text-sm text-slate-800 dark:text-slate-100 mb-2 pr-8 leading-tight">{item.assTitulo}</p>
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 pr-10">{item.discNome}</span>
+                        <p className="font-bold text-base text-slate-800 dark:text-slate-100 mb-4 pr-10 leading-tight">{item.assTitulo}</p>
                         
-                        {/* Checkboxes Super Compactas e Legíveis */}
-                        <div className="mt-auto space-y-1.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/50">
-                          <label className={`flex items-center gap-2 cursor-pointer transition-colors ${isEstudado ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100'}`}>
-                            <input type="checkbox" checked={isEstudado} onChange={() => toggleProgress(item.assId, 'estudado')} disabled={!isActive} className="w-4 h-4 rounded cursor-pointer disabled:opacity-50 shrink-0" />
+                        {/* Checkboxes Legíveis e Padronizadas */}
+                        <div className="mt-auto space-y-2.5 pt-4 border-t border-slate-200/60 dark:border-slate-700/50">
+                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isEstudado ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100'}`}>
+                            <input type="checkbox" checked={isEstudado} onChange={() => toggleProgress(item.assId, 'estudado')} disabled={!isActive} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-slate-600" />
                             <span className="font-bold text-xs uppercase tracking-wide">1. Teoria</span>
                           </label>
 
-                          <label className={`flex items-center gap-2 cursor-pointer transition-colors ${isQuestoes ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100'}`}>
-                            <input type="checkbox" checked={isQuestoes} onChange={() => toggleProgress(item.assId, 'questoes')} disabled={!isActive || !isEstudado} className="w-4 h-4 rounded cursor-pointer disabled:opacity-50 shrink-0" />
+                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isQuestoes ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100'}`}>
+                            <input type="checkbox" checked={isQuestoes} onChange={() => toggleProgress(item.assId, 'questoes')} disabled={!isActive || !isEstudado} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-slate-600" />
                             <span className="font-bold text-xs uppercase tracking-wide">2. Questões</span>
                           </label>
 
-                          <label className={`flex items-center gap-2 cursor-pointer transition-colors ${isRevisado ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100'}`}>
-                            <input type="checkbox" checked={isRevisado} onChange={() => toggleProgress(item.assId, 'revisado')} disabled={!isActive || !isQuestoes} className="w-4 h-4 rounded cursor-pointer disabled:opacity-50 shrink-0" />
+                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isRevisado ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100'}`}>
+                            <input type="checkbox" checked={isRevisado} onChange={() => toggleProgress(item.assId, 'revisado')} disabled={!isActive || !isQuestoes} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-slate-600" />
                             <span className="font-bold text-xs uppercase tracking-wide">3. Revisão Auto</span>
                           </label>
                           
                           {item.linkTec && isActive && (
-                            <a href={item.linkTec} target="_blank" rel="noopener noreferrer" className={`mt-2 flex items-center justify-center gap-1.5 w-full py-1.5 text-[11px] font-bold rounded-md ${themeColors.button.split(' ')[0]} text-white transition-all shadow-sm cursor-pointer`}>
-                              <ExternalLink className="w-3 h-3" /> Resolver no TEC
+                            <a href={item.linkTec} target="_blank" rel="noopener noreferrer" className={`mt-4 flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold rounded-lg ${themeColors.button.split(' ')[0]} text-white transition-all shadow-sm cursor-pointer hover:shadow-md`}>
+                              <ExternalLink className="w-4 h-4" /> Resolver no TEC
                             </a>
                           )}
                         </div>
@@ -1617,9 +1610,9 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                   })}
                   {/* Placeholder */}
                   {group.length === 1 && (
-                    <div className="rounded-lg border-2 border-dashed border-slate-200/60 dark:border-slate-700 flex flex-col items-center justify-center text-slate-400 dark:text-slate-600 opacity-60 p-2 min-h-[120px]">
-                      <Target className="w-5 h-5 mb-1.5" />
-                      <p className="text-[9px] font-bold uppercase tracking-wider">Espaço Vazio</p>
+                    <div className="rounded-xl border-2 border-dashed border-slate-200/60 dark:border-slate-700 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 opacity-60 p-4 min-h-[160px]">
+                      <Target className="w-6 h-6 mb-2" />
+                      <p className="text-xs font-bold uppercase tracking-wider">Espaço Vazio</p>
                     </div>
                   )}
                 </div>
@@ -1670,46 +1663,46 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
         <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
           <BrainCircuit className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Revisão Inteligente
         </h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Retenção ativa guiada por espaçamento ótimo. Faça um esforço mental para lembrar os conceitos e avalie os tópicos abaixo.</p>
+        <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">Retenção ativa guiada por espaçamento ótimo. Faça um esforço mental para lembrar os conceitos e avalie os tópicos abaixo.</p>
       </header>
 
       <div className="grid md:grid-cols-2 gap-8 mt-6">
         <div>
-          <h3 className="text-lg font-bold text-red-600 dark:text-red-400 flex items-center gap-2 mb-4 border-b border-red-100 dark:border-red-900/30 pb-2">
+          <h3 className="text-lg font-bold text-red-600 dark:text-red-400 flex items-center gap-2 mb-4 border-b border-red-100 dark:border-red-900/30 pb-3">
             <AlertTriangle className="w-5 h-5"/> Tópicos a Revisar (Hoje)
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {revisoesPendentes.length === 0 ? (
-              <div className="text-sm font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200/60 dark:border-slate-800 flex flex-col items-center justify-center text-center">
-                <CheckCircle className="w-10 h-10 text-emerald-400 mb-3 opacity-50"/>
+              <div className="text-base font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200/60 dark:border-slate-800 flex flex-col items-center justify-center text-center h-48">
+                <CheckCircle className="w-12 h-12 text-emerald-400 mb-3 opacity-50"/>
                 <p>A sua memória está em dia!</p>
-                <p className="text-xs font-normal mt-1">Nenhum tópico pendente para hoje.</p>
+                <p className="text-sm font-normal mt-1">Nenhum tópico pendente para hoje.</p>
               </div>
             ) : (
               revisoesPendentes.map((data) => (
-                <div key={data.id} className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700 p-4 rounded-xl shadow-sm flex flex-col gap-3 border-l-4 border-l-red-500 transition-all hover:shadow-md">
+                <div key={data.id} className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700 p-5 rounded-2xl shadow-sm flex flex-col gap-4 border-l-4 border-l-red-500 transition-all hover:shadow-md">
                   <div className="flex justify-between items-start">
                     <div className="pr-4">
-                      <span className="text-[9px] uppercase font-black text-slate-400 block mb-0.5">{data.discNome}</span>
-                      <h4 className="font-bold text-slate-800 dark:text-slate-200 text-base leading-tight">{data.titulo}</h4>
+                      <span className="text-xs uppercase font-bold text-slate-400 tracking-wider block mb-1">{data.discNome}</span>
+                      <h4 className="font-bold text-slate-800 dark:text-slate-100 text-lg leading-tight">{data.titulo}</h4>
                     </div>
                     {data.linkTec && (
-                      <a href={data.linkTec} target="_blank" rel="noreferrer" title="Abrir Caderno TEC" className={`p-2 rounded-lg ${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]} hover:scale-110 transition-transform cursor-pointer shrink-0`}>
-                        <ExternalLink className="w-4 h-4" />
+                      <a href={data.linkTec} target="_blank" rel="noreferrer" title="Abrir Caderno TEC" className={`p-2.5 rounded-xl ${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]} hover:scale-110 transition-transform cursor-pointer shrink-0 shadow-sm`}>
+                        <ExternalLink className="w-5 h-5" />
                       </a>
                     )}
                   </div>
                   
                   {/* BOTÕES INLINE DE REVISÃO */}
-                  <div className="grid grid-cols-3 gap-2 mt-1 pt-3 border-t border-slate-100 dark:border-slate-800">
-                    <button onClick={() => handleReviewFeedback(data.id, 'dificil')} className="py-2.5 px-1 bg-red-50 hover:bg-red-500 text-red-600 hover:text-white dark:bg-red-900/10 dark:hover:bg-red-600 dark:text-red-400 rounded-lg text-[11px] font-black uppercase tracking-wide transition-colors flex flex-col items-center gap-0.5 cursor-pointer">
-                      <span>Difícil</span><span className="text-[8px] font-bold opacity-70">Amanhã</span>
+                  <div className="grid grid-cols-3 gap-3 mt-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <button onClick={() => handleReviewFeedback(data.id, 'dificil')} className="py-3 px-2 bg-red-50 hover:bg-red-500 text-red-600 hover:text-white dark:bg-red-900/10 dark:hover:bg-red-600 dark:text-red-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-red-100 dark:border-red-900/30">
+                      <span>Difícil</span><span className="text-[10px] font-bold opacity-70">Amanhã</span>
                     </button>
-                    <button onClick={() => handleReviewFeedback(data.id, 'bom')} className="py-2.5 px-1 bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white dark:bg-amber-900/10 dark:hover:bg-amber-600 dark:text-amber-400 rounded-lg text-[11px] font-black uppercase tracking-wide transition-colors flex flex-col items-center gap-0.5 cursor-pointer">
-                      <span>Bom</span><span className="text-[8px] font-bold opacity-70">7 Dias</span>
+                    <button onClick={() => handleReviewFeedback(data.id, 'bom')} className="py-3 px-2 bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white dark:bg-amber-900/10 dark:hover:bg-amber-600 dark:text-amber-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-amber-100 dark:border-amber-900/30">
+                      <span>Bom</span><span className="text-[10px] font-bold opacity-70">7 Dias</span>
                     </button>
-                    <button onClick={() => handleReviewFeedback(data.id, 'facil')} className="py-2.5 px-1 bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white dark:bg-emerald-900/10 dark:hover:bg-emerald-600 dark:text-emerald-400 rounded-lg text-[11px] font-black uppercase tracking-wide transition-colors flex flex-col items-center gap-0.5 cursor-pointer">
-                      <span>Fácil</span><span className="text-[8px] font-bold opacity-70">15 Dias</span>
+                    <button onClick={() => handleReviewFeedback(data.id, 'facil')} className="py-3 px-2 bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white dark:bg-emerald-900/10 dark:hover:bg-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-emerald-100 dark:border-emerald-900/30">
+                      <span>Fácil</span><span className="text-[10px] font-bold opacity-70">15 Dias</span>
                     </button>
                   </div>
                 </div>
@@ -1719,12 +1712,12 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
         </div>
 
         <div>
-          <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2 mb-4 border-b border-emerald-100 dark:border-emerald-900/30 pb-2">
+          <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2 mb-4 border-b border-emerald-100 dark:border-emerald-900/30 pb-3">
             <Calendar className="w-5 h-5"/> Memória de Longo Prazo (Agendados)
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {revisoesConcluidas.length === 0 ? (
-              <div className="text-sm font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200/60 dark:border-slate-800 flex items-center justify-center text-center">
+              <div className="text-sm font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200/60 dark:border-slate-800 flex items-center justify-center text-center h-48">
                 Quando classificar as suas revisões, elas aparecerão aqui.
               </div>
             ) : (
@@ -1733,13 +1726,13 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
                 .map((data) => {
                   const p = progress[data.id];
                   return (
-                    <div key={data.id} className="bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 p-3 rounded-xl flex justify-between items-center opacity-70">
+                    <div key={data.id} className="bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 p-4 rounded-xl flex justify-between items-center opacity-80 hover:opacity-100 transition-opacity">
                       <div className="truncate pr-4">
-                        <span className="block text-[8px] uppercase font-black text-slate-400 mb-0.5">{data.discNome}</span>
-                        <h4 className="font-bold text-slate-600 dark:text-slate-400 text-xs truncate">{data.titulo}</h4>
+                        <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">{data.discNome}</span>
+                        <h4 className="font-bold text-slate-700 dark:text-slate-300 text-sm truncate">{data.titulo}</h4>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="block text-xs font-black text-emerald-500 dark:text-emerald-400">{getDaysUntil(p.nextReviewTimestamp)}</span>
+                        <span className="block text-sm font-black text-emerald-500 dark:text-emerald-400">{getDaysUntil(p.nextReviewTimestamp)}</span>
                       </div>
                     </div>
                   );
@@ -2013,7 +2006,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
           <h3 className="text-lg font-black text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
             <Sliders className="w-5 h-5 text-emerald-500"/> Motor de Retenção (Leitner)
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Ajuste os intervalos em dias para a próxima revisão baseada na sua avaliação no Deck de Combate.</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Ajuste os intervalos em dias para a próxima revisão baseada na sua avaliação no Deck de Combate.</p>
           
           <div className="grid grid-cols-2 gap-5">
             <div>
@@ -2024,7 +2017,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                   min="1"
                   value={localConfig.revBom} 
                   onChange={e => setLocalConfig({...localConfig, revBom: parseInt(e.target.value)})}
-                  className="w-full p-3 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/10 text-amber-800 dark:text-amber-200 outline-none focus:border-amber-500 transition-colors font-black text-center"
+                  className="w-full p-3 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/10 text-amber-800 dark:text-amber-200 outline-none focus:border-amber-500 transition-colors font-black text-center text-lg"
                 />
                 <span className="text-sm font-bold text-slate-400">Dias</span>
               </div>
@@ -2038,7 +2031,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                   min="2"
                   value={localConfig.revFacil} 
                   onChange={e => setLocalConfig({...localConfig, revFacil: parseInt(e.target.value)})}
-                  className="w-full p-3 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-900/10 text-emerald-800 dark:text-emerald-200 outline-none focus:border-emerald-500 transition-colors font-black text-center"
+                  className="w-full p-3 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-900/10 text-emerald-800 dark:text-emerald-200 outline-none focus:border-emerald-500 transition-colors font-black text-center text-lg"
                 />
                 <span className="text-sm font-bold text-slate-400">Dias</span>
               </div>
@@ -2053,7 +2046,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
             <h3 className="text-lg font-black text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
               <Download className="w-5 h-5 text-purple-500"/> Backup & Segurança
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 mt-3">Exporte todo o seu progresso, arsenal de matérias e níveis de XP para um arquivo de segurança no seu dispositivo.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 mt-3">Exporte todo o seu progresso, arsenal de matérias e níveis de XP para um arquivo de segurança no seu dispositivo.</p>
           </div>
           
           <div className="flex flex-col gap-3">
@@ -2078,10 +2071,10 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-red-100 dark:border-red-900/50 flex flex-col justify-between shadow-sm">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-red-100 dark:border-red-900/50 flex flex-col justify-between shadow-sm">
               <div>
-                <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-1">Limpar Progresso</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Zera todas as marcações de estudo, níveis, XP e revisões. O seu Arsenal de Matérias editado será <strong className="text-slate-700 dark:text-slate-300">mantido</strong>.</p>
+                <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Limpar Progresso</h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Zera todas as marcações de estudo, níveis, XP e revisões. O seu Arsenal de Matérias editado será <strong className="text-slate-700 dark:text-slate-300">mantido</strong>.</p>
               </div>
               <button 
                 onClick={handleResetProgress}
@@ -2091,10 +2084,10 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
               </button>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 p-5 rounded-xl border border-red-100 dark:border-red-900/50 flex flex-col justify-between shadow-sm">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-red-100 dark:border-red-900/50 flex flex-col justify-between shadow-sm">
               <div>
-                <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-1">Restaurar Padrão de Fábrica</h4>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Aviso: Isto apaga <strong className="text-red-500">TUDO</strong>. O progresso e qualquer matéria ou flashcard que tenha adicionado serão destruídos.</p>
+                <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Restaurar Padrão de Fábrica</h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Aviso: Isto apaga <strong className="text-red-500">TUDO</strong>. O progresso e qualquer matéria ou flashcard que tenha adicionado serão destruídos.</p>
               </div>
               <button 
                 onClick={handleFactoryReset}
