@@ -5,7 +5,7 @@ import {
   RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Link, Pencil, Settings,
   Edit, AlertTriangle, ChevronUp, Flame, Trophy, TrendingUp, Activity, Award, ListPlus, ArrowRight, ArrowLeft, BarChart2,
   Thermometer, CalendarDays, LayoutGrid, BrainCircuit, Eye, Zap, Image as ImageIcon, ShieldAlert, Download, Sliders, Lock, LogOut,
-  UnfoldVertical, FoldVertical, FilePlus, Upload, Filter, Play, Pause, Coffee, PartyPopper, X
+  UnfoldVertical, FoldVertical, FilePlus, Upload, Filter, Play, Pause, Coffee, PartyPopper, X, Menu
 } from 'lucide-react';
 
 // --- FIREBASE CLOUD STORAGE SETUP ---
@@ -76,7 +76,7 @@ export const THEMES = {
     icon: 'text-indigo-500',
     bg: 'bg-indigo-500',
     lightBg: 'bg-indigo-50 dark:bg-indigo-900/20',
-    headerBg: 'bg-indigo-100/60 dark:bg-indigo-950/40',
+    headerBg: 'bg-indigo-100/60 dark:bg-indigo-950/40', 
     border: 'border-indigo-200/60 dark:border-indigo-800/50',
     text: 'text-indigo-600 dark:text-indigo-400',
     solidText: 'text-white'
@@ -89,7 +89,7 @@ export const THEMES = {
     icon: 'text-emerald-500',
     bg: 'bg-emerald-500',
     lightBg: 'bg-emerald-50 dark:bg-emerald-900/20',
-    headerBg: 'bg-emerald-100/60 dark:bg-teal-950/40',
+    headerBg: 'bg-emerald-100/60 dark:bg-teal-950/40', 
     border: 'border-emerald-200/60 dark:border-emerald-800/50',
     text: 'text-emerald-600 dark:text-emerald-400',
     solidText: 'text-white'
@@ -102,7 +102,7 @@ export const THEMES = {
     icon: 'text-amber-500',
     bg: 'bg-amber-500',
     lightBg: 'bg-amber-50 dark:bg-amber-900/20',
-    headerBg: 'bg-amber-100/60 dark:bg-amber-950/40',
+    headerBg: 'bg-amber-100/60 dark:bg-amber-950/40', 
     border: 'border-amber-200/60 dark:border-amber-800/50',
     text: 'text-amber-600 dark:text-amber-400',
     solidText: 'text-slate-900 font-black'
@@ -115,7 +115,7 @@ export const THEMES = {
     icon: 'text-rose-500',
     bg: 'bg-rose-500',
     lightBg: 'bg-rose-50 dark:bg-rose-900/20',
-    headerBg: 'bg-rose-100/60 dark:bg-rose-950/40',
+    headerBg: 'bg-rose-100/60 dark:bg-rose-950/40', 
     border: 'border-rose-200/60 dark:border-rose-800/50',
     text: 'text-rose-600 dark:text-rose-400',
     solidText: 'text-white'
@@ -650,7 +650,6 @@ export default function App() {
 
   return (
     <div className={isDarkMode ? 'dark' : ''}>
-      {/* MUDANÇA: Fundo central bg-slate-200 no modo claro garante profundidade em relação aos cartões brancos */}
       <div className="min-h-screen bg-slate-200 dark:bg-slate-950 text-slate-800 dark:text-slate-200 flex flex-col md:flex-row font-sans transition-colors duration-300 relative">
         <ConfettiOverlay fire={confettiFire} />
         <LevelUpModal data={levelUpData} onClose={() => setLevelUpData(null)} />
@@ -659,17 +658,17 @@ export default function App() {
         {/* MOBILE TOP HEADER */}
         <div className={`md:hidden flex items-center justify-between p-4 ${themeColors.headerBg} shadow-md border-b ${themeColors.border} z-20 sticky top-0 transition-colors duration-500`}>
           <div className="flex items-center gap-3 min-w-0 pr-2">
-            <div className={`w-12 h-12 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
-              <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
+            <div className={`w-11 h-11 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
+              <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1" />
             </div>
             <div className="flex flex-col min-w-0">
-              <span className={`text-xs ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[150px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
-              <h2 className={`font-extrabold text-lg leading-tight tracking-tight truncate max-w-[150px] ${themeColors.headerText}`}>{projectConfig.appName}</h2>
+              <span className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[150px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
+              <h2 className={`font-extrabold text-base leading-tight tracking-tight truncate max-w-[150px] ${themeColors.headerText}`}>{projectConfig.appName}</h2>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-3 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm`}>
-              {isDarkMode ? <Sun className="w-5 h-5 text-amber-500" /> : <Moon className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`} />}
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm`}>
+              {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
             </button>
           </div>
         </div>
@@ -678,18 +677,18 @@ export default function App() {
         <aside className="hidden md:flex w-72 bg-white dark:bg-slate-900 shadow-xl flex-col z-10 shrink-0 border-r border-slate-300 dark:border-slate-800 sticky top-0 h-screen overflow-hidden">
           <div className={`p-6 ${themeColors.headerBg} border-b ${themeColors.border} relative transition-colors duration-500 shrink-0`}>
             
-            {/* BOTÃO DE TEMA */}
+            {/* BOTÃO DE TEMA - POSIÇÃO ABSOLUTA NO TOPO */}
             <button onClick={() => setIsDarkMode(!isDarkMode)} className={`absolute top-6 right-6 p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-slate-400 z-10`}>
               {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
             </button>
 
             {/* LOGO + APP NAME */}
-            <div className="flex items-center gap-4 min-w-0 mb-6 pr-10 mt-1">
-              <div className={`w-14 h-14 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
-                <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-2" />
+            <div className="flex items-center gap-3 min-w-0 mb-6 pr-10 mt-1">
+              <div className={`w-12 h-12 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
+                <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className={`text-xs ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[120px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
+                <span className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[120px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
                 <h2 className={`font-extrabold text-xl tracking-tight truncate ${themeColors.headerText}`} title={projectConfig.appName}>{projectConfig.appName}</h2>
               </div>
             </div>
@@ -697,16 +696,16 @@ export default function App() {
             {/* INFORMAÇÕES DA TRILHA */}
             <div className="flex flex-col gap-3">
               <div>
-                <p className={`text-xs ${themeColors.headerSubtext} font-bold uppercase tracking-widest leading-tight mb-1.5 truncate`}>{projectConfig.concurso}</p>
-                <h3 className={`text-2xl font-black leading-tight truncate mb-2 ${themeColors.headerText}`}>{projectConfig.cargo}</h3>
+                <p className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest leading-tight mb-1.5 truncate`}>{projectConfig.concurso}</p>
+                <h3 className={`text-xl font-black leading-tight truncate mb-2 ${themeColors.headerText}`}>{projectConfig.cargo}</h3>
                 
                 {/* TAGS DE BANCA E HORAS ACIMA */}
                 <div className="flex flex-col xl:flex-row gap-2 w-full mb-1">
-                  <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-3 py-2 rounded-xl text-xs font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm truncate`} title={projectConfig.banca}>
+                  <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm truncate`} title={projectConfig.banca}>
                     {projectConfig.banca}
                   </span>
-                  <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-3 py-2 rounded-xl text-xs font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm`}>
-                    <Target size={14} /> {projectConfig.horasDia}h/dia
+                  <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm`}>
+                    <Target size={12} /> {projectConfig.horasDia}h/dia
                   </span>
                 </div>
               </div>
@@ -715,40 +714,40 @@ export default function App() {
               <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 p-4 transition-all hover:shadow-md cursor-pointer shadow-sm`}>
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-3">
-                    <Award size={24} className="text-amber-500 dark:text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)] group-hover:scale-110 transition-transform duration-300" />
+                    <Award size={22} className="text-amber-500 dark:text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)] group-hover:scale-110 transition-transform duration-300" />
                     <div className="flex flex-col">
-                      <span className="text-base font-black text-slate-800 dark:text-white leading-none">Lvl {userLevel.nivel}</span>
-                      <span className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1.5 truncate max-w-[90px]">{userLevel.titulo}</span>
+                      <span className="text-sm font-black text-slate-800 dark:text-white leading-none">Lvl {userLevel.nivel}</span>
+                      <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1 truncate max-w-[90px]">{userLevel.titulo}</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
-                    <div className="flex items-center gap-1.5 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/10 px-2.5 py-1.5 rounded-lg flex-shrink-0 border border-orange-200 dark:border-orange-500/20">
-                      <Flame size={14} className="fill-current animate-pulse" />
-                      <span className="text-sm font-black">{gamification.streak}</span>
+                    <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/10 px-2 py-1 rounded-md flex-shrink-0 border border-orange-200 dark:border-orange-500/20">
+                      <Flame size={12} className="fill-current animate-pulse" />
+                      <span className="text-[11px] font-black">{gamification.streak}</span>
                     </div>
                   </div>
                 </div>
                 {/* Barra de Progresso */}
-                <div className="relative w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-3">
+                <div className="relative w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
                   <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <nav className="flex-1 p-4 space-y-3 overflow-y-auto custom-scrollbar flex flex-col bg-slate-50/50 dark:bg-slate-900">
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar flex flex-col bg-slate-50/50 dark:bg-slate-900">
             {navPhases.map((phaseGroup, pIdx) => (
               <div key={pIdx} className={pIdx > 0 ? "pt-4" : ""}>
-                <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 px-4 text-left">{phaseGroup.phase}</h3>
-                <div className="space-y-1.5">
+                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-4 text-left">{phaseGroup.phase}</h3>
+                <div className="space-y-1">
                   {phaseGroup.items.map((item) => {
                     const IconComponent = item.icon;
                     return (
-                      <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all font-medium cursor-pointer ${activeTab === item.id ? themeColors.activeTab + ' shadow-sm text-sm' : 'text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                      <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all font-medium cursor-pointer ${activeTab === item.id ? themeColors.activeTab + ' shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
                         <IconComponent className={`w-5 h-5 ${activeTab === item.id ? 'opacity-100' : 'opacity-70'}`} />
                         <span className="flex-1 text-left">{item.label}</span>
-                        {item.id === 'cronograma' && customSprint.length > 0 && <span className="bg-emerald-500 text-white text-xs font-black px-2.5 py-0.5 rounded-full">{customSprint.length}</span>}
-                        {item.badge > 0 && <span className="bg-red-500 animate-pulse text-white text-xs font-black px-2.5 py-0.5 rounded-full shadow-sm">{item.badge}</span>}
+                        {item.id === 'cronograma' && customSprint.length > 0 && <span className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{customSprint.length}</span>}
+                        {item.badge > 0 && <span className="bg-red-500 animate-pulse text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">{item.badge}</span>}
                       </button>
                     );
                   })}
@@ -760,7 +759,7 @@ export default function App() {
           {user && (
             <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 mt-auto shrink-0">
               <button onClick={() => { if(window.confirm('Tem certeza que deseja sair do sistema?')) { auth && signOut(auth); } }} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors font-bold text-sm cursor-pointer">
-                <LogOut className="w-5 h-5" /> Sair do Sistema
+                <LogOut className="w-4 h-4" /> Sair do Sistema
               </button>
             </div>
           )}
@@ -768,8 +767,7 @@ export default function App() {
 
         {/* CONTENT AREA */}
         <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-28 md:pb-8 text-left">
-          {/* MAX-WIDTH ESTENDIDO PARA MONITORES GRANDES */}
-          <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full transition-all duration-500">
+          <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full transition-all duration-500 h-full flex flex-col">
             {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} />}
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} />}
             {activeTab === 'planner' && <TabPlanner customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} progress={userProgress} toggleProgress={toggleProgress} />}
@@ -793,11 +791,11 @@ export default function App() {
                 <div className={`p-1.5 rounded-xl transition-all duration-300 ${isActive ? `${themeColors.lightBg.split(' ')[0]} scale-110` : ''}`}>
                   <IconComponent className={`w-6 h-6 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
                 </div>
-                <span className={`text-xs font-bold tracking-tight transition-all duration-300 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 h-0 overflow-hidden translate-y-2'}`}>
+                <span className={`text-[9px] font-bold tracking-tight transition-all duration-300 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 h-0 overflow-hidden translate-y-2'}`}>
                   {item.label}
                 </span>
                 {item.badge > 0 && (
-                  <span className="absolute top-0 right-1/4 translate-x-1/2 -translate-y-1/4 bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full border-2 border-white dark:border-slate-900 shadow-sm">
+                  <span className="absolute top-0 right-1/4 translate-x-1/2 -translate-y-1/4 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full border-2 border-white dark:border-slate-900 shadow-sm">
                     {item.badge > 9 ? '9+' : item.badge}
                   </span>
                 )}
@@ -1008,36 +1006,32 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
 }
 
 // ==========================================
-// ABA 1: ARSENAL DE MATÉRIAS
+// ABA 1: ARSENAL DE MATÉRIAS (MASTER-DETAIL)
 // ==========================================
 function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprintItem, resetProgress, themeColors }) {
   const [expanded, setExpanded] = useState(() => {
     const initial = {}; edital.forEach(bloco => { initial[bloco.id] = true; }); return initial;
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [isAllExpanded, setIsAllExpanded] = useState(false);
   const [newTopic, setNewTopic] = useState({ discId: '', titulo: '', linkTec: '' });
   const [editingTopicId, setEditingTopicId] = useState(null);
   const [editTopicData, setEditTopicData] = useState({ titulo: '', linkTec: '', pergunta: '', resposta: '', indent: 0 });
   const [bulkInput, setBulkInput] = useState({ discId: null, text: '' });
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  
+  // FASE 1: MASTER-DETAIL STATE
+  const [selectedDiscId, setSelectedDiscId] = useState(null);
+
+  // Auto-selecionar a primeira disciplina se nenhuma estiver selecionada
+  useEffect(() => {
+    if (!selectedDiscId && edital.length > 0 && edital[0].disciplinas.length > 0) {
+      setSelectedDiscId(edital[0].disciplinas[0].id);
+    }
+  }, [edital, selectedDiscId]);
 
   const toggleNode = (id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
-  const toggleExpandAll = () => {
-    if (isAllExpanded) { setExpanded({}); setIsAllExpanded(false); } 
-    else { const newExpanded = {}; edital.forEach(bloco => { newExpanded[bloco.id] = true; bloco.disciplinas.forEach(disc => { newExpanded[disc.id] = true; }); }); setExpanded(newExpanded); setIsAllExpanded(true); }
-  };
-
-  const dragItem = useRef(null); const dragOverItem = useRef(null);
-  const handleDragStart = (e, position, discId) => { dragItem.current = { position, discId }; e.dataTransfer.effectAllowed = "move"; };
-  const handleDragEnter = (e, position, discId) => { e.preventDefault(); dragOverItem.current = { position, discId }; };
-  const handleDrop = (e) => {
-    e.preventDefault(); if (!dragItem.current || !dragOverItem.current) return; if (dragItem.current.discId !== dragOverItem.current.discId) return;
-    const discId = dragItem.current.discId; const dragIdx = dragItem.current.position; const dropIdx = dragOverItem.current.position;
-    dragItem.current = null; dragOverItem.current = null;
-    setEdital(prevEdital => prevEdital.map(bloco => ({ ...bloco, disciplinas: bloco.disciplinas.map(disc => { if (disc.id === discId) { const newAssuntos = [...disc.assuntos]; const [draggedTopic] = newAssuntos.splice(dragIdx, 1); newAssuntos.splice(dropIdx, 0, draggedTopic); return { ...disc, assuntos: newAssuntos }; } return disc; }) })));
-  };
-
+  
+  // Funções de Gestão de Blocos/Disciplinas (Esquerda)
   const handleEditBlocoNome = (blocoId, newNome) => { setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, nome: newNome } : b)); };
   const handleDeleteBlocoClick = (blocoId) => {
     if (confirmDeleteId === `bloco_${blocoId}`) { setEdital(prev => prev.filter(b => b.id !== blocoId)); setConfirmDeleteId(null); } 
@@ -1050,19 +1044,33 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
 
   const handleEditDiscNome = (blocoId, discId, newNome) => { setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: b.disciplinas.map(d => d.id === discId ? { ...d, nome: newNome } : d) } : b)); };
   const handleDeleteDisciplinaClick = (blocoId, discId) => {
-    if (confirmDeleteId === `disc_${discId}`) { setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: b.disciplinas.filter(d => d.id !== discId) } : b)); setConfirmDeleteId(null); } 
+    if (confirmDeleteId === `disc_${discId}`) { 
+      setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: b.disciplinas.filter(d => d.id !== discId) } : b)); 
+      if(selectedDiscId === discId) setSelectedDiscId(null);
+      setConfirmDeleteId(null); 
+    } 
     else { setConfirmDeleteId(`disc_${discId}`); setTimeout(() => setConfirmDeleteId(null), 3000); }
   };
   const handleAddDisciplina = (blocoId) => {
     const newDisc = { id: `d_${Date.now()}`, nome: 'Nova Disciplina', cor: 'text-indigo-700 bg-indigo-100', assuntos: [] };
     setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: [...b.disciplinas, newDisc] } : b));
   };
-
   const handleMoveBloco = (blocoIndex, direction) => {
     setEdital(prev => { if (blocoIndex + direction < 0 || blocoIndex + direction >= prev.length) return prev; const newEdital = [...prev]; const temp = newEdital[blocoIndex]; newEdital[blocoIndex] = newEdital[blocoIndex + direction]; newEdital[blocoIndex + direction] = temp; return newEdital; });
   };
   const handleMoveDisciplina = (blocoId, discIndex, direction) => {
     setEdital(prev => prev.map(b => { if (b.id !== blocoId) return b; if (discIndex + direction < 0 || discIndex + direction >= b.disciplinas.length) return b; const newDisciplinas = [...b.disciplinas]; const temp = newDisciplinas[discIndex]; newDisciplinas[discIndex] = newDisciplinas[discIndex + direction]; newDisciplinas[discIndex + direction] = temp; return { ...b, disciplinas: newDisciplinas }; }));
+  };
+
+  // Funções de Gestão de Assuntos (Direita)
+  const dragItem = useRef(null); const dragOverItem = useRef(null);
+  const handleDragStart = (e, position, discId) => { dragItem.current = { position, discId }; e.dataTransfer.effectAllowed = "move"; };
+  const handleDragEnter = (e, position, discId) => { e.preventDefault(); dragOverItem.current = { position, discId }; };
+  const handleDrop = (e) => {
+    e.preventDefault(); if (!dragItem.current || !dragOverItem.current) return; if (dragItem.current.discId !== dragOverItem.current.discId) return;
+    const discId = dragItem.current.discId; const dragIdx = dragItem.current.position; const dropIdx = dragOverItem.current.position;
+    dragItem.current = null; dragOverItem.current = null;
+    setEdital(prevEdital => prevEdital.map(bloco => ({ ...bloco, disciplinas: bloco.disciplinas.map(disc => { if (disc.id === discId) { const newAssuntos = [...disc.assuntos]; const [draggedTopic] = newAssuntos.splice(dragIdx, 1); newAssuntos.splice(dropIdx, 0, draggedTopic); return { ...disc, assuntos: newAssuntos }; } return disc; }) })));
   };
 
   const handleDeleteClick = (discId, assId) => {
@@ -1101,203 +1109,254 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
   };
   const checkStatus = (assId) => {
     const p = progress[assId]; const count = (p?.estudado ? 1 : 0) + (p?.questoes ? 1 : 0) + (p?.revisado ? 1 : 0);
-    if (count === 3) return <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />;
-    if (count > 0) return <PlayCircle className="w-4 h-4 text-blue-400 shrink-0" />;
-    return <div className="w-4 h-4 rounded-full border border-slate-300 dark:border-slate-600 shrink-0"></div>;
+    if (count === 3) return <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />;
+    if (count > 0) return <PlayCircle className="w-5 h-5 text-blue-400 shrink-0" />;
+    return <div className="w-5 h-5 rounded-full border border-slate-300 dark:border-slate-600 shrink-0"></div>;
   };
 
+  // Identificar a disciplina e bloco ativos para renderização do painel direito
+  const activeBloco = edital.find(b => b.disciplinas.some(d => d.id === selectedDiscId));
+  const activeDisc = activeBloco?.disciplinas.find(d => d.id === selectedDiscId);
+
+  // Lógica responsiva (Mobile esconde lista se houver disc selecionada)
+  const isMobileDetailView = !!activeDisc;
+
   return (
-    <div className="space-y-6 animate-in fade-in text-left pb-10">
-      {/* HEADER PADRONIZADO */}
-      <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="flex flex-col h-full space-y-6 animate-in fade-in pb-10">
+      {/* HEADER DA ABA */}
+      <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white leading-tight">Arsenal de Matérias</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-1 text-sm">A sua Trilha Base. Assuntos dominados ficam riscados.</p>
+          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
+            <Folder className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Arsenal de Matérias
+          </h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">A sua Trilha Base. Selecione uma disciplina para ver o edital detalhado.</p>
         </div>
-        <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); }} className={`flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700/50'}`}>
-          {isEditing ? <Save className="w-4 h-4"/> : <Edit className="w-4 h-4"/>}{isEditing ? 'Concluir Gestão' : 'Gerenciar Matérias'}
+        <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); }} className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700/50'}`}>
+          {isEditing ? <Save className="w-5 h-5"/> : <Edit className="w-5 h-5"/>}{isEditing ? 'Concluir Gestão' : 'Gerenciar Matérias'}
         </button>
       </header>
 
       {isEditing && (
-        <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 p-4 rounded-xl flex items-center gap-3">
+        <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 p-4 rounded-xl flex items-center gap-3 shrink-0">
           <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
-          <div className="text-xs text-amber-800 dark:text-amber-200/80 leading-relaxed"><strong>Modo Edição:</strong> Arraste itens para reordenar, clique no lápis para editar ou exclua conforme necessário.</div>
+          <div className="text-sm text-amber-800 dark:text-amber-200/80 leading-relaxed"><strong>Modo Edição Ativo:</strong> Edite nomes, reorganize pastas (menu esquerdo) ou assuntos (painel direito).</div>
         </div>
       )}
 
-      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-4 md:p-6">
-        <div className="flex justify-start mb-4">
-          <button onClick={toggleExpandAll} className="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/50 dark:hover:bg-blue-900/20 px-3 py-2 rounded-lg border border-slate-200/60 dark:border-slate-700 shadow-sm cursor-pointer">
-            {isAllExpanded ? <ChevronUp className="w-4 h-4"/> : <ChevronDown className="w-4 h-4"/>}{isAllExpanded ? 'Recolher Tudo' : 'Expandir Tudo'}
-          </button>
-        </div>
+      {/* FASE 1: LAYOUT MASTER-DETAIL (Duas Colunas) */}
+      <div className="flex flex-col md:flex-row gap-6 items-start flex-1 min-h-[600px]">
+        
+        {/* COLUNA ESQUERDA: NAVEGAÇÃO (Menu de Blocos e Disciplinas) */}
+        <div className={`w-full md:w-1/3 lg:w-1/4 flex-shrink-0 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-4 md:sticky md:top-6 ${isMobileDetailView ? 'hidden md:flex' : 'flex'} flex-col max-h-[85vh] overflow-hidden`}>
+          <div className="flex items-center gap-2 mb-4 px-2 shrink-0">
+            <Menu className="w-5 h-5 text-slate-400" />
+            <h3 className="font-bold text-sm text-slate-600 dark:text-slate-300 uppercase tracking-wider">Módulos</h3>
+          </div>
 
-        <div className="flex flex-col gap-4">
-          {edital.map((bloco, bIndex) => (
-            <div key={bloco.id} className="border-b border-slate-100 dark:border-slate-800/60 pb-4 mb-2 last:border-0 last:pb-0">
-              
-              <div onClick={() => !isEditing && toggleNode(bloco.id)} className={`flex items-center gap-3 p-3 rounded-xl bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 mb-3 group transition-colors ${!isEditing ? 'cursor-pointer hover:bg-slate-200/60 dark:hover:bg-slate-700' : ''}`}>
-                <div onClick={(e) => { if(isEditing) { e.stopPropagation(); toggleNode(bloco.id); } }} className="cursor-pointer flex items-center justify-center shrink-0">
-                  {expanded[bloco.id] ? <ChevronDown className="w-5 h-5 text-slate-500" /> : <ChevronRight className="w-5 h-5 text-slate-500" />}
-                </div>
-                <Layers className={`w-5 h-5 ${themeColors.text.split(' ')[0]} shrink-0`}/>
-                {isEditing ? (
-                  <input type="text" value={bloco.nome} onClick={(e) => e.stopPropagation()} onChange={(e) => handleEditBlocoNome(bloco.id, e.target.value)} className={`flex-1 font-black text-base text-slate-800 dark:text-slate-200 uppercase tracking-tight bg-white dark:bg-slate-900 border ${themeColors.border.split(' ')[0]} rounded-md px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500 w-full`} />
-                ) : (
-                  <span className="flex-1 font-black text-base text-slate-800 dark:text-slate-200 uppercase tracking-tight truncate">{bloco.nome}</span>
-                )}
-                {isEditing && (
-                  <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
-                    <button onClick={() => handleMoveBloco(bIndex, -1)} disabled={bIndex === 0} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded transition-colors disabled:opacity-30 cursor-pointer" title="Sobe"><ChevronUp className="w-4 h-4" /></button>
-                    <button onClick={() => handleMoveBloco(bIndex, 1)} disabled={bIndex === edital.length - 1} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded transition-colors disabled:opacity-30 cursor-pointer" title="Desce"><ChevronDown className="w-4 h-4" /></button>
-                    <button onClick={() => handleDeleteBlocoClick(bloco.id)} className={`p-2 rounded cursor-pointer transition-colors flex items-center ${confirmDeleteId === 'bloco_' + bloco.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Bloco"><Trash2 className="w-4 h-4" /></button>
+          <div className="overflow-y-auto custom-scrollbar flex-1 pr-2 space-y-4">
+            {edital.map((bloco, bIndex) => (
+              <div key={bloco.id} className="mb-2">
+                {/* Cabeçalho do Bloco */}
+                <div onClick={() => !isEditing && toggleNode(bloco.id)} className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${!isEditing ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50' : ''}`}>
+                  <div onClick={(e) => { if(isEditing) { e.stopPropagation(); toggleNode(bloco.id); } }} className="cursor-pointer shrink-0">
+                    {expanded[bloco.id] ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
                   </div>
-                )}
-              </div>
-
-              {expanded[bloco.id] && (
-                <div className="space-y-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                  {bloco.disciplinas.map((disc, dIndex) => {
-                    const totalAssuntosDisc = disc.assuntos.length;
-                    const concluidosAssuntosDisc = disc.assuntos.filter(a => isFullyMastered(a.id)).length;
-                    const percConcluidoDisc = totalAssuntosDisc === 0 ? 0 : Math.round((concluidosAssuntosDisc / totalAssuntosDisc) * 100);
-                    const isDiscMastered = totalAssuntosDisc > 0 && concluidosAssuntosDisc === totalAssuntosDisc;
-
-                    return (
-                      <div key={disc.id}>
-                        <div className="flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-2 rounded-lg select-none border border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-900 transition-colors">
-                          {isEditing && (
-                            <div className="flex flex-col gap-0 shrink-0">
-                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, -1); }} disabled={dIndex === 0} className="text-slate-400 hover:text-slate-600 disabled:opacity-30 cursor-pointer"><ChevronUp className="w-4 h-4" /></button>
-                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, 1); }} disabled={dIndex === bloco.disciplinas.length - 1} className="text-slate-400 hover:text-slate-600 disabled:opacity-30 cursor-pointer"><ChevronDown className="w-4 h-4" /></button>
-                            </div>
-                          )}
-                          <div onClick={() => !isEditing && toggleNode(disc.id)} className={`flex flex-1 items-center gap-2.5 ${!isEditing ? 'cursor-pointer' : ''} overflow-hidden`}>
-                            <div onClick={(e) => { if(isEditing) { e.stopPropagation(); toggleNode(disc.id); } }} className="cursor-pointer flex items-center justify-center">
-                              {expanded[disc.id] ? <ChevronDown className="w-5 h-5 text-slate-400" /> : <ChevronRight className="w-5 h-5 text-slate-400" />}
-                            </div>
-                            <FolderOpen className={`w-5 h-5 shrink-0 ${disc.cor?.split(' ')[0] || 'text-slate-500'}`} />
-                            {isEditing ? (
-                              <input type="text" value={disc.nome} onChange={(e) => handleEditDiscNome(bloco.id, disc.id, e.target.value)} className={`font-bold text-sm text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 border ${themeColors.border.split(' ')[0]} rounded px-2 py-1 outline-none focus:ring-2 focus:ring-indigo-500 w-full`} />
-                            ) : (
-                              <span className="font-bold text-sm text-slate-700 dark:text-slate-300 flex-1 truncate">{disc.nome}</span>
-                            )}
-                          </div>
-                          
-                          <div className="flex items-center gap-2 bg-white dark:bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-200/60 dark:border-slate-700 shadow-sm shrink-0">
-                            <span className={`text-xs font-black tracking-wider ${isDiscMastered ? 'text-emerald-500' : 'text-slate-500'}`}>{concluidosAssuntosDisc}/{totalAssuntosDisc}</span>
-                            <div className="w-12 h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden hidden sm:block"><div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${percConcluidoDisc}%` }}></div></div>
-                          </div>
-                          
-                          {isEditing && (
-                            <button onClick={(e) => { e.stopPropagation(); handleDeleteDisciplinaClick(bloco.id, disc.id); }} className={`ml-2 p-1.5 rounded cursor-pointer transition-colors shrink-0 ${confirmDeleteId === 'disc_' + disc.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Disciplina"><Trash2 className="w-4 h-4" /></button>
-                          )}
-                        </div>
-
-                        {expanded[disc.id] && (
-                          <div className="mt-1.5 space-y-1.5">
-                            {disc.assuntos.map((assunto, index) => {
-                              const isInSprint = customSprint.some(item => item.assId === assunto.id);
-                              const isCurrentlyEditing = editingTopicId === assunto.id;
-                              const mastered = isFullyMastered(assunto.id);
-                              const memoryHealth = getMemoryHealth(assunto.id);
-
-                              return (
-                                <div key={assunto.id} draggable={isEditing && !isCurrentlyEditing} onDragStart={(e) => handleDragStart(e, index, disc.id)} onDragEnter={(e) => handleDragEnter(e, index, disc.id)} onDragOver={(e) => e.preventDefault()} onDrop={handleDrop} style={{ marginLeft: assunto.indent ? `${assunto.indent * 1}rem` : '0' }} className={`flex items-center gap-3 py-2.5 px-3 rounded-lg border transition-colors bg-white dark:bg-slate-900 shadow-sm ${isEditing && !isCurrentlyEditing ? 'border-dashed border-amber-300 cursor-move hover:bg-amber-50 dark:hover:bg-amber-900/10' : 'border-slate-200/60 dark:border-slate-800/80'} ${mastered && !isEditing ? 'opacity-60 bg-slate-50 dark:bg-slate-900/40' : ''}`}>
-                                  {isCurrentlyEditing ? (
-                                    <div className="flex-1 flex flex-col gap-3 p-2 animate-in fade-in">
-                                      <div className="grid md:grid-cols-2 gap-3 w-full">
-                                        <div><input type="text" value={editTopicData.titulo} onChange={(e) => setEditTopicData({...editTopicData, titulo: e.target.value})} className="w-full p-2 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Título do Assunto" /></div>
-                                        <div><input type="text" value={editTopicData.linkTec} onChange={(e) => setEditTopicData({...editTopicData, linkTec: e.target.value})} className="w-full p-2 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Link Caderno TEC (Opcional)" /></div>
-                                      </div>
-                                      <div className="flex gap-2">
-                                        <button onClick={() => saveEditTopic(disc.id, assunto.id)} className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer">Salvar Alterações</button>
-                                        <button onClick={() => setEditingTopicId(null)} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer">Cancelar</button>
-                                      </div>
-                                    </div>
-                                  ) : (
-                                    <>
-                                      {isEditing ? (<GripVertical className="w-4 h-4 text-slate-300 dark:text-slate-600 cursor-move shrink-0" />) : (mastered ? <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" /> : checkStatus(assunto.id))}
-                                      
-                                      <div className="flex-1 flex items-center justify-between gap-3 overflow-hidden">
-                                        <span className={`font-semibold truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-300'} ${assunto.indent > 0 ? 'text-sm' : 'text-base'}`}>{assunto.titulo}</span>
-                                        <div className="flex gap-1.5 items-center shrink-0">
-                                          {!isEditing && memoryHealth && (<div className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded-md font-bold tracking-wider uppercase ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória"><Thermometer className="w-3 h-3"/> <span className="hidden sm:inline">{memoryHealth.label}</span></div>)}
-                                          {isEditing && assunto.linkTec && <span className="text-[10px] text-blue-500 dark:text-blue-400 font-bold uppercase flex items-center gap-1 border border-blue-200 dark:border-blue-800 px-2 py-1 rounded-md"><Link className="w-3 h-3"/> TEC</span>}
-                                        </div>
-                                      </div>
-
-                                      {!isEditing && (
-                                        <button onClick={() => { if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(disc.id, assunto.id, disc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center gap-1.5 text-xs font-bold uppercase transition-colors px-3 py-1.5 rounded-lg border shadow-sm cursor-pointer shrink-0 ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' : `bg-white ${themeColors.text.split(' ')[0]} border-indigo-200 dark:bg-slate-800 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40`}`}>
-                                          {isInSprint ? <CheckCircle className="w-4 h-4" /> : (mastered ? <RefreshCcw className="w-4 h-4" /> : <Target className="w-4 h-4" />)}
-                                          <span className="hidden md:inline">{isInSprint ? 'Na Sprint' : (mastered ? 'Refazer' : 'Add Sprint')}</span>
-                                        </button>
-                                      )}
-                                      
-                                      {isEditing && (
-                                        <div className="flex gap-1.5 shrink-0">
-                                          <button onClick={() => handleIndent(disc.id, assunto.id, -1)} disabled={!assunto.indent} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer" title="Recuar"><ArrowLeft className="w-4 h-4"/></button>
-                                          <button onClick={() => handleIndent(disc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-md hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer" title="Avançar"><ArrowRight className="w-4 h-4"/></button>
-                                          <button onClick={() => startEditTopic(assunto)} className={`p-1.5 ${themeColors.text.split(' ')[0]} hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors cursor-pointer`} title="Editar"><Pencil className="w-4 h-4"/></button>
-                                          <button onClick={() => handleDeleteClick(disc.id, assunto.id)} className={`p-1.5 rounded-md transition-colors ${confirmDeleteId === assunto.id ? 'bg-red-500 text-white' : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30'} cursor-pointer`} title="Excluir"><Trash2 className="w-4 h-4"/></button>
-                                        </div>
-                                      )}
-                                    </>
-                                  )}
-                                </div>
-                              );
-                            })}
-                            
-                            {/* CAIXA DE IMPORTAÇÃO / ADIÇÃO (COMPACTA) */}
-                            {isEditing && (
-                              <div className="mt-3 p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50 rounded-xl flex flex-col gap-3 shadow-inner">
-                                {bulkInput.discId === disc.id ? (
-                                  <div className="flex flex-col gap-3 animate-in fade-in">
-                                    <h4 className="text-xs font-black uppercase text-amber-700 dark:text-amber-500 flex items-center gap-2"><ListPlus className="w-4 h-4"/> Importação Rápida</h4>
-                                    <textarea rows="4" placeholder="Exemplo:&#10;Modelagem de Dados&#10;Normalização" value={bulkInput.text} onChange={(e) => setBulkInput({ discId: disc.id, text: e.target.value })} className="w-full p-3 text-sm rounded-lg border border-amber-300 dark:border-amber-700/50 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500 resize-none" />
-                                    <div className="flex gap-2">
-                                      <button onClick={() => handleBulkAdd(disc.id)} className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer">Gerar Assuntos</button>
-                                      <button onClick={() => setBulkInput({ discId: null, text: '' })} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer">Cancelar</button>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <>
-                                    <div className="flex flex-col sm:flex-row gap-2 items-center">
-                                      <Plus className="w-5 h-5 text-amber-600 shrink-0 hidden sm:block"/>
-                                      <input type="text" placeholder="Adicionar assunto manualmente..." value={newTopic.discId === disc.id ? newTopic.titulo : ''} onChange={(e) => setNewTopic({...newTopic, discId: disc.id, titulo: e.target.value})} className="flex-1 w-full p-2.5 text-sm rounded-lg border border-amber-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500" />
-                                      <button onClick={() => handleAddTopic(disc.id)} className="bg-amber-500 hover:bg-amber-600 text-white px-5 py-2.5 rounded-lg text-xs font-bold w-full sm:w-auto transition-colors cursor-pointer shadow-sm">Adicionar</button>
-                                    </div>
-                                    <button onClick={() => setBulkInput({ discId: disc.id, text: '' })} className="w-full mt-2 border border-dashed border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 px-3 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer">
-                                      <ListPlus className="w-4 h-4"/> Colar Índice Completo
-                                    </button>
-                                  </>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                  
+                  <Layers className={`w-4 h-4 ${themeColors.text.split(' ')[0]} shrink-0 opacity-70`}/>
+                  {isEditing ? (
+                    <input type="text" value={bloco.nome} onClick={(e) => e.stopPropagation()} onChange={(e) => handleEditBlocoNome(bloco.id, e.target.value)} className={`flex-1 font-black text-xs text-slate-700 dark:text-slate-300 uppercase tracking-wide bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 outline-none focus:border-indigo-500 w-full`} />
+                  ) : (
+                    <span className="flex-1 font-black text-xs text-slate-600 dark:text-slate-400 uppercase tracking-wider truncate">{bloco.nome}</span>
+                  )}
                   {isEditing && (
-                    <div className="mt-3">
-                      <button onClick={() => handleAddDisciplina(bloco.id)} className={`w-full flex items-center justify-center gap-2 text-sm font-bold ${themeColors.text.split(' ')[0]} ${themeColors.lightBg.split(' ')[0]} px-4 py-3 rounded-xl transition-colors border ${themeColors.border.split(' ')[0]} border-dashed cursor-pointer hover:opacity-80`}>
-                        <Plus className="w-4 h-4"/> Nova Disciplina
-                      </button>
+                    <div className="flex items-center shrink-0" onClick={(e) => e.stopPropagation()}>
+                      <button onClick={() => handleMoveBloco(bIndex, -1)} disabled={bIndex === 0} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30 cursor-pointer" title="Sobe"><ChevronUp className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleMoveBloco(bIndex, 1)} disabled={bIndex === edital.length - 1} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 disabled:opacity-30 cursor-pointer" title="Desce"><ChevronDown className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleDeleteBlocoClick(bloco.id)} className={`p-1 rounded cursor-pointer transition-colors ${confirmDeleteId === 'bloco_' + bloco.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600'}`} title="Excluir Bloco"><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   )}
                 </div>
-              )}
-            </div>
-          ))}
-          
+
+                {/* Lista de Disciplinas do Bloco */}
+                {expanded[bloco.id] && (
+                  <div className="pl-6 pr-1 space-y-1 mt-1 border-l-2 border-slate-100 dark:border-slate-800/60 ml-4">
+                    {bloco.disciplinas.map((disc, dIndex) => {
+                      const totalAssuntosDisc = disc.assuntos.length;
+                      const concluidosAssuntosDisc = disc.assuntos.filter(a => isFullyMastered(a.id)).length;
+                      const isSelected = selectedDiscId === disc.id;
+                      
+                      return (
+                        <div key={disc.id} onClick={() => !isEditing && setSelectedDiscId(disc.id)} className={`flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all ${isSelected && !isEditing ? `${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]} border ${themeColors.border.split(' ')[0]} shadow-sm` : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent text-slate-600 dark:text-slate-400'}`}>
+                          {isEditing && (
+                            <div className="flex flex-col gap-0 shrink-0">
+                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, -1); }} disabled={dIndex === 0} className="text-slate-400 hover:text-slate-600 disabled:opacity-30 cursor-pointer"><ChevronUp className="w-3 h-3" /></button>
+                              <button onClick={(e) => { e.stopPropagation(); handleMoveDisciplina(bloco.id, dIndex, 1); }} disabled={dIndex === bloco.disciplinas.length - 1} className="text-slate-400 hover:text-slate-600 disabled:opacity-30 cursor-pointer"><ChevronDown className="w-3 h-3" /></button>
+                            </div>
+                          )}
+                          
+                          <FolderOpen className={`w-4 h-4 shrink-0 ${isSelected ? '' : 'opacity-60'}`} />
+                          
+                          {isEditing ? (
+                            <input type="text" value={disc.nome} onChange={(e) => handleEditDiscNome(bloco.id, disc.id, e.target.value)} onClick={(e) => e.stopPropagation()} className={`font-bold text-sm text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded px-1.5 py-0.5 outline-none focus:border-indigo-500 w-full`} />
+                          ) : (
+                            <span className="font-bold text-sm flex-1 truncate">{disc.nome}</span>
+                          )}
+                          
+                          {!isEditing && (
+                            <span className={`text-[10px] font-black shrink-0 px-1.5 py-0.5 rounded-md ${isSelected ? 'bg-white/60 dark:bg-black/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                              {concluidosAssuntosDisc}/{totalAssuntosDisc}
+                            </span>
+                          )}
+
+                          {isEditing && (
+                            <button onClick={(e) => { e.stopPropagation(); handleDeleteDisciplinaClick(bloco.id, disc.id); }} className={`p-1 rounded cursor-pointer shrink-0 ${confirmDeleteId === 'disc_' + disc.id ? 'bg-red-500 text-white' : 'text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20'}`} title="Excluir Disciplina"><Trash2 className="w-3.5 h-3.5" /></button>
+                          )}
+                        </div>
+                      )
+                    })}
+                    
+                    {/* Botão Nova Disciplina */}
+                    {isEditing && (
+                      <div className="pt-1">
+                        <button onClick={() => handleAddDisciplina(bloco.id)} className={`w-full flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:${themeColors.text.split(' ')[0]} p-1.5 rounded-lg transition-colors cursor-pointer`}>
+                          <Plus className="w-3.5 h-3.5"/> Add Disciplina
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Botão Novo Bloco */}
           {isEditing && (
-            <div className="pt-3 mt-2">
-              <button onClick={handleAddBloco} className={`w-full flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest text-slate-500 hover:${themeColors.text.split(' ')[0]} bg-slate-50 hover:${themeColors.lightBg.split(' ')[0]} dark:bg-slate-800/50 px-5 py-4 rounded-xl transition-colors border-2 border-dashed border-slate-300 hover:${themeColors.border.split(' ')[0]} dark:border-slate-700 cursor-pointer`}>
-                <Layers className="w-5 h-5"/> Criar Novo Bloco
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800/60 mt-auto shrink-0">
+              <button onClick={handleAddBloco} className={`w-full flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest text-slate-500 hover:${themeColors.text.split(' ')[0]} bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl transition-colors border-2 border-dashed border-slate-300 dark:border-slate-700 cursor-pointer`}>
+                <Layers className="w-4 h-4"/> Criar Novo Bloco
               </button>
+            </div>
+          )}
+        </div>
+
+        {/* COLUNA DIREITA: PAINEL DE CONTEÚDO (Assuntos da Disciplina) */}
+        <div className={`flex-1 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-4 md:p-6 ${!isMobileDetailView ? 'hidden md:flex' : 'flex'} flex-col min-h-[500px]`}>
+          
+          {!activeDisc ? (
+            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-center p-8">
+              <BookOpen className="w-16 h-16 mb-4 opacity-20" />
+              <h3 className="text-xl font-bold text-slate-600 dark:text-slate-300 mb-2">Nenhuma disciplina selecionada</h3>
+              <p className="text-sm">Selecione uma matéria no menu lateral para visualizar e gerir os seus assuntos.</p>
+            </div>
+          ) : (
+            <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-300">
+              
+              {/* Header do Painel Direito */}
+              <div className="mb-6 border-b border-slate-100 dark:border-slate-800 pb-4">
+                {/* Mobile Back Button */}
+                <button onClick={() => setSelectedDiscId(null)} className="md:hidden flex items-center gap-1.5 text-sm font-bold text-blue-500 mb-4 cursor-pointer hover:underline">
+                  <ArrowLeft className="w-4 h-4" /> Voltar às Matérias
+                </button>
+                
+                <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-1">{activeBloco?.nome}</span>
+                <div className="flex items-start justify-between gap-4">
+                  <h3 className={`text-2xl font-black ${themeColors.text.split(' ')[0]}`}>{activeDisc.nome}</h3>
+                  <div className="flex flex-col items-end shrink-0">
+                    <span className="text-sm font-bold text-slate-500">
+                      {activeDisc.assuntos.filter(a => isFullyMastered(a.id)).length} de {activeDisc.assuntos.length} Concluídos
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Lista de Assuntos */}
+              <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-2 pb-6">
+                {activeDisc.assuntos.length === 0 ? (
+                  <div className="text-sm text-slate-500 text-center p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl">
+                    Esta disciplina ainda não tem assuntos cadastrados.
+                  </div>
+                ) : (
+                  activeDisc.assuntos.map((assunto, index) => {
+                    const isInSprint = customSprint.some(item => item.assId === assunto.id);
+                    const isCurrentlyEditing = editingTopicId === assunto.id;
+                    const mastered = isFullyMastered(assunto.id);
+                    const memoryHealth = getMemoryHealth(assunto.id);
+
+                    return (
+                      <div key={assunto.id} draggable={isEditing && !isCurrentlyEditing} onDragStart={(e) => handleDragStart(e, index, activeDisc.id)} onDragEnter={(e) => handleDragEnter(e, index, activeDisc.id)} onDragOver={(e) => e.preventDefault()} onDrop={handleDrop} style={{ marginLeft: assunto.indent ? `${assunto.indent * 1.5}rem` : '0' }} className={`flex items-center gap-3 py-3 px-4 rounded-xl border transition-colors bg-white dark:bg-slate-900 shadow-sm ${isEditing && !isCurrentlyEditing ? 'border-dashed border-amber-300 cursor-move hover:bg-amber-50 dark:hover:bg-amber-900/10' : 'border-slate-200/60 dark:border-slate-700'} ${mastered && !isEditing ? 'opacity-60 bg-slate-50 dark:bg-slate-900/40' : 'hover:shadow-md'}`}>
+                        {isCurrentlyEditing ? (
+                          <div className="flex-1 flex flex-col gap-3 p-1 animate-in fade-in">
+                            <div className="grid md:grid-cols-2 gap-3 w-full">
+                              <div><input type="text" value={editTopicData.titulo} onChange={(e) => setEditTopicData({...editTopicData, titulo: e.target.value})} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Título do Assunto" /></div>
+                              <div><input type="text" value={editTopicData.linkTec} onChange={(e) => setEditTopicData({...editTopicData, linkTec: e.target.value})} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500" placeholder="Link Caderno TEC (Opcional)" /></div>
+                            </div>
+                            <div className="flex gap-2">
+                              <button onClick={() => saveEditTopic(activeDisc.id, assunto.id)} className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer">Salvar Alterações</button>
+                              <button onClick={() => setEditingTopicId(null)} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-lg text-xs font-bold transition-colors cursor-pointer">Cancelar</button>
+                            </div>
+                          </div>
+                        ) : (
+                          <>
+                            {isEditing ? (<GripVertical className="w-5 h-5 text-slate-300 dark:text-slate-600 cursor-move shrink-0" />) : (mastered ? <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" /> : checkStatus(assunto.id))}
+                            
+                            <div className="flex-1 flex items-center justify-between gap-3 overflow-hidden">
+                              <span className={`font-semibold truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'} ${assunto.indent > 0 ? 'text-sm' : 'text-base'}`}>{assunto.titulo}</span>
+                              <div className="flex gap-2 items-center shrink-0">
+                                {!isEditing && memoryHealth && (<div className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded-md font-bold tracking-wider uppercase ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória"><Thermometer className="w-3 h-3"/> <span className="hidden sm:inline">{memoryHealth.label}</span></div>)}
+                                {isEditing && assunto.linkTec && <span className="text-[10px] text-blue-500 dark:text-blue-400 font-bold uppercase flex items-center gap-1 border border-blue-200 dark:border-blue-800 px-2 py-1 rounded-md"><Link className="w-3 h-3"/> TEC</span>}
+                              </div>
+                            </div>
+
+                            {!isEditing && (
+                              <button onClick={() => { if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} className={`flex items-center gap-1.5 text-xs font-bold uppercase transition-colors px-3 py-2 rounded-lg border shadow-sm cursor-pointer shrink-0 ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' : `bg-white ${themeColors.text.split(' ')[0]} border-indigo-200 dark:bg-slate-800 dark:border-indigo-800 hover:bg-indigo-50 dark:hover:bg-indigo-900/40`}`}>
+                                {isInSprint ? <CheckCircle className="w-4 h-4" /> : (mastered ? <RefreshCcw className="w-4 h-4" /> : <Target className="w-4 h-4" />)}
+                                <span className="hidden md:inline">{isInSprint ? 'Na Sprint' : (mastered ? 'Refazer' : 'Add Sprint')}</span>
+                              </button>
+                            )}
+                            
+                            {isEditing && (
+                              <div className="flex gap-1.5 shrink-0">
+                                <button onClick={() => handleIndent(activeDisc.id, assunto.id, -1)} disabled={!assunto.indent} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer" title="Recuar"><ArrowLeft className="w-4 h-4"/></button>
+                                <button onClick={() => handleIndent(activeDisc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors disabled:opacity-30 cursor-pointer" title="Avançar"><ArrowRight className="w-4 h-4"/></button>
+                                <button onClick={() => startEditTopic(assunto)} className={`p-2 ${themeColors.text.split(' ')[0]} hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors cursor-pointer`} title="Editar"><Pencil className="w-4 h-4"/></button>
+                                <button onClick={() => handleDeleteClick(activeDisc.id, assunto.id)} className={`p-2 rounded-lg transition-colors ${confirmDeleteId === assunto.id ? 'bg-red-500 text-white' : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30'} cursor-pointer`} title="Excluir"><Trash2 className="w-4 h-4"/></button>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+
+              {/* Inserção de Novos Assuntos (Rodapé do Painel Direito) */}
+              {isEditing && (
+                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
+                  <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50 rounded-xl p-4 flex flex-col gap-3 shadow-inner">
+                    {bulkInput.discId === activeDisc.id ? (
+                      <div className="flex flex-col gap-3 animate-in fade-in">
+                        <h4 className="text-xs font-black uppercase text-amber-700 dark:text-amber-500 flex items-center gap-2"><ListPlus className="w-4 h-4"/> Importação Rápida</h4>
+                        <textarea rows="4" placeholder="Cole a lista de assuntos aqui... Ex:&#10;Modelagem de Dados&#10;Normalização" value={bulkInput.text} onChange={(e) => setBulkInput({ discId: activeDisc.id, text: e.target.value })} className="w-full p-3 text-sm rounded-lg border border-amber-300 dark:border-amber-700/50 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500 resize-none" />
+                        <div className="flex gap-2">
+                          <button onClick={() => handleBulkAdd(activeDisc.id)} className="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-sm">Gerar Assuntos</button>
+                          <button onClick={() => setBulkInput({ discId: null, text: '' })} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-5 py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer">Cancelar</button>
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex flex-col sm:flex-row gap-3 items-center">
+                          <Plus className="w-5 h-5 text-amber-600 shrink-0 hidden sm:block"/>
+                          <input type="text" placeholder="Adicionar assunto manualmente..." value={newTopic.discId === activeDisc.id ? newTopic.titulo : ''} onChange={(e) => setNewTopic({...newTopic, discId: activeDisc.id, titulo: e.target.value})} className="flex-1 w-full p-3 text-sm rounded-lg border border-amber-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500" />
+                          <button onClick={() => handleAddTopic(activeDisc.id)} className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-lg text-sm font-bold w-full sm:w-auto transition-colors cursor-pointer shadow-sm">Adicionar</button>
+                        </div>
+                        <button onClick={() => setBulkInput({ discId: activeDisc.id, text: '' })} className="w-full border border-dashed border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/40 px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer mt-1">
+                          <ListPlus className="w-4 h-4"/> Colar Índice Completo
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1348,8 +1407,8 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
     <div className="space-y-6 animate-in fade-in text-left h-full pb-10">
       <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3"><LayoutGrid className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`}/> Metas da Semana</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">A sua visão estratégica. O que for agendado aqui será executado na Sprint Diária.</p>
+          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2"><LayoutGrid className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`}/> Metas da Semana</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">A sua visão estratégica. O que for agendado aqui será executado na Sprint Diária.</p>
         </div>
       </header>
 
