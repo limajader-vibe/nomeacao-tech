@@ -76,7 +76,7 @@ export const THEMES = {
     icon: 'text-indigo-500',
     bg: 'bg-indigo-500',
     lightBg: 'bg-indigo-50 dark:bg-indigo-900/20',
-    headerBg: 'bg-indigo-200/60 dark:bg-slate-900', 
+    headerBg: 'bg-indigo-100/60 dark:bg-indigo-950/40', // Fundo temático harmônico
     border: 'border-indigo-200/60 dark:border-indigo-800/50',
     text: 'text-indigo-600 dark:text-indigo-400',
     solidText: 'text-white'
@@ -89,7 +89,7 @@ export const THEMES = {
     icon: 'text-emerald-500',
     bg: 'bg-emerald-500',
     lightBg: 'bg-emerald-50 dark:bg-emerald-900/20',
-    headerBg: 'bg-emerald-200/60 dark:bg-slate-900', 
+    headerBg: 'bg-emerald-100/60 dark:bg-teal-950/40', // Fundo temático harmônico
     border: 'border-emerald-200/60 dark:border-emerald-800/50',
     text: 'text-emerald-600 dark:text-emerald-400',
     solidText: 'text-white'
@@ -102,7 +102,7 @@ export const THEMES = {
     icon: 'text-amber-500',
     bg: 'bg-amber-500',
     lightBg: 'bg-amber-50 dark:bg-amber-900/20',
-    headerBg: 'bg-amber-200/60 dark:bg-slate-900', 
+    headerBg: 'bg-amber-100/60 dark:bg-amber-950/40', // Fundo temático harmônico
     border: 'border-amber-200/60 dark:border-amber-800/50',
     text: 'text-amber-600 dark:text-amber-400',
     solidText: 'text-slate-900 font-black'
@@ -115,7 +115,7 @@ export const THEMES = {
     icon: 'text-rose-500',
     bg: 'bg-rose-500',
     lightBg: 'bg-rose-50 dark:bg-rose-900/20',
-    headerBg: 'bg-rose-200/60 dark:bg-slate-900', 
+    headerBg: 'bg-rose-100/60 dark:bg-rose-950/40', // Fundo temático harmônico
     border: 'border-rose-200/60 dark:border-rose-800/50',
     text: 'text-rose-600 dark:text-rose-400',
     solidText: 'text-white'
@@ -650,98 +650,91 @@ export default function App() {
 
   return (
     <div className={isDarkMode ? 'dark' : ''}>
-      {/* Fundo central bg-slate-100 para contrastar com os cartões brancos e matar o efeito "folha em branco" */}
-      <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-200 flex flex-col md:flex-row font-sans transition-colors duration-300 relative">
+      <div className="min-h-screen bg-slate-200 dark:bg-slate-950 text-slate-800 dark:text-slate-200 flex flex-col md:flex-row font-sans transition-colors duration-300 relative">
         <ConfettiOverlay fire={confettiFire} />
         <LevelUpModal data={levelUpData} onClose={() => setLevelUpData(null)} />
         {showLevelMap && <LevelMapModal currentXp={gamification.xp} onClose={() => setShowLevelMap(false)} />}
 
-        {/* MOBILE TOP HEADER (Design Glassmorphism Neutro e Suave) */}
-        <div className="md:hidden flex items-center justify-between p-4 bg-white/80 dark:bg-slate-950/80 backdrop-blur-xl shadow-sm border-b border-slate-200 dark:border-slate-800/60 z-20 sticky top-0 transition-colors duration-500">
+        {/* MOBILE TOP HEADER */}
+        <div className={`md:hidden flex items-center justify-between p-4 ${themeColors.headerBg} text-slate-800 dark:text-white shadow-md border-b ${themeColors.border} z-20 sticky top-0 transition-colors duration-500`}>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-transparent flex items-center justify-center overflow-hidden shrink-0">
-              <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain drop-shadow-sm" />
+            {/* LOGÓTIPO ARREDONDADO */}
+            <div className={`w-11 h-11 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-300 dark:border-slate-700 shadow-sm`}>
+              <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1" />
             </div>
             <div className="flex flex-col">
-              <h2 className="font-extrabold text-lg leading-tight tracking-tight text-slate-800 dark:text-slate-100 truncate max-w-[150px]">{projectConfig.appName}</h2>
-              <div className="flex items-center gap-2 mt-0.5">
-                <p className={`text-[10px] ${themeColors.text.split(' ')[0]} font-bold uppercase tracking-wider flex items-center gap-1`}>Lvl {userLevel.nivel}</p>
-                <span className="text-[10px] text-orange-500 font-black flex items-center gap-0.5 border-l border-slate-300 dark:border-slate-700 pl-2"><Flame className="w-3 h-3"/> {gamification.streak}</span>
-              </div>
+              <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest truncate max-w-[150px]">Olá, {projectConfig.userName}</span>
+              <h2 className="font-extrabold text-base leading-tight tracking-tight truncate max-w-[150px]">{projectConfig.appName}</h2>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2.5 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/50 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-slate-400">
-              {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4" />}
-            </button>
-            <button onClick={() => setActiveTab('admin')} className="p-2.5 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700/50 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-slate-400">
-              <Settings className="w-4 h-4" />
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm`}>
+              {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
             </button>
           </div>
         </div>
 
-        {/* SIDEBAR DESKTOP (Design Neutro, Ícones Temáticos e UI Premium) */}
-        <aside className="hidden md:flex w-72 bg-white dark:bg-slate-900 shadow-xl flex-col z-10 shrink-0 border-r border-slate-200 dark:border-slate-800 sticky top-0 h-screen overflow-hidden">
-          <div className="p-6 bg-slate-50/50 dark:bg-slate-950/50 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800/50 relative transition-colors duration-500 shrink-0">
+        {/* SIDEBAR DESKTOP */}
+        <aside className="hidden md:flex w-72 bg-white dark:bg-slate-900 shadow-xl flex-col z-10 shrink-0 border-r border-slate-300 dark:border-slate-800 sticky top-0 h-screen overflow-hidden">
+          <div className={`p-6 ${themeColors.headerBg} border-b ${themeColors.border} relative transition-colors duration-500 shrink-0`}>
             {/* LOGO + APP NAME + THEME TOGGLE */}
             <div className="flex justify-between items-center mb-6">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 bg-transparent flex items-center justify-center overflow-hidden shrink-0">
-                  <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain drop-shadow-sm" />
+                {/* LOGÓTIPO ARREDONDADO */}
+                <div className={`w-12 h-12 bg-white dark:bg-slate-800 rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-300 dark:border-slate-700 shadow-sm`}>
+                  <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
                 </div>
-                <h2 className="font-extrabold text-xl tracking-tight text-slate-800 dark:text-slate-100 truncate" title={projectConfig.appName}>{projectConfig.appName}</h2>
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest truncate max-w-[120px]">Olá, {projectConfig.userName.split(' ')[0]}</span>
+                  <h2 className="font-extrabold text-xl tracking-tight text-slate-800 dark:text-white truncate" title={projectConfig.appName}>{projectConfig.appName}</h2>
+                </div>
               </div>
-              <button onClick={() => setIsDarkMode(!isDarkMode)} className="p-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700/50 rounded-full transition-colors cursor-pointer shrink-0 ml-2 shadow-sm text-slate-500 dark:text-slate-400">
-                {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className="w-4 h-4" />}
+              <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shrink-0 ml-2 shadow-sm text-slate-500 dark:text-slate-400`}>
+                {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
               </button>
             </div>
             
             {/* INFORMAÇÕES DA TRILHA */}
-            <div className="flex flex-col">
-              <div className="mb-1">
-                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest leading-tight mb-1 truncate">{projectConfig.concurso}</p>
-                <h3 className="text-xl font-black leading-tight text-slate-800 dark:text-slate-100 truncate">{projectConfig.cargo}</h3>
-              </div>
-              
-              {/* TAGS (Design Badges com ícones temáticos) */}
-              <div className="flex flex-col xl:flex-row gap-2 w-full mt-3">
-                <span className="flex flex-1 items-center gap-2 bg-white dark:bg-slate-900 px-3 py-2 rounded-xl text-[10px] font-bold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 shadow-sm truncate" title={projectConfig.banca}>
-                  <Layers className={`w-3.5 h-3.5 ${themeColors.text.split(' ')[0]}`} /> {projectConfig.banca}
-                </span>
-                <span className="flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-slate-900 px-3 py-2 rounded-xl text-[10px] font-bold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 shadow-sm">
-                  <Target className={`w-3.5 h-3.5 ${themeColors.text.split(' ')[0]}`} /> {projectConfig.horasDia}h/dia
-                </span>
+            <div className="flex flex-col gap-3">
+              <div>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest leading-tight mb-1.5 truncate">{projectConfig.concurso}</p>
+                <h3 className="text-xl font-black leading-tight text-slate-800 dark:text-white truncate">{projectConfig.cargo}</h3>
               </div>
 
-              {/* CARTÃO DE NÍVEL E STREAK (UI Refinada) */}
-              <div onClick={() => setShowLevelMap(true)} className="group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 p-4 transition-all hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 cursor-pointer shadow-sm mt-4">
+              {/* CARTÃO DE NÍVEL E STREAK (Subiu) */}
+              <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 p-4 transition-all hover:shadow-md cursor-pointer shadow-sm`}>
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-xl ${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]}`}>
-                      <Award size={20} className="drop-shadow-sm group-hover:scale-110 transition-transform duration-300" />
-                    </div>
+                    <Award size={22} className="text-amber-500 dark:text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)] group-hover:scale-110 transition-transform duration-300" />
                     <div className="flex flex-col">
-                      <span className="text-sm font-black text-slate-800 dark:text-slate-100 leading-none">Lvl {userLevel.nivel}</span>
+                      <span className="text-sm font-black text-slate-800 dark:text-white leading-none">Lvl {userLevel.nivel}</span>
                       <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1 truncate max-w-[90px]">{userLevel.titulo}</span>
                     </div>
                   </div>
-                  <div className="flex flex-col items-end">
-                    <div className="flex items-center gap-1 text-orange-500 dark:text-orange-400">
-                      <Flame size={14} className="fill-current animate-pulse" />
-                      <span className="text-sm font-black">{gamification.streak}</span>
-                    </div>
-                    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Dias</span>
+                  <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/10 px-2 py-1 rounded-md flex-shrink-0 border border-orange-200 dark:border-orange-500/20">
+                    <Flame size={12} className="fill-current animate-pulse" />
+                    <span className="text-[11px] font-black">{gamification.streak}</span>
                   </div>
                 </div>
-                {/* Barra de Progresso Gradiente */}
-                <div className="relative w-full h-1.5 bg-slate-100 dark:bg-slate-900 rounded-full overflow-hidden">
-                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-400 to-orange-500 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
+                {/* Barra de Progresso */}
+                <div className="relative w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
+                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
                 </div>
+              </div>
+
+              {/* TAGS DE BANCA E HORAS (Desceram e ficaram mais sofisticadas) */}
+              <div className="flex flex-col xl:flex-row gap-2 w-full mt-1">
+                <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm truncate`} title={projectConfig.banca}>
+                  {projectConfig.banca}
+                </span>
+                <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm`}>
+                  <Target size={12} /> {projectConfig.horasDia}h/dia
+                </span>
               </div>
             </div>
           </div>
 
-          <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar flex flex-col bg-transparent">
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar flex flex-col bg-slate-50/50 dark:bg-slate-900">
             {navPhases.map((phaseGroup, pIdx) => (
               <div key={pIdx} className={pIdx > 0 ? "pt-4" : ""}>
                 <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-4 text-left">{phaseGroup.phase}</h3>
@@ -763,7 +756,7 @@ export default function App() {
           </nav>
 
           {user && (
-            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-transparent mt-auto shrink-0">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 mt-auto shrink-0">
               <button onClick={() => { if(window.confirm('Tem certeza que deseja sair do sistema?')) { auth && signOut(auth); } }} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors font-bold text-sm cursor-pointer">
                 <LogOut className="w-4 h-4" /> Sair do Sistema
               </button>
@@ -1112,7 +1105,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
 
   return (
     <div className="space-y-4 animate-in fade-in text-left pb-10">
-      {/* HEADER COMPACTO */}
       <header className="border-b border-slate-200/60 dark:border-slate-800 pb-3 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
         <div>
           <h2 className="text-2xl font-extrabold text-slate-800 dark:text-white leading-tight">Arsenal de Matérias</h2>
@@ -1130,7 +1122,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
         </div>
       )}
 
-      {/* CONTAINER PRINCIPAL MAIS FINO */}
       <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-3 md:p-4">
         <div className="flex justify-start mb-3">
           <button onClick={toggleExpandAll} className="flex items-center gap-1 text-[10px] font-bold text-slate-500 hover:text-blue-600 dark:text-slate-400 dark:hover:text-blue-400 transition-colors bg-slate-50 hover:bg-blue-50 dark:bg-slate-800/50 dark:hover:bg-blue-900/20 px-2.5 py-1.5 rounded-md border border-slate-200/60 dark:border-slate-700 shadow-sm cursor-pointer">
@@ -1142,7 +1133,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
           {edital.map((bloco, bIndex) => (
             <div key={bloco.id} className="border-b border-slate-100 dark:border-slate-800/60 pb-3 mb-1 last:border-0 last:pb-0">
               
-              {/* BLOCO - SUPER COMPACTO */}
               <div onClick={() => !isEditing && toggleNode(bloco.id)} className={`flex items-center gap-2 p-2 rounded-lg bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 mb-2 group transition-colors ${!isEditing ? 'cursor-pointer hover:bg-slate-200/60 dark:hover:bg-slate-700' : ''}`}>
                 <div onClick={(e) => { if(isEditing) { e.stopPropagation(); toggleNode(bloco.id); } }} className="cursor-pointer flex items-center justify-center shrink-0">
                   {expanded[bloco.id] ? <ChevronDown className="w-4 h-4 text-slate-500" /> : <ChevronRight className="w-4 h-4 text-slate-500" />}
@@ -1172,7 +1162,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
 
                     return (
                       <div key={disc.id}>
-                        {/* DISCIPLINA - LINHA FINA */}
                         <div className="flex items-center gap-1.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 p-1.5 rounded-md select-none border border-slate-100 dark:border-slate-800/60 bg-slate-50/50 dark:bg-slate-900 transition-colors">
                           {isEditing && (
                             <div className="flex flex-col gap-0 shrink-0">
@@ -1202,7 +1191,6 @@ function TabDisciplinas({ edital, setEdital, progress, customSprint, toggleSprin
                           )}
                         </div>
 
-                        {/* ASSUNTOS - LISTA DE ALTA DENSIDADE */}
                         {expanded[disc.id] && (
                           <div className="mt-1 space-y-1">
                             {disc.assuntos.map((assunto, index) => {
