@@ -1141,7 +1141,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
   
   // FASE 2: TABS E ESTADOS DA VISÃO ZEN
   const [topicTab, setTopicTab] = useState('todos'); // 'todos', 'pendentes', 'sprint', 'dominados'
-  const [collapsedTopics, setCollapsedTopics] = useState({});
+  const [expandedTopics, setExpandedTopics] = useState({});
   
   // UX 4: Seleção em Massa
   const [selectedAssuntosBulk, setSelectedAssuntosBulk] = useState(new Set());
@@ -1294,11 +1294,11 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
         currentParentId = assunto.id;
         visible.push(assunto);
       } else {
-        if (!collapsedTopics[currentParentId]) visible.push(assunto);
+        if (!currentParentId || expandedTopics[currentParentId]) visible.push(assunto);
       }
     });
     return visible;
-  }, [filteredAssuntos, shouldApplyCollapse, collapsedTopics]);
+  }, [filteredAssuntos, shouldApplyCollapse, expandedTopics]);
 
   const assuntoAtual = useMemo(() => {
     if (!activeDisc) return null;
@@ -1583,19 +1583,19 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                                 ) : (mastered ? <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" /> : checkStatus(assunto.id))}
                                 
                                 <div className="flex-1 flex items-center justify-between gap-3 overflow-hidden">
-                                  <div className="flex items-center gap-1.5 overflow-hidden">
-                                    {hasChildren && shouldApplyCollapse && !isEditing && (
-                                      <button 
-                                        onClick={(e) => { e.stopPropagation(); setCollapsedTopics(prev => ({...prev, [assunto.id]: !prev[assunto.id]})) }}
-                                        className="mr-1 p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer shrink-0"
-                                      >
-                                        {collapsedTopics[assunto.id] ? <ChevronRight className="w-4 h-4"/> : <ChevronDown className="w-4 h-4"/>}
-                                      </button>
-                                    )}
-                                    <span className={`font-semibold truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'} ${assunto.indent > 0 && shouldApplyCollapse ? 'text-sm' : 'text-base'}`}>{assunto.titulo}</span>
-                                  </div>
-                                  
-                                  <div className="flex gap-2 items-center shrink-0 pr-8">
+                                <div className="flex items-center gap-1.5 overflow-hidden">
+                                  {hasChildren && shouldApplyCollapse && !isEditing && (
+                                    <button 
+                                      onClick={(e) => { e.stopPropagation(); setExpandedTopics(prev => ({...prev, [assunto.id]: !prev[assunto.id]})) }}
+                                      className="mr-1 p-1 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer shrink-0"
+                                    >
+                                      {expandedTopics[assunto.id] ? <ChevronDown className="w-4 h-4"/> : <ChevronRight className="w-4 h-4"/>}
+                                    </button>
+                                  )}
+                                  <span className={`font-semibold truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-700 dark:text-slate-200'} ${assunto.indent > 0 && shouldApplyCollapse ? 'text-sm' : 'text-base'}`}>{assunto.titulo}</span>
+                                </div>
+                                
+                                <div className="flex gap-2 items-center shrink-0 pr-8">
                                     {!isEditing && memoryHealth && (<div className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded-md font-bold tracking-wider uppercase ${memoryHealth.bg} ${memoryHealth.color}`} title="Saúde da Memória"><Thermometer className="w-3 h-3"/> <span className="hidden sm:inline">{memoryHealth.label}</span></div>)}
                                     {assunto.linkTec && <span className="text-[10px] text-blue-500 dark:text-blue-400 font-bold uppercase flex items-center gap-1 border border-blue-200 dark:border-blue-800 px-2 py-1 rounded-md"><Link className="w-3 h-3"/> TEC</span>}
                                   </div>
