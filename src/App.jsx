@@ -5,7 +5,7 @@ import {
   RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Link, Pencil, Settings,
   Edit, AlertTriangle, ChevronUp, Flame, Trophy, TrendingUp, Activity, Award, ListPlus, ArrowRight, ArrowLeft, BarChart2,
   Thermometer, CalendarDays, LayoutGrid, BrainCircuit, Eye, Zap, Image as ImageIcon, ShieldAlert, Download, Sliders, Lock, LogOut,
-  UnfoldVertical, FoldVertical, FilePlus, Upload, Filter, Play, Pause, Coffee, PartyPopper, X, Menu, Search
+  UnfoldVertical, FoldVertical, FilePlus, Upload, Filter, Play, Pause, Coffee, PartyPopper, X, Menu, Search, Minus
 } from 'lucide-react';
 
 // --- FIREBASE CLOUD STORAGE SETUP ---
@@ -266,7 +266,6 @@ const SwipeableItem = ({ children, onSwipeRight, onSwipeLeft, disabled, isCompac
   const handleTouchMove = (e) => {
       if (disabled) return;
       const diff = e.touches[0].clientX - startXRef.current;
-      // Limit swipe boundary
       if (diff > -80 && diff < 80) setOffset(diff);
   };
   const handleTouchEnd = () => {
@@ -287,7 +286,7 @@ const SwipeableItem = ({ children, onSwipeRight, onSwipeLeft, disabled, isCompac
            onTouchMove={handleTouchMove}
            onTouchEnd={handleTouchEnd}
            style={{ transform: `translateX(${offset}px)`, transition: offset === 0 ? 'transform 0.3s ease' : 'none' }}
-           className={`relative z-10 w-full ${isCompact ? '' : ''}`}
+           className={`relative z-10 w-full`}
         >
            {children}
         </div>
@@ -532,11 +531,14 @@ export default function App() {
   const [isCloudReady, setIsCloudReady] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard'); 
+  const [zoomLevel, setZoomLevel] = useState(() => getStorage('nomeacao_zoom', 100));
+  const [sidebarHovered, setSidebarHovered] = useState(false);
 
-  // ESTADOS DE EFEITOS
+  // EFEITOS DE SUCESSO (DOPAMINA)
   const [confettiFire, setConfettiFire] = useState(0);
   const [levelUpData, setLevelUpData] = useState(null);
   const [showLevelMap, setShowLevelMap] = useState(false);
+  const [flashElementId, setFlashElementId] = useState(null); 
 
   // ESTADOS DE DADOS E MÉTRICAS
   const [projectConfig, setProjectConfig] = useState(initialConfig);
@@ -547,10 +549,19 @@ export default function App() {
   const [gamification, setGamification] = useState({ xp: 0, streak: 0, lastActiveDate: '' });
   const [dailyLogs, setDailyLogs] = useState({});
   const [reviewStats, setReviewStats] = useState(() => getStorage('nomeacao_prod_review_stats', { facil: 0, bom: 0, dificil: 0 }));
+  const [dailyReviewStats, setDailyReviewStats] = useState(() => getStorage('nomeacao_daily_reviews', {})); // UX 3: Linha do Tempo
 
   const themeColors = THEMES[projectConfig.appTheme] || THEMES.default;
+  const isZenModeActive = activeTab === 'cronograma';
+  const hideSidebar = isZenModeActive && !sidebarHovered;
 
-  // 1. INICIALIZAÇÃO DO FIREBASE AUTH
+  // 1. INICIALIZAÇÃO E APLICAÇÃO DO ZOOM GLOBAL
+  useEffect(() => {
+    document.documentElement.style.fontSize = `${zoomLevel}%`;
+    setStorage('nomeacao_zoom', zoomLevel);
+  }, [zoomLevel]);
+
+  // 2. INICIALIZAÇÃO DO FIREBASE AUTH
   useEffect(() => {
     if (!auth) {
       setIsCloudReady(true);
@@ -566,7 +577,7 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // 2. SINCRONIZAÇÃO DE LEITURA (NUVEM -> LOCAL)
+  // 3. SINCRONIZAÇÃO DE LEITURA (NUVEM -> LOCAL)
   useEffect(() => {
     if (!user || !db) return;
     try {
@@ -582,7 +593,9 @@ export default function App() {
           if (data.gamification) setGamification(data.gamification);
           if (data.dailyLogs) setDailyLogs(data.dailyLogs);
           if (data.reviewStats) setReviewStats(data.reviewStats);
+          if (data.dailyReviewStats) setDailyReviewStats(data.dailyReviewStats);
           if (data.isDarkMode !== undefined) setIsDarkMode(data.isDarkMode);
+          if (data.zoomLevel !== undefined) setZoomLevel(data.zoomLevel);
         }
         setIsCloudReady(true);
       }, (err) => {
@@ -596,7 +609,7 @@ export default function App() {
     }
   }, [user]);
 
-  // 3. SINCRONIZAÇÃO DE ESCRITA (LOCAL -> NUVEM)
+  // 4. SINCRONIZAÇÃO DE ESCRITA (LOCAL -> NUVEM)
   const saveToCloud = async (key, value) => {
     if (!user || !db || !isCloudReady) return;
     try {
@@ -605,6 +618,7 @@ export default function App() {
   };
 
   useEffect(() => { saveToCloud('isDarkMode', isDarkMode); }, [isDarkMode, isCloudReady]);
+  useEffect(() => { saveToCloud('zoomLevel', zoomLevel); }, [zoomLevel, isCloudReady]);
   useEffect(() => { saveToCloud('config', projectConfig); }, [projectConfig, isCloudReady]);
   useEffect(() => { saveToCloud('edital', edital); }, [edital, isCloudReady]);
   useEffect(() => { saveToCloud('userProgress', userProgress); }, [userProgress, isCloudReady]);
@@ -616,6 +630,10 @@ export default function App() {
     setStorage('nomeacao_prod_review_stats', reviewStats);
     saveToCloud('reviewStats', reviewStats); 
   }, [reviewStats, isCloudReady]);
+  useEffect(() => { 
+    setStorage('nomeacao_daily_reviews', dailyReviewStats);
+    saveToCloud('dailyReviewStats', dailyReviewStats); 
+  }, [dailyReviewStats, isCloudReady]);
 
   const calculateLevel = (xp) => {
     const levelFound = LEVELS_MAP.find(l => xp >= l.min && xp < l.max);
@@ -652,6 +670,13 @@ export default function App() {
   }, [gamification.lastActiveDate, gamification.streak]);
 
   const triggerConfetti = () => setConfettiFire(f => f + 1);
+  
+  // UX 4: Reforço Visual Dopamina (Flash Green)
+  const triggerVisualFlash = (id) => {
+    setFlashElementId(id);
+    setTimeout(() => setFlashElementId(null), 800);
+  };
+
   const addXP = useCallback((amount) => { setGamification(prev => ({ ...prev, xp: prev.xp + amount })); }, []);
 
   const handleAutoLog = useCallback((hoursToAdd) => {
@@ -688,12 +713,21 @@ export default function App() {
           newState.nextReviewTimestamp = null;
         }
       }
+      triggerVisualFlash(assId);
       return { ...prev, [assId]: newState };
     });
   };
 
   const handleReviewFeedback = (assId, feedbackType) => {
     setReviewStats(prev => ({ ...prev, [feedbackType]: (prev[feedbackType] || 0) + 1 }));
+    
+    // UX 3: Salva no Histórico Diário de Evolução
+    const today = new Date().toLocaleDateString();
+    setDailyReviewStats(prev => {
+      const current = prev[today] || { facil: 0, bom: 0, dificil: 0 };
+      return { ...prev, [today]: { ...current, [feedbackType]: current[feedbackType] + 1 } };
+    });
+
     setUserProgress(prev => {
       const current = prev[assId] || {};
       const now = new Date().getTime();
@@ -701,6 +735,7 @@ export default function App() {
       if (feedbackType === 'bom') daysToAdd = projectConfig.revBom || 7;
       if (feedbackType === 'facil') daysToAdd = projectConfig.revFacil || 15;
       addXP(15); 
+      triggerVisualFlash(assId);
       return { ...prev, [assId]: { ...current, revisado: true, lastReviewedTimestamp: now, nextReviewTimestamp: now + (1000 * 60 * 60 * 24 * daysToAdd) } };
     });
   };
@@ -711,6 +746,7 @@ export default function App() {
     setCustomSprint(prev => {
       const exists = prev.find(item => item.assId === assId);
       if (exists) return prev.filter(item => item.assId !== assId);
+      triggerVisualFlash(assId);
       return [...prev, { discId, assId, discNome, assTitulo, temp, linkTec }];
     });
   };
@@ -735,17 +771,18 @@ export default function App() {
   }, 0);
   const progressPerc = totalCheckboxes === 0 ? 0 : Math.round((completedCheckboxes / totalCheckboxes) * 100);
 
+  // UX 1: Renomeação SaaS das Abas
   const navPhases = [
     { phase: 'Cockpit', items: [
-      { id: 'dashboard', icon: Activity, label: 'Painel Geral' }
+      { id: 'dashboard', icon: Activity, label: 'Centro de Comando' }
     ]},
     { phase: 'Planejamento', id: 'planejamento', items: [
-      { id: 'disciplinas', icon: Folder, label: 'Arsenal de Matérias' },
-      { id: 'planner', icon: LayoutGrid, label: 'Metas da Semana' }
+      { id: 'disciplinas', icon: Folder, label: 'Edital Verticalizado' },
+      { id: 'planner', icon: LayoutGrid, label: 'Backlog de Sprints' }
     ]},
     { phase: 'Execução', id: 'acao', items: [
-      { id: 'cronograma', icon: Calendar, label: 'Sprints Diárias' }, 
-      { id: 'revisoes', icon: BrainCircuit, label: 'Revisão Inteligente', badge: pendingReviewsCount }
+      { id: 'cronograma', icon: Calendar, label: 'Mesa de Foco' }, 
+      { id: 'revisoes', icon: BrainCircuit, label: 'Motor de Revisão', badge: pendingReviewsCount }
     ]},
     { phase: 'Sistema', id: 'sistema', items: [
       { id: 'admin', icon: Settings, label: 'Painel de Controle' }
@@ -767,9 +804,9 @@ export default function App() {
 
   const mobileNavItems = [
     { id: 'dashboard', icon: Activity, label: 'Painel' },
-    { id: 'disciplinas', icon: Folder, label: 'Arsenal' },
-    { id: 'planner', icon: LayoutGrid, label: 'Metas' },
-    { id: 'cronograma', icon: Calendar, label: 'Sprints', badge: customSprint.length > 0 ? customSprint.length : 0 },
+    { id: 'disciplinas', icon: Folder, label: 'Edital' },
+    { id: 'planner', icon: LayoutGrid, label: 'Backlog' },
+    { id: 'cronograma', icon: Calendar, label: 'Foco', badge: customSprint.length > 0 ? customSprint.length : 0 },
     { id: 'revisoes', icon: BrainCircuit, label: 'Revisões', badge: pendingReviewsCount }
   ];
 
@@ -798,101 +835,117 @@ export default function App() {
           </div>
         </div>
 
-        {/* SIDEBAR DESKTOP */}
-        <aside className="hidden md:flex w-72 bg-white dark:bg-slate-900 shadow-xl flex-col z-10 shrink-0 border-r border-slate-300 dark:border-slate-800 sticky top-0 h-screen overflow-hidden">
-          <div className={`p-6 ${themeColors.headerBg} border-b ${themeColors.border} relative transition-colors duration-500 shrink-0`}>
-            
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`absolute top-6 right-6 p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-slate-400 z-10`}>
-              {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
-            </button>
-
-            <div className="flex items-center gap-3 min-w-0 mb-6 pr-10 mt-1">
-              <div className={`w-12 h-12 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
-                <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
-              </div>
-              <div className="flex flex-col min-w-0">
-                <span className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[120px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
-                <h2 className={`font-extrabold text-xl tracking-tight truncate ${themeColors.headerText}`} title={projectConfig.appName}>{projectConfig.appName}</h2>
-              </div>
-            </div>
-            
-            <div className="flex flex-col gap-3">
-              <div>
-                <p className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest leading-tight mb-1.5 truncate`}>{projectConfig.concurso}</p>
-                <h3 className={`text-xl font-black leading-tight truncate mb-2 ${themeColors.headerText}`}>{projectConfig.cargo}</h3>
-                
-                <div className="flex flex-col xl:flex-row gap-2 w-full mb-1">
-                  <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm truncate`} title={projectConfig.banca}>
-                    {projectConfig.banca}
-                  </span>
-                  <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm`}>
-                    <Target size={12} /> {projectConfig.horasDia}h/dia
-                  </span>
+        {/* SIDEBAR DESKTOP (MODO ULTRA-ZEN: Esconde automaticamente na Mesa de Foco) */}
+        <aside 
+          onMouseEnter={() => setSidebarHovered(true)}
+          onMouseLeave={() => setSidebarHovered(false)}
+          className={`hidden md:flex shadow-xl flex-col z-50 border-r sticky top-0 h-screen transition-all duration-300 ${hideSidebar ? `w-2 bg-indigo-500/20 dark:bg-indigo-500/10 cursor-e-resize border-transparent delay-300 opacity-50 hover:opacity-100 hover:bg-indigo-500/50` : `w-72 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-800 shrink-0`}`}
+        >
+          {/* Invólucro de largura fixa interna para o conteúdo não "esmagar" durante a animação de esconder */}
+          <div className="w-72 h-full flex flex-col relative overflow-hidden">
+            <div className={`p-6 ${themeColors.headerBg} border-b ${themeColors.border} relative transition-colors duration-500 shrink-0`}>
+              
+              <div className="absolute top-6 right-6 flex items-center gap-2 z-10">
+                {/* BOTÕES DE ZOOM GLOBAL */}
+                <div className="flex bg-white dark:bg-slate-800 rounded-full p-1 border border-slate-200/60 dark:border-slate-700 shadow-sm mr-2">
+                  <button onClick={() => setZoomLevel(p => Math.max(70, p - 5))} className="px-2 text-xs font-bold text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors" title="Diminuir Zoom">A-</button>
+                  <span className="px-1 text-[10px] font-black text-indigo-500 flex items-center">{zoomLevel}%</span>
+                  <button onClick={() => setZoomLevel(p => Math.min(130, p + 5))} className="px-2 text-xs font-bold text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors" title="Aumentar Zoom">A+</button>
                 </div>
+
+                <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-slate-400`}>
+                  {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
+                </button>
               </div>
 
-              <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 p-4 transition-all hover:shadow-md cursor-pointer shadow-sm`}>
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex items-center gap-3">
-                    <Award size={22} className="text-amber-500 dark:text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)] group-hover:scale-110 transition-transform duration-300" />
-                    <div className="flex flex-col">
-                      <span className="text-sm font-black text-slate-800 dark:text-white leading-none">Lvl {userLevel.nivel}</span>
-                      <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1 truncate max-w-[90px]">{userLevel.titulo}</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end">
-                    <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/10 px-2 py-1 rounded-md flex-shrink-0 border border-orange-200 dark:border-orange-500/20">
-                      <Flame size={12} className="fill-current animate-pulse" />
-                      <span className="text-[11px] font-black">{gamification.streak}</span>
-                    </div>
+              <div className="flex items-center gap-3 min-w-0 mb-6 pr-32 mt-1">
+                <div className={`w-12 h-12 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
+                  <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[120px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
+                  <h2 className={`font-extrabold text-xl tracking-tight truncate ${themeColors.headerText}`} title={projectConfig.appName}>{projectConfig.appName}</h2>
+                </div>
+              </div>
+              
+              <div className="flex flex-col gap-3">
+                <div>
+                  <p className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest leading-tight mb-1.5 truncate`}>{projectConfig.concurso}</p>
+                  <h3 className={`text-xl font-black leading-tight truncate mb-2 ${themeColors.headerText}`}>{projectConfig.cargo}</h3>
+                  
+                  <div className="flex flex-col xl:flex-row gap-2 w-full mb-1">
+                    <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm truncate`} title={projectConfig.banca}>
+                      {projectConfig.banca}
+                    </span>
+                    <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm`}>
+                      <Target size={12} /> {projectConfig.horasDia}h/dia
+                    </span>
                   </div>
                 </div>
-                <div className="relative w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
-                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
+
+                <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 p-4 transition-all hover:shadow-md cursor-pointer shadow-sm`}>
+                  <div className="flex justify-between items-center mb-3">
+                    <div className="flex items-center gap-3">
+                      <Award size={22} className="text-amber-500 dark:text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)] group-hover:scale-110 transition-transform duration-300" />
+                      <div className="flex flex-col">
+                        <span className="text-sm font-black text-slate-800 dark:text-white leading-none">Lvl {userLevel.nivel}</span>
+                        <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1 truncate max-w-[90px]">{userLevel.titulo}</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/10 px-2 py-1 rounded-md flex-shrink-0 border border-orange-200 dark:border-orange-500/20">
+                        <Flame size={12} className="fill-current animate-pulse" />
+                        <span className="text-[11px] font-black">{gamification.streak}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="relative w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
+                    <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
+                  </div>
                 </div>
               </div>
             </div>
+
+            <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar flex flex-col bg-slate-50/50 dark:bg-slate-900">
+              {navPhases.map((phaseGroup, pIdx) => (
+                <div key={pIdx} className={pIdx > 0 ? "pt-4" : ""}>
+                  <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-4 text-left">{phaseGroup.phase}</h3>
+                  <div className="space-y-1">
+                    {phaseGroup.items.map((item) => {
+                      const IconComponent = item.icon;
+                      return (
+                        <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all font-medium cursor-pointer ${activeTab === item.id ? themeColors.activeTab + ' shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                          <IconComponent className={`w-5 h-5 ${activeTab === item.id ? 'opacity-100' : 'opacity-70'}`} />
+                          <span className="flex-1 text-left">{item.label}</span>
+                          {item.id === 'cronograma' && customSprint.length > 0 && <span className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{customSprint.length}</span>}
+                          {item.badge > 0 && <span className="bg-red-500 animate-pulse text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">{item.badge}</span>}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </nav>
+
+            {user && (
+              <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 mt-auto shrink-0">
+                <button onClick={() => { if(window.confirm('Tem certeza que deseja sair do sistema?')) { auth && signOut(auth); } }} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors font-bold text-sm cursor-pointer">
+                  <LogOut className="w-4 h-4" /> Sair do Sistema
+                </button>
+              </div>
+            )}
           </div>
-
-          <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar flex flex-col bg-slate-50/50 dark:bg-slate-900">
-            {navPhases.map((phaseGroup, pIdx) => (
-              <div key={pIdx} className={pIdx > 0 ? "pt-4" : ""}>
-                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-4 text-left">{phaseGroup.phase}</h3>
-                <div className="space-y-1">
-                  {phaseGroup.items.map((item) => {
-                    const IconComponent = item.icon;
-                    return (
-                      <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all font-medium cursor-pointer ${activeTab === item.id ? themeColors.activeTab + ' shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
-                        <IconComponent className={`w-5 h-5 ${activeTab === item.id ? 'opacity-100' : 'opacity-70'}`} />
-                        <span className="flex-1 text-left">{item.label}</span>
-                        {item.id === 'cronograma' && customSprint.length > 0 && <span className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{customSprint.length}</span>}
-                        {item.badge > 0 && <span className="bg-red-500 animate-pulse text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">{item.badge}</span>}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-          </nav>
-
-          {user && (
-            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 mt-auto shrink-0">
-              <button onClick={() => { if(window.confirm('Tem certeza que deseja sair do sistema?')) { auth && signOut(auth); } }} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors font-bold text-sm cursor-pointer">
-                <LogOut className="w-4 h-4" /> Sair do Sistema
-              </button>
-            </div>
-          )}
         </aside>
 
         {/* CONTENT AREA */}
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-28 md:pb-8 text-left">
-          <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full transition-all duration-500 h-full flex flex-col">
-            {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} />}
-            {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} setUserProgress={setUserProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} setActiveTab={setActiveTab} addXP={addXP} />}
-            {activeTab === 'planner' && <TabPlanner customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} progress={userProgress} toggleProgress={toggleProgress} />}
-            {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} triggerConfetti={triggerConfetti} themeColors={themeColors} handleAutoLog={handleAutoLog} />}
-            {activeTab === 'revisoes' && <TabRevisaoInteligente progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} />}
-            {activeTab === 'admin' && <TabAdmin auth={auth} config={projectConfig} setConfig={setProjectConfig} userProgress={userProgress} setUserProgress={setUserProgress} gamification={gamification} setGamification={setGamification} edital={edital} setEdital={setEdital} customSprint={customSprint} setCustomSprint={setCustomSprint} initialEdital={initialEdital} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} reviewStats={reviewStats} themeColors={themeColors} playLevelUpSound={playLevelUpSound} />}
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-28 md:pb-8 text-left transition-all duration-300 relative">
+          <div className="max-w-7xl mx-auto w-full transition-all duration-500 h-full flex flex-col">
+            {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} dailyReviewStats={dailyReviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} />}
+            {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} setUserProgress={setUserProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} setActiveTab={setActiveTab} addXP={addXP} triggerVisualFlash={triggerVisualFlash} flashElementId={flashElementId} />}
+            {activeTab === 'planner' && <TabPlanner customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} progress={userProgress} toggleProgress={toggleProgress} flashElementId={flashElementId} />}
+            {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} triggerConfetti={triggerConfetti} themeColors={themeColors} handleAutoLog={handleAutoLog} flashElementId={flashElementId} />}
+            {activeTab === 'revisoes' && <TabRevisaoInteligente progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} flashElementId={flashElementId} />}
+            {activeTab === 'admin' && <TabAdmin auth={auth} config={projectConfig} setConfig={setProjectConfig} userProgress={userProgress} setUserProgress={setUserProgress} gamification={gamification} setGamification={setGamification} edital={edital} setEdital={setEdital} customSprint={customSprint} setCustomSprint={setCustomSprint} initialEdital={initialEdital} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} reviewStats={reviewStats} dailyReviewStats={dailyReviewStats} setDailyReviewStats={setDailyReviewStats} themeColors={themeColors} playLevelUpSound={playLevelUpSound} />}
           </div>
         </main>
 
@@ -929,12 +982,29 @@ export default function App() {
 }
 
 // ==========================================
-// ABA DASHBOARD / SUPER COCKPIT DE COMANDO
+// ABA DASHBOARD / CENTRO DE COMANDO
 // ==========================================
-function TabDashboard({ config, progressPerc, gamification, setGamification, dailyLogs, setDailyLogs, userLevel, themeColors, reviewStats, edital, activeSubjectIds, userProgress }) {
-  const [loggedHoursToday, setLoggedHoursToday] = useState('');
+function TabDashboard({ config, progressPerc, gamification, setGamification, dailyLogs, setDailyLogs, userLevel, themeColors, reviewStats, dailyReviewStats, edital, activeSubjectIds, userProgress }) {
   const today = new Date().toLocaleDateString();
   const todayHours = dailyLogs[today] || 0;
+  
+  const [isEditingHours, setIsEditingHours] = useState(false);
+  const [editHoursValue, setEditHoursValue] = useState(todayHours);
+
+  useEffect(() => {
+    setEditHoursValue(todayHours);
+  }, [todayHours]);
+
+  const handleSaveHours = () => {
+    const val = parseFloat(editHoursValue);
+    if (!isNaN(val) && val >= 0) {
+      setDailyLogs(prev => ({ ...prev, [today]: val }));
+      if (val >= config.horasDia && gamification.lastActiveDate !== today) {
+        setGamification(prev => ({ ...prev, streak: prev.streak + 1, lastActiveDate: today }));
+      }
+    }
+    setIsEditingHours(false);
+  };
 
   const radarData = [];
   edital.forEach(b => b.disciplinas.forEach(d => {
@@ -963,13 +1033,28 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
   const last14Days = Array.from({length: 14}).map((_, i) => {
     const d = new Date(); d.setDate(d.getDate() - (13 - i));
     return { dateObj: d, dateStr: d.toLocaleDateString(), dayLabel: d.toLocaleDateString('pt-BR', { weekday: 'short' }).charAt(0).toUpperCase() };
-  });
+  }).reverse(); // Do mais antigo para o mais novo
   
   const maxHoursLogged = Math.max(...last14Days.map(d => dailyLogs[d.dateStr] || 0));
   const maxHours = Math.max(maxHoursLogged, config.horasDia * 1.2, 2); 
+  const avgHours = (last14Days.reduce((acc, curr) => acc + (dailyLogs[curr.dateStr] || 0), 0) / 14).toFixed(1);
+
+  // UX 3: Cálculo do Gráfico de Retenção (Linha)
+  const lineChartPoints = last14Days.map(day => {
+    const stats = dailyReviewStats[day.dateStr];
+    let rate = 0;
+    if (stats) {
+      const total = (stats.facil || 0) + (stats.bom || 0) + (stats.dificil || 0);
+      if (total > 0) rate = (((stats.facil || 0) + (stats.bom || 0)) / total) * 100;
+    }
+    return rate;
+  });
+  const maxRateStr = Math.max(...lineChartPoints).toFixed(0);
+  const minRateStr = Math.min(...lineChartPoints.filter(r => r > 0)).toFixed(0) || 0;
   
-  const totalHours14Days = last14Days.reduce((acc, curr) => acc + (dailyLogs[curr.dateStr] || 0), 0);
-  const avgHours = (totalHours14Days / 14).toFixed(1);
+  // Constrói SVG Polyline string: x vai de 0 a 100%, y vai de 100% a 0%
+  const xStep = 100 / 13;
+  const polylineStr = lineChartPoints.map((val, idx) => `${idx * xStep},${100 - val}`).join(' ');
 
   const totalReviews = reviewStats?.facil + reviewStats?.bom + reviewStats?.dificil || 0;
   const facilPerc = totalReviews > 0 ? Math.round((reviewStats.facil / totalReviews) * 100) : 0;
@@ -977,26 +1062,13 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
   const dificilPerc = totalReviews > 0 ? Math.round((reviewStats.dificil / totalReviews) * 100) : 0;
   const successRate = totalReviews > 0 ? (((reviewStats.facil + reviewStats.bom) / totalReviews) * 100).toFixed(1) : 0;
 
-  const handleLogHours = (e) => {
-    e.preventDefault(); const hours = parseFloat(loggedHoursToday);
-    if (!isNaN(hours) && hours > 0) {
-      setDailyLogs(prev => ({ ...prev, [today]: (prev[today] || 0) + hours }));
-      if ((todayHours + hours) >= config.horasDia && gamification.lastActiveDate !== today) {
-        setGamification(prev => ({ ...prev, streak: prev.streak + 1, lastActiveDate: today }));
-      } else if (gamification.lastActiveDate !== today) {
-        setGamification(prev => ({ ...prev, lastActiveDate: today }));
-      }
-      setLoggedHoursToday('');
-    }
-  };
-
   return (
     <div className="space-y-6 animate-in fade-in pb-10">
       <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4">
         <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
-          <Activity className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Painel Geral
+          <Activity className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Centro de Comando
         </h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">Central de comando. Zero distrações, máximo desempenho.</p>
+        <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">A sua fotografia tática. Zero distrações, máximo desempenho.</p>
       </header>
 
       {/* LINHA 1: OS 3 INDICADORES VITAIS (KPIs) */}
@@ -1013,11 +1085,37 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col justify-center items-center text-center">
           <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-2xl mb-3"><Clock className="w-6 h-6 text-blue-500"/></div>
           <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Horas de Hoje</p>
-          <div className="flex items-end gap-1.5 mt-1 mb-2">
-            <span className="text-3xl font-black text-slate-800 dark:text-white">{todayHours.toFixed(1)}</span>
-            <span className="text-sm font-bold text-slate-400 mb-1">/ {config.horasDia}h</span>
+          
+          <div className="flex items-end justify-center gap-1.5 mt-1 mb-2 relative min-h-[40px]">
+            {isEditingHours ? (
+              <div className="flex items-center gap-1">
+                <input 
+                  type="number" 
+                  step="0.5" 
+                  min="0" 
+                  autoFocus 
+                  value={editHoursValue} 
+                  onChange={e => setEditHoursValue(e.target.value)} 
+                  onKeyDown={e => e.key === 'Enter' && handleSaveHours()} 
+                  onBlur={handleSaveHours} 
+                  className="w-20 text-3xl font-black text-center border-b-2 border-blue-500 bg-transparent outline-none text-slate-800 dark:text-white pb-1" 
+                />
+                <span className="text-sm font-bold text-slate-400 mb-1">h</span>
+              </div>
+            ) : (
+              <div 
+                className="flex items-end gap-1.5 group cursor-pointer" 
+                onClick={() => setIsEditingHours(true)}
+                title="Clique para editar as horas de hoje"
+              >
+                <span className="text-3xl font-black text-slate-800 dark:text-white transition-colors group-hover:text-blue-500">{todayHours.toFixed(1)}</span>
+                <span className="text-sm font-bold text-slate-400 mb-1">/ {config.horasDia}h</span>
+                <Pencil className="w-4 h-4 text-slate-300 group-hover:text-blue-500 mb-2 ml-1 opacity-0 group-hover:opacity-100 transition-all" />
+              </div>
+            )}
           </div>
-          <div className="w-full max-w-[140px] h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+
+          <div className="w-full max-w-[140px] h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1">
             <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${Math.min((todayHours / config.horasDia) * 100, 100)}%` }}></div>
           </div>
         </div>
@@ -1036,13 +1134,8 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
           <div className="flex justify-between items-start mb-5">
             <div>
               <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><BarChart2 className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Esforço Diário</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Média: <strong className="text-slate-700 dark:text-slate-300">{avgHours}h/dia</strong></p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Média últimos 14d: <strong className="text-slate-700 dark:text-slate-300">{avgHours}h/dia</strong></p>
             </div>
-            
-            <form onSubmit={handleLogHours} className="flex gap-1.5 bg-slate-50 dark:bg-slate-800 p-1.5 rounded-xl border border-slate-200/60 dark:border-slate-700">
-              <input type="number" step="0.5" placeholder="+ Hrs" value={loggedHoursToday} onChange={(e) => setLoggedHoursToday(e.target.value)} className="w-16 p-2 rounded-lg bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none text-xs font-bold text-center border border-slate-200/60 dark:border-slate-700 focus:border-blue-500 transition-colors" />
-              <button type="submit" className={`${themeColors.bg.split(' ')[0]} hover:opacity-80 text-white px-3 py-2 rounded-lg font-bold transition-colors text-xs flex items-center justify-center cursor-pointer`} title="Adicionar Horas"><Plus className="w-4 h-4"/></button>
-            </form>
           </div>
           
           <div className="flex-1 flex items-end justify-between gap-1.5 mt-auto pt-4 relative">
@@ -1067,28 +1160,74 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
           </div>
         </div>
 
+        {/* UX 3: Evolução da Retenção */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col h-full min-h-[260px]">
           <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2 mb-1"><BrainCircuit className="w-5 h-5 text-emerald-500"/> Retenção de Memória</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-6">Precisão do seu cérebro no Deck de Combate (Anki).</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 flex justify-between">
+            <span>Gráfico de Evolução (Últimos 14 Dias).</span>
+            <span className="font-bold text-emerald-600 dark:text-emerald-400">Precisão Total: {successRate}%</span>
+          </p>
+          
           {totalReviews === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-sm">
               <PieChart className="w-10 h-10 mb-3 opacity-30"/>
-              <p>Faça revisões para gerar o gráfico.</p>
+              <p>Faça revisões para gerar o gráfico de evolução.</p>
             </div>
           ) : (
-            <div className="flex flex-row items-center justify-center gap-8 flex-1">
-              <div className="relative w-32 h-32 shrink-0">
-                <div className="w-full h-full rounded-full shadow-inner" style={{ background: `conic-gradient(#10b981 0% ${facilPerc}%, #f59e0b ${facilPerc}% ${facilPerc + bomPerc}%, #ef4444 ${facilPerc + bomPerc}% 100%)` }}></div>
-                <div className="absolute inset-0 m-auto w-24 h-24 bg-white dark:bg-slate-900 rounded-full flex flex-col items-center justify-center shadow-[inset_0_0_10px_rgba(0,0,0,0.05)] dark:shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]">
-                  <span className="text-2xl font-black text-slate-800 dark:text-white leading-none">{successRate}%</span>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 mt-1">De Acerto</span>
-                </div>
-              </div>
-              <div className="space-y-4 w-full max-w-[140px]">
-                <div className="flex items-center justify-between gap-3"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-emerald-500 shadow-sm"></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300">Fácil</span></div><span className="font-black text-base text-slate-800 dark:text-white">{facilPerc}%</span></div>
-                <div className="flex items-center justify-between gap-3"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-amber-500 shadow-sm"></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300">Bom</span></div><span className="font-black text-base text-slate-800 dark:text-white">{bomPerc}%</span></div>
-                <div className="flex items-center justify-between gap-3"><div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-red-500 shadow-sm"></div><span className="text-sm font-bold text-slate-700 dark:text-slate-300">Difícil</span></div><span className="font-black text-base text-slate-800 dark:text-white">{dificilPerc}%</span></div>
-              </div>
+            <div className="flex flex-col flex-1 relative">
+               <div className="flex-1 relative w-full h-full">
+                 {/* Y Axis Grid Lines */}
+                 <div className="absolute inset-0 flex flex-col justify-between">
+                    <div className="w-full border-t border-dashed border-slate-200 dark:border-slate-800 flex justify-start"><span className="text-[9px] text-slate-400 -translate-y-1/2 bg-white dark:bg-slate-900 pr-1">100%</span></div>
+                    <div className="w-full border-t border-dashed border-slate-200 dark:border-slate-800 flex justify-start"><span className="text-[9px] text-slate-400 -translate-y-1/2 bg-white dark:bg-slate-900 pr-1">50%</span></div>
+                    <div className="w-full border-t border-dashed border-slate-200 dark:border-slate-800 flex justify-start"><span className="text-[9px] text-slate-400 -translate-y-1/2 bg-white dark:bg-slate-900 pr-1">0%</span></div>
+                 </div>
+                 
+                 {/* The Line Chart SVG */}
+                 <div className="absolute inset-0 pt-2 pb-2 pl-6">
+                   <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
+                      <polyline 
+                        points={polylineStr}
+                        fill="none" 
+                        stroke="url(#lineGradient)" 
+                        strokeWidth="2.5" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        className="drop-shadow-[0_4px_3px_rgba(16,185,129,0.3)]"
+                      />
+                      <defs>
+                        <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
+                          <stop offset="100%" stopColor="#10b981" />
+                        </linearGradient>
+                      </defs>
+                      {/* Dots on the line */}
+                      {lineChartPoints.map((val, idx) => {
+                         if (val === 0) return null; // Skip days with no data
+                         return (
+                           <circle 
+                              key={idx} 
+                              cx={idx * xStep} 
+                              cy={100 - val} 
+                              r="1.5" 
+                              fill="white" 
+                              stroke="#10b981" 
+                              strokeWidth="1" 
+                           >
+                              <title>Dia {last14Days[idx].dateStr}: {val.toFixed(1)}%</title>
+                           </circle>
+                         );
+                      })}
+                   </svg>
+                 </div>
+               </div>
+               
+               {/* X Axis Labels */}
+               <div className="flex justify-between mt-3 text-[9px] font-bold text-slate-400 pl-6">
+                 {last14Days.map((d, i) => (
+                    i % 2 === 0 ? <span key={i} className={i === 13 ? "text-emerald-500" : ""}>{d.dayLabel}</span> : <span key={i}></span>
+                 ))}
+               </div>
             </div>
           )}
         </div>
@@ -1125,26 +1264,20 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
 }
 
 // ==========================================
-// ABA 1: ARSENAL DE MATÉRIAS (MASTER-DETAIL + UX AVANÇADA)
+// ABA 1: EDITAL VERTICALIZADO (MASTER-DETAIL + UX AVANÇADA)
 // ==========================================
-function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSprintItem, customSprint, resetProgress, themeColors, setActiveTab, addXP }) {
-  // Árvore recolhida por padrão (Inicia como um objeto vazio)
+function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSprintItem, customSprint, resetProgress, themeColors, setActiveTab, addXP, triggerVisualFlash, flashElementId }) {
   const [expanded, setExpanded] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [newTopic, setNewTopic] = useState({ discId: '', titulo: '', linkTec: '' });
   const [editingTopicId, setEditingTopicId] = useState(null);
   const [bulkInput, setBulkInput] = useState({ discId: null, text: '' });
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
-  
   const [selectedDiscId, setSelectedDiscId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  
-  // FASE 2: TABS E ESTADOS DA VISÃO ZEN
-  const [topicTab, setTopicTab] = useState('todos'); // 'todos', 'pendentes', 'sprint', 'dominados'
+  const [topicTab, setTopicTab] = useState('todos'); 
   const [expandedTopics, setExpandedTopics] = useState({});
   const [viewMode, setViewMode] = useState('detailed');
-  
-  // UX 4: Seleção em Massa
   const [selectedAssuntosBulk, setSelectedAssuntosBulk] = useState(new Set());
 
   useEffect(() => {
@@ -1153,14 +1286,21 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     }
   }, [edital, selectedDiscId]);
 
-  // UX: Limpar a barra de pesquisa ao mudar de disciplina
   useEffect(() => {
     setSearchTerm('');
   }, [selectedDiscId]);
 
   const toggleNode = (id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
+
+  const handleExpandAll = () => {
+    const allExpanded = {};
+    edital.forEach(b => { allExpanded[b.id] = true; });
+    setExpanded(allExpanded);
+  };
+  const handleCollapseAll = () => {
+    setExpanded({});
+  };
   
-  // Gestão Bloco/Disciplina
   const handleEditBlocoNome = (blocoId, newNome) => { setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, nome: newNome } : b)); };
   const handleDeleteBlocoClick = (blocoId) => {
     if (confirmDeleteId === `bloco_${blocoId}`) { setEdital(prev => prev.filter(b => b.id !== blocoId)); setConfirmDeleteId(null); } 
@@ -1190,7 +1330,6 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     setEdital(prev => prev.map(b => { if (b.id !== blocoId) return b; if (discIndex + direction < 0 || discIndex + direction >= b.disciplinas.length) return b; const newDisciplinas = [...b.disciplinas]; const temp = newDisciplinas[discIndex]; newDisciplinas[discIndex] = newDisciplinas[discIndex + direction]; newDisciplinas[discIndex + direction] = temp; return { ...b, disciplinas: newDisciplinas }; }));
   };
 
-  // Gestão de Assuntos
   const dragItem = useRef(null); const dragOverItem = useRef(null);
   const handleDragStart = (e, position, discId) => { dragItem.current = { position, discId }; e.dataTransfer.effectAllowed = "move"; };
   const handleDragEnter = (e, position, discId) => { e.preventDefault(); dragOverItem.current = { position, discId }; };
@@ -1227,7 +1366,6 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     setEditingTopicId(null);
   };
 
-  // Bulk Edit Handlers
   const toggleBulkSelect = (id) => {
     const newSet = new Set(selectedAssuntosBulk);
     if (newSet.has(id)) newSet.delete(id); else newSet.add(id);
@@ -1254,7 +1392,6 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     })})));
   };
 
-  // Helpers
   const isFullyMastered = useCallback((assId) => { const p = progress[assId]; return p?.estudado && p?.questoes && p?.revisado; }, [progress]);
   const getMemoryHealth = (assId) => {
     const p = progress[assId]; if (!p?.lastReviewedTimestamp) return null; 
@@ -1309,7 +1446,6 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     return visible;
   }, [filteredAssuntos, shouldApplyCollapse, expandedTopics]);
 
-  // Swipe Action Handlers
   const handleSwipeToSprint = (assunto) => {
      if (isFullyMastered(assunto.id) && !customSprint.some(item => item.assId === assunto.id)) resetProgress(assunto.id);
      toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec);
@@ -1322,6 +1458,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
            [assunto.id]: { estudado: true, questoes: true, revisado: true, lastReviewedTimestamp: now, nextReviewTimestamp: now + (1000 * 60 * 60 * 24 * 15) }
         }));
         addXP(25);
+        triggerVisualFlash(assunto.id);
      }
   };
 
@@ -1330,7 +1467,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
       <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
         <div>
           <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
-            <Folder className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Arsenal de Matérias
+            <Folder className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Edital Verticalizado
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">A sua Trilha Base. Selecione uma disciplina para ver o edital detalhado.</p>
         </div>
@@ -1350,9 +1487,20 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
         
         {/* COLUNA ESQUERDA: MÓDULOS */}
         <div className={`w-full md:w-1/3 lg:w-1/4 flex-shrink-0 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-4 md:sticky md:top-6 ${isMobileDetailView ? 'hidden md:flex' : 'flex'} flex-col max-h-[85vh] overflow-hidden`}>
-          <div className="flex items-center gap-2 mb-4 px-2 shrink-0">
-            <Menu className="w-5 h-5 text-slate-400" />
-            <h3 className="font-bold text-sm text-slate-600 dark:text-slate-300 uppercase tracking-wider">Módulos</h3>
+          <div className="flex items-center justify-between mb-4 px-2 shrink-0 border-b border-slate-100 dark:border-slate-800/60 pb-3">
+            <div className="flex items-center gap-2">
+              <Menu className="w-5 h-5 text-slate-400" />
+              <h3 className="font-bold text-sm text-slate-600 dark:text-slate-300 uppercase tracking-wider">Módulos</h3>
+            </div>
+            
+            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5">
+              <button onClick={handleExpandAll} className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-colors cursor-pointer" title="Expandir Tudo ( + )">
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+              <button onClick={handleCollapseAll} className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-colors cursor-pointer" title="Recolher Tudo ( - )">
+                <Minus className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
           <div className="overflow-y-auto custom-scrollbar flex-1 pr-2 space-y-4">
@@ -1534,6 +1682,9 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                     const hasChildren = isParent && activeDisc.assuntos[trueIndex + 1]?.indent > 0;
                     const isDragDisabled = isEditing && (!isCurrentlyEditing && (searchTerm !== '' || topicTab !== 'todos'));
                     const isSelectedBulk = selectedAssuntosBulk.has(assunto.id);
+                    
+                    // UX Dopamine Feedback
+                    const isFlashing = flashElementId === assunto.id;
 
                     return (
                       <SwipeableItem 
@@ -1549,7 +1700,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                           onDragOver={(e) => e.preventDefault()} 
                           onDrop={handleDrop} 
                           style={{ marginLeft: assunto.indent && shouldApplyCollapse ? `${assunto.indent * 1.5}rem` : '0' }} 
-                          className={`group flex flex-col relative transition-all rounded-xl border shadow-sm ${isParent ? 'bg-slate-50 dark:bg-slate-800/40 border-slate-300 dark:border-slate-600 mt-3 mb-1' : 'bg-white dark:bg-slate-900 border-slate-200/60 dark:border-slate-700'} ${isEditing && !isCurrentlyEditing && !isDragDisabled ? 'cursor-move hover:border-amber-300 dark:hover:border-amber-700' : ''} ${mastered && !isEditing ? 'opacity-60' : 'hover:shadow-md'} ${isSelectedBulk ? 'border-amber-500 ring-1 ring-amber-500 bg-amber-50 dark:bg-amber-900/10' : ''} ${isCompact ? 'p-3' : 'p-4'}`}
+                          className={`group flex flex-col relative transition-all duration-300 rounded-xl border ${isFlashing ? 'bg-emerald-100 dark:bg-emerald-900/40 border-emerald-400 ring-2 ring-emerald-400 scale-[1.02]' : isParent ? 'bg-slate-50 dark:bg-slate-800/40 border-slate-300 dark:border-slate-600 mt-3 mb-1' : 'bg-white dark:bg-slate-900 border-slate-200/60 dark:border-slate-700 shadow-sm'} ${isEditing && !isCurrentlyEditing && !isDragDisabled ? 'cursor-move hover:border-amber-300 dark:hover:border-amber-700' : ''} ${mastered && !isEditing && !isFlashing ? 'opacity-60' : 'hover:shadow-md'} ${isSelectedBulk ? 'border-amber-500 ring-1 ring-amber-500 bg-amber-50 dark:bg-amber-900/10' : ''} ${isCompact ? 'p-3' : 'p-4'}`}
                         >
                           {isCurrentlyEditing ? (
                             <InlineTopicEditor 
@@ -1694,7 +1845,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
 // ==========================================
 // ABA: METAS DA SEMANA
 // ==========================================
-function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActiveTab, themeColors, progress, toggleProgress }) {
+function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActiveTab, themeColors, progress, toggleProgress, flashElementId }) {
   const [draggedIndex, setDraggedIndex] = useState(null);
   const dragItem = useRef(null);
   const dragOverItem = useRef(null);
@@ -1733,8 +1884,8 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
     <div className="space-y-6 animate-in fade-in text-left h-full pb-10">
       <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2"><LayoutGrid className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`}/> Metas da Semana</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">A sua visão estratégica. O que for agendado aqui será executado na Sprint Diária.</p>
+          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2"><LayoutGrid className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`}/> Backlog de Sprints</h2>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">A sua visão estratégica. O que for agendado aqui será executado na Mesa de Foco.</p>
         </div>
       </header>
 
@@ -1770,7 +1921,7 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
             ))}
             {backlogSprints.length === 0 && (
               <div className="text-sm text-slate-400 p-6 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl flex flex-col items-center gap-2 text-center">
-                <p>O seu Backlog está vazio.</p><p className="text-xs">Vá ao Arsenal de Matérias para organizar a semana.</p>
+                <p>O seu Backlog está vazio.</p><p className="text-xs">Vá ao Edital Verticalizado para organizar a semana.</p>
               </div>
             )}
           </div>
@@ -1802,7 +1953,7 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
                      </div>
                    )
                  })}
-                 <button onClick={() => setActiveTab('cronograma')} className={`mt-5 w-full ${themeColors.button.split(' ')[0]} font-bold text-sm py-2.5 rounded-xl transition-colors cursor-pointer text-white shadow-sm`}>Ir para Execução</button>
+                 <button onClick={() => setActiveTab('cronograma')} className={`mt-5 w-full ${themeColors.button.split(' ')[0]} font-bold text-sm py-2.5 rounded-xl transition-colors cursor-pointer text-white shadow-sm`}>Ir para Mesa de Foco</button>
               </div>
            ) : (
              <div className={`text-sm ${themeColors.text.split(' ')[0]} p-8 border-2 border-dashed ${themeColors.border.split(' ')[0]} rounded-2xl flex items-center justify-center text-center`}>Nenhuma Sprint ativada hoje.</div>
@@ -1823,9 +1974,9 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
 }
 
 // ==========================================
-// ABA 4: SPRINTS DE ESTUDO DIÁRIA
+// ABA 4: MESA DE FOCO (SPRINTS DIÁRIAS)
 // ==========================================
-function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, addXP, triggerConfetti, themeColors, handleAutoLog }) {
+function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, addXP, triggerConfetti, themeColors, handleAutoLog, flashElementId }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState(null);
   const dragItem = useRef(null);
@@ -1870,8 +2021,8 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
     <div className="space-y-6 animate-in fade-in text-left pb-10">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200/60 dark:border-slate-800 pb-5 gap-4">
         <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">Sprints de Estudo</h2>
-          <p className="text-slate-500 mt-2 text-base">Marque os passos. Bater a Sprint rende <strong className={`${themeColors.text.split(' ')[0]}`}>+50 XP</strong>.</p>
+          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">Mesa de Foco</h2>
+          <p className="text-slate-500 mt-2 text-base">Ocultámos as distrações. Marque os passos. Bater a Sprint rende <strong className={`${themeColors.text.split(' ')[0]}`}>+50 XP</strong>.</p>
         </div>
         <div className="flex gap-3 items-center w-full md:w-auto">
           <button disabled={sprintGroups.length === 0} onClick={handleCompleteSprint} className={`w-full md:w-auto px-8 py-3.5 rounded-2xl font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${showConfirm ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white disabled:opacity-50 shadow-md hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/20'}`}>
@@ -1880,10 +2031,10 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
         </div>
       </header>
 
-      {/* WIDGET POMODORO (AGORA ISOLADO PARA PERFORMANCE) */}
+      {/* WIDGET POMODORO */}
       <PomodoroWidget themeColors={themeColors} handleAutoLog={handleAutoLog} addXP={addXP} triggerConfetti={triggerConfetti} />
 
-      {/* SPRINTS: CARDS RESTAURADOS À LEITURA CONFORTÁVEL */}
+      {/* SPRINTS */}
       {sprintGroups.length === 0 ? (
         <div className="bg-white dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-3xl p-12 flex flex-col items-center justify-center mt-8">
           <ShoppingCart className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-4" />
@@ -1891,7 +2042,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
           <p className="text-base text-slate-500 mb-6 text-center">Planeje a sua semana adicionando matérias.</p>
           <div className="flex gap-3">
             <button onClick={() => setActiveTab('disciplinas')} className="bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-6 py-3 rounded-xl text-base font-bold cursor-pointer transition-colors shadow-sm">
-              Ir para o Arsenal de Matérias
+              Ir para o Edital Verticalizado
             </button>
           </div>
         </div>
@@ -1910,7 +2061,6 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                   {isActive && <span className="text-[10px] bg-white/20 px-2 py-1 rounded mt-2 font-bold tracking-wider text-white">HOJE</span>}
                 </div>
                 
-                {/* Cartões das Matérias LIPOASPIRADOS MAS LEGÍVEIS */}
                 <div className="p-4 flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
                   {group.map((item, localIdx) => {
                     const globalIdx = (idx * 2) + localIdx;
@@ -1918,6 +2068,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                     const isEstudado = progress[item.assId]?.estudado || false;
                     const isQuestoes = progress[item.assId]?.questoes || false;
                     const isRevisado = progress[item.assId]?.revisado || false;
+                    const isFlashing = flashElementId === item.assId;
 
                     return (
                       <div 
@@ -1927,7 +2078,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                         onDragEnter={(e) => handleDragEnter(e, globalIdx)}
                         onDragEnd={handleDragEnd}
                         onDragOver={(e) => e.preventDefault()}
-                        className={`rounded-xl p-5 flex flex-col relative transition-all cursor-move ${isActive ? `bg-white dark:bg-slate-800 border-2 ${themeColors.border.split(' ')[0]} shadow-sm` : 'bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700'} ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95 z-10' : 'hover:shadow-md'}`}
+                        className={`rounded-xl p-5 flex flex-col relative transition-all duration-300 cursor-move ${isFlashing ? 'bg-emerald-100 dark:bg-emerald-900/40 border-emerald-400 ring-2 ring-emerald-400 scale-[1.02]' : isActive ? `bg-white dark:bg-slate-800 border-2 ${themeColors.border.split(' ')[0]} shadow-sm` : 'bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700'} ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95 z-10' : 'hover:shadow-md'}`}
                       >
                         <div className="absolute top-4 right-10 text-slate-300 hover:text-slate-500 transition-colors" title="Arrastar e Soltar">
                           <GripVertical className="w-5 h-5" />
@@ -1937,7 +2088,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                         <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 pr-10">{item.discNome}</span>
                         <p className="font-bold text-base text-slate-800 dark:text-slate-100 mb-4 pr-10 leading-tight">{item.assTitulo}</p>
                         
-                        {/* Checkboxes Legíveis e Padronizadas */}
+                        {/* Checkboxes */}
                         <div className="mt-auto space-y-2.5 pt-4 border-t border-slate-200/60 dark:border-slate-700/50">
                           <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isEstudado ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100'}`}>
                             <input type="checkbox" checked={isEstudado} onChange={() => toggleProgress(item.assId, 'estudado')} disabled={!isActive} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-slate-600" />
@@ -1983,7 +2134,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
 // ==========================================
 // ABA 5: REVISÃO INTELIGENTE (ESPAÇADA)
 // ==========================================
-function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeSubjectIds, themeColors }) {
+function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeSubjectIds, themeColors, flashElementId }) {
   let todosAssuntos = [];
   edital.forEach(b => b.disciplinas.forEach(d => {
     d.assuntos.forEach(a => todosAssuntos.push({...a, discNome: d.nome}))
@@ -2016,7 +2167,7 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
     <div className="space-y-6 animate-in fade-in text-left pb-10">
       <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4">
         <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
-          <BrainCircuit className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Revisão Inteligente
+          <BrainCircuit className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Motor de Revisão
         </h2>
         <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">Retenção ativa guiada por espaçamento ótimo. Faça um esforço mental para lembrar os conceitos e avalie os tópicos abaixo.</p>
       </header>
@@ -2034,34 +2185,37 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
                 <p className="text-sm font-normal mt-1">Nenhum tópico pendente para hoje.</p>
               </div>
             ) : (
-              revisoesPendentes.map((data) => (
-                <div key={data.id} className="bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-700 p-5 rounded-2xl shadow-sm flex flex-col gap-4 border-l-4 border-l-red-500 transition-all hover:shadow-md">
-                  <div className="flex justify-between items-start">
-                    <div className="pr-4">
-                      <span className="text-xs uppercase font-bold text-slate-400 tracking-wider block mb-1">{data.discNome}</span>
-                      <h4 className="font-bold text-slate-800 dark:text-slate-100 text-lg leading-tight">{data.titulo}</h4>
+              revisoesPendentes.map((data) => {
+                const isFlashing = flashElementId === data.id;
+                return (
+                  <div key={data.id} className={`bg-white dark:bg-slate-900 border p-5 rounded-2xl shadow-sm flex flex-col gap-4 border-l-4 transition-all duration-300 ${isFlashing ? 'border-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 scale-[1.02]' : 'border-slate-200/60 dark:border-slate-700 border-l-red-500 hover:shadow-md'}`}>
+                    <div className="flex justify-between items-start">
+                      <div className="pr-4">
+                        <span className="text-xs uppercase font-bold text-slate-400 tracking-wider block mb-1">{data.discNome}</span>
+                        <h4 className="font-bold text-slate-800 dark:text-slate-100 text-lg leading-tight">{data.titulo}</h4>
+                      </div>
+                      {data.linkTec && (
+                        <a href={data.linkTec} target="_blank" rel="noreferrer" title="Abrir Caderno TEC" className={`p-2.5 rounded-xl ${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]} hover:scale-110 transition-transform cursor-pointer shrink-0 shadow-sm`}>
+                          <ExternalLink className="w-5 h-5" />
+                        </a>
+                      )}
                     </div>
-                    {data.linkTec && (
-                      <a href={data.linkTec} target="_blank" rel="noreferrer" title="Abrir Caderno TEC" className={`p-2.5 rounded-xl ${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]} hover:scale-110 transition-transform cursor-pointer shrink-0 shadow-sm`}>
-                        <ExternalLink className="w-5 h-5" />
-                      </a>
-                    )}
+                    
+                    {/* BOTÕES INLINE DE REVISÃO */}
+                    <div className="grid grid-cols-3 gap-3 mt-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                      <button onClick={() => handleReviewFeedback(data.id, 'dificil')} className="py-3 px-2 bg-red-50 hover:bg-red-500 text-red-600 hover:text-white dark:bg-red-900/10 dark:hover:bg-red-600 dark:text-red-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-red-100 dark:border-red-900/30">
+                        <span>Difícil</span><span className="text-[10px] font-bold opacity-70">Amanhã</span>
+                      </button>
+                      <button onClick={() => handleReviewFeedback(data.id, 'bom')} className="py-3 px-2 bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white dark:bg-amber-900/10 dark:hover:bg-amber-600 dark:text-amber-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-amber-100 dark:border-amber-900/30">
+                        <span>Bom</span><span className="text-[10px] font-bold opacity-70">7 Dias</span>
+                      </button>
+                      <button onClick={() => handleReviewFeedback(data.id, 'facil')} className="py-3 px-2 bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white dark:bg-emerald-900/10 dark:hover:bg-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-emerald-100 dark:border-emerald-900/30">
+                        <span>Fácil</span><span className="text-[10px] font-bold opacity-70">15 Dias</span>
+                      </button>
+                    </div>
                   </div>
-                  
-                  {/* BOTÕES INLINE DE REVISÃO */}
-                  <div className="grid grid-cols-3 gap-3 mt-2 pt-4 border-t border-slate-100 dark:border-slate-800">
-                    <button onClick={() => handleReviewFeedback(data.id, 'dificil')} className="py-3 px-2 bg-red-50 hover:bg-red-500 text-red-600 hover:text-white dark:bg-red-900/10 dark:hover:bg-red-600 dark:text-red-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-red-100 dark:border-red-900/30">
-                      <span>Difícil</span><span className="text-[10px] font-bold opacity-70">Amanhã</span>
-                    </button>
-                    <button onClick={() => handleReviewFeedback(data.id, 'bom')} className="py-3 px-2 bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white dark:bg-amber-900/10 dark:hover:bg-amber-600 dark:text-amber-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-amber-100 dark:border-amber-900/30">
-                      <span>Bom</span><span className="text-[10px] font-bold opacity-70">7 Dias</span>
-                    </button>
-                    <button onClick={() => handleReviewFeedback(data.id, 'facil')} className="py-3 px-2 bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white dark:bg-emerald-900/10 dark:hover:bg-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-emerald-100 dark:border-emerald-900/30">
-                      <span>Fácil</span><span className="text-[10px] font-bold opacity-70">15 Dias</span>
-                    </button>
-                  </div>
-                </div>
-              ))
+                )
+              })
             )}
           </div>
         </div>
@@ -2080,8 +2234,9 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
                 .sort((a, b) => progress[a.id].nextReviewTimestamp - progress[b.id].nextReviewTimestamp)
                 .map((data) => {
                   const p = progress[data.id];
+                  const isFlashing = flashElementId === data.id;
                   return (
-                    <div key={data.id} className="bg-slate-50 dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 p-4 rounded-xl flex justify-between items-center opacity-80 hover:opacity-100 transition-opacity">
+                    <div key={data.id} className={`bg-slate-50 dark:bg-slate-900 border p-4 rounded-xl flex justify-between items-center transition-all duration-300 ${isFlashing ? 'border-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 opacity-100 scale-[1.02]' : 'border-slate-200/60 dark:border-slate-800 opacity-80 hover:opacity-100'}`}>
                       <div className="truncate pr-4">
                         <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">{data.discNome}</span>
                         <h4 className="font-bold text-slate-700 dark:text-slate-300 text-sm truncate">{data.titulo}</h4>
@@ -2103,7 +2258,7 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
 // ==========================================
 // ABA NOVA: PAINEL DE CONTROLE (ADMINISTRAÇÃO)
 // ==========================================
-function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gamification, setGamification, edital, setEdital, customSprint, setCustomSprint, initialEdital, sprintsCompleted, setSprintsCompleted, dailyLogs, setDailyLogs, reviewStats, themeColors, playLevelUpSound }) {
+function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gamification, setGamification, edital, setEdital, customSprint, setCustomSprint, initialEdital, sprintsCompleted, setSprintsCompleted, dailyLogs, setDailyLogs, reviewStats, dailyReviewStats, setDailyReviewStats, themeColors, playLevelUpSound }) {
   const [localConfig, setLocalConfig] = useState({
     ...config,
     revBom: config.revBom || 7,
@@ -2129,6 +2284,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
       edital: edital,
       logs: dailyLogs,
       reviewStats: reviewStats,
+      dailyReviewStats: dailyReviewStats,
       exportDate: new Date().toISOString()
     };
     
@@ -2155,6 +2311,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
         if (data.sprints) setCustomSprint(data.sprints);
         if (data.edital) setEdital(data.edital);
         if (data.logs) setDailyLogs(data.logs);
+        if (data.dailyReviewStats) setDailyReviewStats(data.dailyReviewStats);
         
         alert('🎉 Dados restaurados com sucesso na Nuvem! O seu progresso está a salvo.');
       } catch (err) {
@@ -2171,6 +2328,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
       setGamification(prev => ({ ...prev, xp: 0, streak: 0 }));
       setCustomSprint([]);
       setSprintsCompleted(0);
+      setDailyReviewStats({});
       setConfirmResetProgress(false);
       alert("Progresso, gamificação e fila de sprints foram limpos!");
     } else {
@@ -2186,6 +2344,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
       setCustomSprint([]);
       setSprintsCompleted(0);
       setDailyLogs({});
+      setDailyReviewStats({});
       setEdital(initialEdital);
       setConfirmFactoryReset(false);
       alert("Sistema restaurado para o Padrão de Fábrica.");
@@ -2429,7 +2588,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
             <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-red-100 dark:border-red-900/50 flex flex-col justify-between shadow-sm">
               <div>
                 <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Limpar Progresso</h4>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Zera todas as marcações de estudo, níveis, XP e revisões. O seu Arsenal de Matérias editado será <strong className="text-slate-700 dark:text-slate-300">mantido</strong>.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Zera todas as marcações de estudo, níveis, XP e revisões. O seu Edital Verticalizado será <strong className="text-slate-700 dark:text-slate-300">mantido</strong>.</p>
               </div>
               <button 
                 onClick={handleResetProgress}
@@ -2442,7 +2601,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
             <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-red-100 dark:border-red-900/50 flex flex-col justify-between shadow-sm">
               <div>
                 <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Restaurar Padrão de Fábrica</h4>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Aviso: Isto apaga <strong className="text-red-500">TUDO</strong>. O progresso e qualquer matéria ou flashcard que tenha adicionado serão destruídos.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Aviso: Isto apaga <strong className="text-red-500">TUDO</strong>. O progresso e qualquer matéria que tenha adicionado serão destruídos.</p>
               </div>
               <button 
                 onClick={handleFactoryReset}
