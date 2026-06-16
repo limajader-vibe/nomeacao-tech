@@ -13,10 +13,8 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithCustomToken, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 
-// Configuração Automática do Canvas ou Manual (Para o seu Vercel)
 const canvasConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : null;
 
-// 👇 CONCURSEIRO: MANTENHA AQUI AS SUAS CHAVES DO FIREBASE 👇
 const myFirebaseConfig = {
   apiKey: "AIzaSyDQNSDxWrhWryoL8tpTsa8NDT33RY8wq1w",
   authDomain: "nomeacao-tech.firebaseapp.com",
@@ -39,11 +37,9 @@ try {
   console.error("Firebase Init Error:", e);
 }
 
-// Sanitização robusta para o ID do documento
 const appIdStr = typeof __app_id !== 'undefined' ? String(__app_id) : 'nomeacao-tech-prod';
 const safeAppId = encodeURIComponent(appIdStr).replace(/\./g, '_'); 
 
-// --- CONFIGURAÇÃO INICIAL E TEMAS ---
 const getStorage = (key, defaultValue) => {
   try { 
     const item = localStorage.getItem(key);
@@ -67,23 +63,74 @@ const initialConfig = {
   revFacil: 15
 };
 
+// MOTOR DE TEMAS: 100% Compatível com Cyberpunk/Dark Mode
 export const THEMES = {
   default: {
     name: 'Azul Foco (Padrão)',
-    sidebar: 'from-blue-700 to-indigo-900 dark:bg-[#0d1526]',
-    button: 'bg-indigo-600 hover:bg-indigo-700 text-white',
-    activeTab: 'bg-indigo-600 dark:bg-orange-500/10 dark:text-orange-400 text-white',
-    icon: 'text-indigo-500 dark:text-orange-500',
-    bg: 'bg-indigo-500 dark:bg-orange-500',
-    lightBg: 'bg-indigo-50 dark:bg-orange-500/10',
-    headerBg: 'bg-indigo-100/60 dark:bg-[#0d1526]', 
-    border: 'border-indigo-200/60 dark:border-white/5',
-    text: 'text-indigo-600 dark:text-orange-400',
-    solidText: 'text-white'
+    primaryText: 'text-indigo-600 dark:text-indigo-400',
+    brightText: 'text-indigo-500 dark:text-indigo-500',
+    bgSolid: 'bg-indigo-500',
+    bgHover: 'hover:bg-indigo-600',
+    bgSuperLight: 'bg-indigo-50 dark:bg-indigo-500/10',
+    borderLight: 'border-indigo-200 dark:border-indigo-500/20',
+    borderSolid: 'border-indigo-500 dark:border-indigo-500',
+    borderLeft: 'border-l-indigo-500 dark:border-l-indigo-500',
+    ring: 'focus:ring-indigo-500 ring-indigo-500',
+    shadow: 'shadow-indigo-500/20',
+    shadowHover: 'hover:shadow-indigo-500/30',
+    glow: 'drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]',
+    iconGlow: 'shadow-[0_0_30px_rgba(99,102,241,0.15)]'
+  },
+  esmeralda: {
+    name: 'Esmeralda (Aprovação)',
+    primaryText: 'text-emerald-600 dark:text-emerald-400',
+    brightText: 'text-emerald-500 dark:text-emerald-500',
+    bgSolid: 'bg-emerald-500',
+    bgHover: 'hover:bg-emerald-600',
+    bgSuperLight: 'bg-emerald-50 dark:bg-emerald-500/10',
+    borderLight: 'border-emerald-200 dark:border-emerald-500/20',
+    borderSolid: 'border-emerald-500 dark:border-emerald-500',
+    borderLeft: 'border-l-emerald-500 dark:border-l-emerald-500',
+    ring: 'focus:ring-emerald-500 ring-emerald-500',
+    shadow: 'shadow-emerald-500/20',
+    shadowHover: 'hover:shadow-emerald-500/30',
+    glow: 'drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]',
+    iconGlow: 'shadow-[0_0_30px_rgba(16,185,129,0.15)]'
+  },
+  caveira: {
+    name: 'Caveira (Laranja Tático)',
+    primaryText: 'text-orange-600 dark:text-orange-400',
+    brightText: 'text-orange-500 dark:text-orange-500',
+    bgSolid: 'bg-orange-500',
+    bgHover: 'hover:bg-orange-600',
+    bgSuperLight: 'bg-orange-50 dark:bg-orange-500/10',
+    borderLight: 'border-orange-200 dark:border-orange-500/20',
+    borderSolid: 'border-orange-500 dark:border-orange-500',
+    borderLeft: 'border-l-orange-500 dark:border-l-orange-500',
+    ring: 'focus:ring-orange-500 ring-orange-500',
+    shadow: 'shadow-orange-500/20',
+    shadowHover: 'hover:shadow-orange-500/30',
+    glow: 'drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]',
+    iconGlow: 'shadow-[0_0_30px_rgba(249,115,22,0.15)]'
+  },
+  retaFinal: {
+    name: 'Reta Final (Vermelho Alerta)',
+    primaryText: 'text-rose-600 dark:text-rose-400',
+    brightText: 'text-rose-500 dark:text-rose-500',
+    bgSolid: 'bg-rose-500',
+    bgHover: 'hover:bg-rose-600',
+    bgSuperLight: 'bg-rose-50 dark:bg-rose-500/10',
+    borderLight: 'border-rose-200 dark:border-rose-500/20',
+    borderSolid: 'border-rose-500 dark:border-rose-500',
+    borderLeft: 'border-l-rose-500 dark:border-l-rose-500',
+    ring: 'focus:ring-rose-500 ring-rose-500',
+    shadow: 'shadow-rose-500/20',
+    shadowHover: 'hover:shadow-rose-500/30',
+    glow: 'drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]',
+    iconGlow: 'shadow-[0_0_30px_rgba(244,63,94,0.15)]'
   }
 };
 
-// --- SINTETIZADOR NATIVO DE EFEITOS SONOROS ---
 const playLevelUpSound = (soundType) => {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -104,8 +151,8 @@ const playLevelUpSound = (soundType) => {
     };
 
     if (soundType === 'mario') {
-      playTone(987.77, 'square', 0, 0.1, 0.1);     // B5
-      playTone(1318.51, 'square', 0.1, 0.4, 0.1);  // E6
+      playTone(987.77, 'square', 0, 0.1, 0.1);    
+      playTone(1318.51, 'square', 0.1, 0.4, 0.1); 
     } else if (soundType === 'arcade') {
       const notes = [330, 440, 554, 659, 880];
       notes.forEach((f, i) => playTone(f, 'square', i * 0.08, 0.2, 0.08));
@@ -151,27 +198,27 @@ export const LEVELS_MAP = [
 // COMPONENTES ISOLADOS E OTIMIZADOS
 // ==========================================
 
-const EmptyState = ({ icon: Icon, title, message, actionLabel, onAction }) => (
+const EmptyState = ({ icon: Icon, title, message, actionLabel, onAction, themeColors }) => (
   <div className="bg-white dark:bg-[#111e36] border border-slate-200 dark:border-white/5 border-dashed rounded-3xl p-12 flex flex-col items-center justify-center mt-8 shadow-sm">
-    <div className="w-20 h-20 bg-orange-50 dark:bg-orange-500/10 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(249,115,22,0.1)]">
-      <Icon className="w-10 h-10 text-orange-500" />
+    <div className={`w-20 h-20 ${themeColors.bgSuperLight} rounded-full flex items-center justify-center mb-6 ${themeColors.iconGlow}`}>
+      <Icon className={`w-10 h-10 ${themeColors.brightText}`} />
     </div>
     <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">{title}</h3>
     <p className="text-base text-slate-500 dark:text-white/40 mb-8 text-center max-w-sm">{message}</p>
     {actionLabel && onAction && (
-      <button onClick={onAction} className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3.5 rounded-xl text-sm font-bold cursor-pointer transition-all shadow-lg hover:shadow-orange-500/30">
+      <button onClick={onAction} className={`${themeColors.bgSolid} ${themeColors.bgHover} text-white px-8 py-3.5 rounded-xl text-sm font-bold cursor-pointer transition-all shadow-lg ${themeColors.shadowHover}`}>
         {actionLabel}
       </button>
     )}
   </div>
 );
 
-const SectionHeader = ({ overline, title, subtitle, icon: Icon, extra }) => (
+const SectionHeader = ({ overline, title, subtitle, icon: Icon, extra, themeColors }) => (
   <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-200/60 dark:border-white/5 pb-5 gap-4">
     <div>
-      {overline && <span className="text-[10px] font-black text-orange-500 tracking-widest uppercase mb-1.5 block">{overline}</span>}
+      {overline && <span className={`text-[10px] font-black ${themeColors.brightText} tracking-widest uppercase mb-1.5 block`}>{overline}</span>}
       <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
-        {Icon && <Icon className="w-8 h-8 text-orange-500" />}
+        {Icon && <Icon className={`w-8 h-8 ${themeColors.brightText}`} />}
         {title}
       </h2>
       {subtitle && <p className="text-slate-500 dark:text-white/30 mt-2 text-base font-medium">{subtitle}</p>}
@@ -233,11 +280,11 @@ function PomodoroWidget({ themeColors, handleAutoLog, addXP, triggerConfetti }) 
                 stroke="currentColor" strokeWidth="4" fill="transparent" 
                 strokeDasharray={circumference} strokeDashoffset={offset} 
                 strokeLinecap="round"
-                className={`transition-all duration-1000 ease-linear ${isPomodoroActive && !isPomodoroBreak ? 'text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]' : isPomodoroBreak ? 'text-emerald-500' : 'text-slate-300 dark:text-slate-600'}`} 
+                className={`transition-all duration-1000 ease-linear ${isPomodoroActive && !isPomodoroBreak ? `${themeColors.brightText} ${themeColors.glow}` : isPomodoroBreak ? 'text-emerald-500' : 'text-slate-300 dark:text-white/20'}`} 
               />
             </svg>
             <div className={`absolute inset-0 flex items-center justify-center ${isPomodoroActive && !isPomodoroBreak ? 'animate-pulse' : ''}`}>
-               {isPomodoroBreak ? <Coffee className="w-6 h-6 text-emerald-500" /> : <Clock className={`w-6 h-6 ${isPomodoroActive ? 'text-orange-500' : 'text-slate-400 dark:text-slate-500'}`} />}
+               {isPomodoroBreak ? <Coffee className="w-6 h-6 text-emerald-500" /> : <Clock className={`w-6 h-6 ${isPomodoroActive ? themeColors.brightText : 'text-slate-400 dark:text-slate-500'}`} />}
             </div>
          </div>
 
@@ -248,14 +295,14 @@ function PomodoroWidget({ themeColors, handleAutoLog, addXP, triggerConfetti }) 
        </div>
        
        <div className="flex items-center gap-6 pr-4">
-         <span className={`font-mono text-5xl font-black tracking-tighter w-36 text-center tabular-nums ${isPomodoroActive && !isPomodoroBreak ? 'text-orange-500' : isPomodoroBreak ? 'text-emerald-500' : 'text-slate-800 dark:text-white'}`}>
+         <span className={`font-mono text-5xl font-black tracking-tighter w-36 text-center tabular-nums ${isPomodoroActive && !isPomodoroBreak ? themeColors.brightText : isPomodoroBreak ? 'text-emerald-500' : 'text-slate-800 dark:text-white'}`}>
            {formatTime(pomodoroTime)}
          </span>
          <div className="flex gap-3">
-           <button onClick={togglePomodoro} className={`p-4 rounded-2xl shadow-lg transition-all hover:scale-105 cursor-pointer ${isPomodoroActive ? 'bg-slate-800 text-white dark:bg-white/10 dark:hover:bg-white/20' : 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/30'}`}>
+           <button onClick={togglePomodoro} className={`p-4 rounded-2xl shadow-lg transition-all hover:scale-105 cursor-pointer ${isPomodoroActive ? 'bg-slate-800 text-white dark:bg-white/10 dark:hover:bg-white/20' : `${themeColors.bgSolid} ${themeColors.bgHover} text-white ${themeColors.shadow}`}`}>
              {isPomodoroActive ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current ml-1" />}
            </button>
-           <button onClick={resetPomodoro} className="p-4 bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 rounded-2xl transition-all hover:scale-105 cursor-pointer" title="Reiniciar">
+           <button onClick={resetPomodoro} className="p-4 bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-600 dark:text-white/60 rounded-2xl transition-all hover:scale-105 cursor-pointer" title="Reiniciar">
              <RefreshCcw className="w-6 h-6" />
            </button>
          </div>
@@ -268,7 +315,7 @@ const CircularProgress = ({ percent, themeColors }) => {
   const radius = 9;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percent / 100) * circumference;
-  const colorClass = percent === 100 ? 'text-emerald-500' : themeColors.text.split(' ')[0];
+  const colorClass = percent === 100 ? 'text-emerald-500' : themeColors.primaryText;
 
   return (
     <div className="relative flex items-center justify-center w-6 h-6 shrink-0 opacity-80">
@@ -286,21 +333,21 @@ const ModalEditor = ({ assunto, onSave, onCancel, themeColors }) => {
   const [link, setLink] = useState(assunto.linkTec || '');
   
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm animate-in fade-in p-4">
-      <div className="bg-white dark:bg-[#0d1526] p-6 rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-md animate-in zoom-in-95">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 dark:bg-[#0d1526]/80 backdrop-blur-sm animate-in fade-in p-4">
+      <div className="bg-white dark:bg-[#111e36] p-6 rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-md animate-in zoom-in-95">
         <h3 className="text-xl font-black text-slate-800 dark:text-white mb-5">Editar Assunto</h3>
         <div className="space-y-5">
           <div>
             <label className="text-[10px] font-bold text-slate-500 dark:text-white/40 uppercase ml-1 tracking-widest">Título do Assunto</label>
-            <input type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} className="w-full p-3.5 text-sm rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#111e36] text-slate-800 dark:text-white outline-none focus:border-orange-500 mt-1 transition-colors" placeholder="Ex: Atributos do Ato Administrativo" autoFocus />
+            <input type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} className={`w-full p-3.5 text-sm rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none ${themeColors.ring} mt-1 transition-colors`} placeholder="Ex: Atributos do Ato Administrativo" autoFocus />
           </div>
           <div>
             <label className="text-[10px] font-bold text-slate-500 dark:text-white/40 uppercase ml-1 tracking-widest">Link de Questões (Opcional)</label>
-            <input type="text" value={link} onChange={(e) => setLink(e.target.value)} className="w-full p-3.5 text-sm rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#111e36] text-slate-800 dark:text-white outline-none focus:border-orange-500 mt-1 transition-colors" placeholder="https://tecconcursos..." />
+            <input type="text" value={link} onChange={(e) => setLink(e.target.value)} className={`w-full p-3.5 text-sm rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none ${themeColors.ring} mt-1 transition-colors`} placeholder="https://tecconcursos..." />
           </div>
         </div>
         <div className="flex gap-3 mt-8">
-          <button onClick={() => onSave(titulo, link)} className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-3.5 rounded-xl text-sm font-bold transition-all shadow-md cursor-pointer w-full">Guardar</button>
+          <button onClick={() => onSave(titulo, link)} className={`${themeColors.bgSolid} ${themeColors.bgHover} text-white px-5 py-3.5 rounded-xl text-sm font-bold transition-all shadow-md cursor-pointer w-full`}>Guardar</button>
           <button onClick={onCancel} className="bg-slate-200 dark:bg-white/5 text-slate-700 dark:text-white/70 hover:dark:bg-white/10 px-5 py-3.5 rounded-xl text-sm font-bold transition-colors cursor-pointer w-full">Cancelar</button>
         </div>
       </div>
@@ -308,11 +355,11 @@ const ModalEditor = ({ assunto, onSave, onCancel, themeColors }) => {
   );
 };
 
-const ConfettiOverlay = ({ fire }) => {
+const ConfettiOverlay = ({ fire, themeColors }) => {
   const [particles, setParticles] = useState([]);
   useEffect(() => {
     if (fire > 0) {
-      const colors = ['#f97316', '#f59e0b', '#10b981', '#3b82f6'];
+      const colors = themeColors?.confetti || ['#f97316', '#f59e0b', '#10b981', '#3b82f6'];
       const newParticles = Array.from({ length: 120 }).map((_, i) => ({
         id: i, left: Math.random() * 100, delay: Math.random() * 0.5, duration: 1.5 + Math.random() * 2,
         color: colors[Math.floor(Math.random() * colors.length)], size: 6 + Math.random() * 10, tilt: Math.random() * 360
@@ -321,7 +368,7 @@ const ConfettiOverlay = ({ fire }) => {
       const timer = setTimeout(() => setParticles([]), 4000);
       return () => clearTimeout(timer);
     }
-  }, [fire]);
+  }, [fire, themeColors]);
 
   if (particles.length === 0) return null;
   return (
@@ -337,8 +384,8 @@ const ConfettiOverlay = ({ fire }) => {
 const LevelUpModal = ({ data, onClose }) => {
   if (!data) return null;
   return (
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-300 px-4">
-      <div className="bg-white dark:bg-[#0d1526] p-8 md:p-12 rounded-[2rem] shadow-2xl border border-amber-500/30 max-w-sm w-full text-center transform transition-all animate-in zoom-in-90 duration-500 relative overflow-hidden">
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/80 dark:bg-[#0d1526]/90 backdrop-blur-md animate-in fade-in duration-300 px-4">
+      <div className="bg-white dark:bg-[#111e36] p-8 md:p-12 rounded-[2rem] shadow-2xl border border-amber-500/30 max-w-sm w-full text-center transform transition-all animate-in zoom-in-90 duration-500 relative overflow-hidden">
         <div className="absolute inset-0 flex items-center justify-center opacity-10 animate-spin-slow pointer-events-none" style={{ animationDuration: '20s' }}>
            <div className="w-[150%] h-32 bg-amber-500 absolute rotate-0 blur-3xl"></div>
         </div>
@@ -348,7 +395,7 @@ const LevelUpModal = ({ data, onClose }) => {
           </div>
           <h2 className="text-5xl font-black text-slate-800 dark:text-white mb-2 tracking-tighter">Nível {data.nivel}!</h2>
           <p className="text-slate-500 dark:text-white/50 mb-8 font-medium">A sua consistência foi recompensada.</p>
-          <div className="bg-slate-50 dark:bg-[#111e36] p-5 rounded-2xl border border-slate-200 dark:border-white/5 mb-8">
+          <div className="bg-slate-50 dark:bg-[#0d1526] p-5 rounded-2xl border border-slate-200 dark:border-white/5 mb-8">
             <span className="block text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1.5">Nova Patente</span>
             <span className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">{data.titulo}</span>
           </div>
@@ -363,8 +410,8 @@ const LevelUpModal = ({ data, onClose }) => {
 
 const LevelMapModal = ({ onClose, currentXp }) => {
   return (
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-300 px-4">
-      <div className="bg-white dark:bg-[#0d1526] p-6 md:p-8 rounded-[2rem] shadow-2xl border border-slate-200 dark:border-white/10 max-w-md w-full relative">
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/80 dark:bg-[#0d1526]/80 backdrop-blur-sm animate-in fade-in duration-300 px-4">
+      <div className="bg-white dark:bg-[#111e36] p-6 md:p-8 rounded-[2rem] shadow-2xl border border-slate-200 dark:border-white/10 max-w-md w-full relative">
         <button onClick={onClose} className="absolute top-6 right-6 p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full cursor-pointer transition-colors"><X className="w-5 h-5"/></button>
         <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2 flex items-center gap-3"><Trophy className="text-amber-500 w-7 h-7"/> Jornada de Aprovação</h3>
         <p className="text-sm text-slate-500 dark:text-white/40 mb-8">Acompanhe os níveis e a experiência (XP) necessária.</p>
@@ -374,12 +421,12 @@ const LevelMapModal = ({ onClose, currentXp }) => {
             const isPast = currentXp >= lvl.max;
             return (
               <div key={lvl.nivel} className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${isCurrent ? 'bg-amber-50 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/20 shadow-sm' : isPast ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 opacity-80' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-transparent opacity-50'}`}>
-                <div className={`w-12 h-12 shrink-0 rounded-full flex items-center justify-center font-black text-lg ${isCurrent ? 'bg-amber-500 text-white' : isPast ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-[#111e36] text-slate-400 dark:text-white/30 border dark:border-white/5'}`}>
+                <div className={`w-12 h-12 shrink-0 rounded-full flex items-center justify-center font-black text-lg ${isCurrent ? 'bg-amber-500 text-white' : isPast ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-[#0d1526] text-slate-400 dark:text-white/30 border dark:border-white/5'}`}>
                   {isPast ? <CheckCircle className="w-6 h-6"/> : lvl.nivel}
                 </div>
                 <div className="flex-1">
                   <h4 className={`font-bold text-lg leading-tight mb-0.5 ${isCurrent ? 'text-amber-700 dark:text-amber-400' : isPast ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-600 dark:text-white/60'}`}>{lvl.titulo}</h4>
-                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">{lvl.min} a {lvl.max} XP</p>
+                  <p className="text-[10px] uppercase font-bold text-slate-400 dark:text-white/40 tracking-wider">{lvl.min} a {lvl.max} XP</p>
                 </div>
                 {isCurrent && <div className="text-[10px] font-black uppercase text-amber-500 bg-white dark:bg-[#0d1526] px-2.5 py-1 rounded border border-amber-200 dark:border-amber-500/20">Atual</div>}
               </div>
@@ -394,7 +441,7 @@ const LevelMapModal = ({ onClose, currentXp }) => {
 // ==========================================
 // TELA DE AUTENTICAÇÃO (LOGIN/REGISTO)
 // ==========================================
-const AuthScreen = ({ auth }) => {
+const AuthScreen = ({ auth, themeColors }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -438,7 +485,7 @@ const AuthScreen = ({ auth }) => {
     <div className="min-h-screen bg-[#0d1526] flex flex-col items-center justify-center p-4 text-slate-200 animate-in fade-in">
       <div className="bg-[#111e36] p-10 rounded-[2.5rem] w-full max-w-md shadow-2xl border border-white/5 relative overflow-hidden">
         
-        <div className="w-20 h-20 bg-orange-500/10 text-orange-500 flex items-center justify-center rounded-full mx-auto mb-6">
+        <div className={`w-20 h-20 ${themeColors.bgSuperLight} ${themeColors.brightText} flex items-center justify-center rounded-full mx-auto mb-6`}>
           <Lock className="w-10 h-10" />
         </div>
         
@@ -452,7 +499,7 @@ const AuthScreen = ({ auth }) => {
             <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2 block ml-1">O seu E-mail</label>
             <input 
               type="email" required value={email} onChange={e => setEmail(e.target.value)} 
-              className="w-full p-4 rounded-xl bg-[#0d1526] border border-white/5 text-white outline-none focus:border-orange-500 transition-colors shadow-inner" 
+              className={`w-full p-4 rounded-xl bg-[#0d1526] border border-white/5 text-white outline-none ${themeColors.ring} transition-colors shadow-inner`} 
               placeholder="estudante@concursos.com" 
             />
           </div>
@@ -460,17 +507,17 @@ const AuthScreen = ({ auth }) => {
             <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2 block ml-1">Palavra-passe</label>
             <input 
               type="password" required minLength="6" value={password} onChange={e => setPassword(e.target.value)} 
-              className="w-full p-4 rounded-xl bg-[#0d1526] border border-white/5 text-white outline-none focus:border-orange-500 transition-colors shadow-inner font-black tracking-widest" 
+              className={`w-full p-4 rounded-xl bg-[#0d1526] border border-white/5 text-white outline-none ${themeColors.ring} transition-colors shadow-inner font-black tracking-widest`} 
               placeholder="••••••••" 
             />
           </div>
           
           {!isLogin && (
             <div className="animate-in fade-in slide-in-from-top-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-orange-500 mb-2 block ml-1 flex items-center gap-1.5"><ShieldAlert className="w-3.5 h-3.5"/> Código de Convite</label>
+              <label className={`text-[10px] font-bold uppercase tracking-widest ${themeColors.brightText} mb-2 block ml-1 flex items-center gap-1.5`}><ShieldAlert className="w-3.5 h-3.5"/> Código de Convite</label>
               <input 
                 type="text" required={!isLogin} value={accessCode} onChange={e => setAccessCode(e.target.value)} 
-                className="w-full p-4 rounded-xl bg-[#0d1526] border border-orange-500/30 text-orange-400 outline-none focus:border-orange-500 transition-colors shadow-inner font-black tracking-widest uppercase" 
+                className={`w-full p-4 rounded-xl bg-[#0d1526] border ${themeColors.borderLight} ${themeColors.brightText} outline-none ${themeColors.ring} transition-colors shadow-inner font-black tracking-widest uppercase`} 
                 placeholder="Insira o código secreto..." 
               />
             </div>
@@ -478,7 +525,7 @@ const AuthScreen = ({ auth }) => {
           
           {error && <p className="text-red-400 text-sm font-bold bg-red-500/10 border border-red-500/20 p-4 rounded-xl flex items-center gap-3"><AlertTriangle className="w-5 h-5 shrink-0"/>{error}</p>}
 
-          <button type="submit" disabled={loading} className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 rounded-xl transition-all mt-6 shadow-lg shadow-orange-500/20 disabled:opacity-50 cursor-pointer">
+          <button type="submit" disabled={loading} className={`w-full ${themeColors.bgSolid} ${themeColors.bgHover} text-white font-black py-4 rounded-xl transition-all mt-6 shadow-lg ${themeColors.shadowHover} disabled:opacity-50 cursor-pointer`}>
             {loading ? 'A conectar...' : (isLogin ? 'Entrar no Sistema' : 'Criar Conta')}
           </button>
         </form>
@@ -534,9 +581,9 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
   for (let i = daysToLookBack; i >= 0; i--) {
     const d = new Date(todayObj); d.setDate(todayObj.getDate() - i);
     const dateStr = d.toLocaleDateString(); const hours = dailyLogs[dateStr] || 0;
-    let colorClass = 'bg-slate-200/50 dark:bg-white/5'; 
-    if (hours > 0 && hours < config.horasDia * 0.5) colorClass = 'bg-emerald-200 dark:bg-emerald-500/30';
-    else if (hours >= config.horasDia * 0.5 && hours < config.horasDia) colorClass = 'bg-emerald-300 dark:bg-emerald-500/60';
+    let colorClass = 'bg-slate-100 dark:bg-[#0d1526] border border-transparent dark:border-white/5'; 
+    if (hours > 0 && hours < config.horasDia * 0.5) colorClass = 'bg-emerald-200 dark:bg-emerald-900/40';
+    else if (hours >= config.horasDia * 0.5 && hours < config.horasDia) colorClass = 'bg-emerald-300 dark:bg-emerald-800/60';
     else if (hours >= config.horasDia && hours < config.horasDia * 1.5) colorClass = 'bg-emerald-500 dark:bg-emerald-500';
     else if (hours >= config.horasDia * 1.5) colorClass = 'bg-emerald-700 dark:bg-emerald-400 shadow-[0_0_5px_rgba(16,185,129,0.5)] scale-[1.05] z-10'; 
     heatmapDays.push({ date: dateStr, hours, colorClass });
@@ -593,10 +640,11 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
         title="Centro de Comando" 
         subtitle={`Fotografia tática · ${formattedDate}`} 
         icon={Activity}
+        themeColors={themeColors}
         extra={
-          <div className="border border-orange-500/20 rounded-2xl p-4 flex flex-col items-center justify-center bg-orange-500/5 shadow-sm min-w-[120px]">
-            <span className="text-[10px] font-black text-orange-500 tracking-widest uppercase mb-1">Progresso</span>
-            <span className="text-3xl font-black text-orange-500 leading-none">{progressPerc}%</span>
+          <div className={`border ${themeColors.borderLight} rounded-2xl p-4 flex flex-col items-center justify-center ${themeColors.bgSuperLight} shadow-sm min-w-[120px]`}>
+            <span className={`text-[10px] font-black ${themeColors.brightText} tracking-widest uppercase mb-1`}>Progresso</span>
+            <span className={`text-3xl font-black ${themeColors.brightText} leading-none`}>{progressPerc}%</span>
           </div>
         }
       />
@@ -605,11 +653,11 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Cartão 1: Domínio */}
-        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-orange-500 dark:border-l-orange-500">
+        <div className={`bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 ${themeColors.borderLeft}`}>
           <div className="flex justify-between items-start mb-4">
             <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">Domínio da Trilha</p>
-            <div className="p-2.5 rounded-xl border border-orange-200 dark:border-orange-500/20 bg-orange-50/50 dark:bg-orange-500/5">
-              <TrendingUp className="w-5 h-5 text-orange-500"/>
+            <div className={`p-2.5 rounded-xl border ${themeColors.borderLight} ${themeColors.bgSuperLight}`}>
+              <TrendingUp className={`w-5 h-5 ${themeColors.brightText}`}/>
             </div>
           </div>
           <div className="flex-1 flex items-baseline gap-1 mt-2">
@@ -617,14 +665,14 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
             <span className="text-2xl font-black text-slate-400 dark:text-white/30">%</span>
           </div>
           <div className="mt-8">
-            <div className="w-full h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden mb-3">
-              <div className="h-full bg-orange-500 transition-all duration-1000" style={{ width: `${progressPerc}%` }}></div>
+            <div className="w-full h-1.5 bg-slate-100 dark:bg-[#0d1526] rounded-full overflow-hidden mb-3">
+              <div className={`h-full ${themeColors.bgSolid} transition-all duration-1000`} style={{ width: `${progressPerc}%` }}></div>
             </div>
             <p className="text-[10px] font-bold text-slate-400 dark:text-white/30 tracking-wide">do edital dominado</p>
           </div>
         </div>
 
-        {/* Cartão 2: Horas */}
+        {/* Cartão 2: Horas (Fixo Sky Blue para Semântica SaaS) */}
         <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-sky-500 dark:border-l-sky-500">
           <div className="flex justify-between items-start mb-4">
             <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">Horas de Hoje</p>
@@ -653,14 +701,14 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
           </div>
 
           <div className="mt-8">
-            <div className="w-full h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden mb-3">
+            <div className="w-full h-1.5 bg-slate-100 dark:bg-[#0d1526] rounded-full overflow-hidden mb-3">
               <div className="h-full bg-sky-500 transition-all duration-1000" style={{ width: `${Math.min((todayHours / config.horasDia) * 100, 100)}%` }}></div>
             </div>
             <p className="text-[10px] font-bold text-slate-400 dark:text-white/30 tracking-wide">meta diária: {config.horasDia}h</p>
           </div>
         </div>
 
-        {/* Cartão 3: XP */}
+        {/* Cartão 3: XP (Fixo Amber para Semântica SaaS) */}
         <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-amber-500 dark:border-l-amber-500">
           <Trophy className="absolute -right-6 -bottom-6 w-40 h-40 text-slate-50 dark:text-white/[0.02] pointer-events-none" />
           
@@ -706,7 +754,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
               return (
                 <div key={i} className="flex flex-col items-center flex-1 group">
                   <div className="w-full h-40 flex items-end justify-center relative">
-                    <div className={`w-full max-w-[24px] rounded-t-lg transition-all duration-700 ease-out hover:opacity-80 ${isToday ? 'bg-sky-500' : 'bg-slate-100 dark:bg-white/5'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '8px' : '0' }}>
+                    <div className={`w-full max-w-[24px] rounded-t-lg transition-all duration-700 ease-out hover:opacity-80 ${isToday ? 'bg-sky-500' : 'bg-slate-100 dark:bg-[#0d1526] border dark:border-white/5'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '8px' : '0' }}>
                       <span className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 dark:bg-white dark:text-slate-900 text-white text-[10px] font-black px-2 py-1 rounded pointer-events-none transition-opacity z-10 shadow-sm">{hours > 0 ? `${hours}h` : '0h'}</span>
                     </div>
                   </div>
@@ -799,9 +847,9 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
             </div>
             <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-white/30">
               <span>Menos</span>
-              <div className="w-3.5 h-3.5 rounded bg-slate-100 dark:bg-white/5"></div>
-              <div className="w-3.5 h-3.5 rounded bg-emerald-200 dark:bg-emerald-500/30"></div>
-              <div className="w-3.5 h-3.5 rounded bg-emerald-300 dark:bg-emerald-500/60"></div>
+              <div className="w-3.5 h-3.5 rounded bg-slate-100 dark:bg-[#0d1526] border dark:border-white/5"></div>
+              <div className="w-3.5 h-3.5 rounded bg-emerald-200 dark:bg-emerald-900/40"></div>
+              <div className="w-3.5 h-3.5 rounded bg-emerald-300 dark:bg-emerald-800/60"></div>
               <div className="w-3.5 h-3.5 rounded bg-emerald-500 dark:bg-emerald-500"></div>
               <div className="w-3.5 h-3.5 rounded bg-emerald-700 dark:bg-emerald-400"></div>
               <span>Mais</span>
@@ -820,16 +868,16 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
         </div>
 
         <div className="bg-white dark:bg-[#111e36] rounded-[2rem] shadow-sm border border-slate-200/60 dark:border-white/5 p-8 flex flex-col h-full max-h-[320px]">
-          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-6 flex items-center gap-2 shrink-0"><Filter className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Raio-X por Disciplina</h3>
+          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-6 flex items-center gap-2 shrink-0"><Filter className={`w-5 h-5 ${themeColors.brightText}`}/> Raio-X por Disciplina</h3>
           <div className="space-y-5 flex-1 overflow-y-auto pr-4 custom-scrollbar">
             {radarData.length === 0 ? <div className="text-sm text-slate-400 dark:text-white/30 flex items-center justify-center h-full">Nenhuma disciplina cadastrada.</div> : radarData.map(disc => (
               <div key={disc.id} className="group">
                 <div className="flex justify-between items-end mb-2.5">
-                  <span className={`text-sm font-bold text-slate-700 dark:text-slate-300 truncate pr-3 group-hover:${themeColors.text.split(' ')[0]} transition-colors`}>{disc.nome}</span>
+                  <span className={`text-sm font-bold text-slate-700 dark:text-slate-300 truncate pr-3 group-hover:${themeColors.brightText} transition-colors`}>{disc.nome}</span>
                   <span className="text-sm font-black text-slate-800 dark:text-white shrink-0 tabular-nums">{disc.perc}%</span>
                 </div>
-                <div className="h-2.5 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
-                  <div className={`h-full transition-all duration-1000 rounded-full ${disc.perc === 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : themeColors.bg.split(' ')[0]}`} style={{width: `${disc.perc}%`}}></div>
+                <div className="h-2.5 w-full bg-slate-100 dark:bg-[#0d1526] rounded-full overflow-hidden">
+                  <div className={`h-full transition-all duration-1000 rounded-full ${disc.perc === 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : themeColors.bgSolid}`} style={{width: `${disc.perc}%`}}></div>
                 </div>
               </div>
             ))}
@@ -1100,17 +1148,18 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
         title="Edital Verticalizado" 
         subtitle="A sua Biblioteca. Onde a magia da organização acontece." 
         icon={Folder}
+        themeColors={themeColors}
         extra={
-          <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); setSelectedAssuntosBulk(new Set()); setInlineEditingId(null); }} className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/20' : 'bg-white dark:bg-[#111e36] text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 border border-slate-200/60 dark:border-white/10'}`}>
+          <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); setSelectedAssuntosBulk(new Set()); setInlineEditingId(null); }} className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? `${themeColors.bgSolid} ${themeColors.bgHover} text-white ${themeColors.shadowHover}` : `bg-white dark:bg-[#111e36] text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 border border-slate-200/60 dark:border-white/10`}`}>
             {isEditing ? <Save className="w-5 h-5"/> : <Edit className="w-5 h-5"/>}{isEditing ? 'Concluir Gestão' : 'Gerenciar Matérias'}
           </button>
         }
       />
 
       {isEditing && (
-        <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 shadow-sm">
+        <div className="bg-amber-50 dark:bg-[#111e36] border border-amber-200 dark:border-white/5 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 shadow-sm">
           <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
-          <div className="text-sm text-amber-800 dark:text-amber-200/80 leading-relaxed flex-1"><strong>Modo Edição Ativo:</strong> Arraste e solte (Vertical e Horizontal). Faça <strong className="underline">duplo clique</strong> num nome para editá-lo. Pressione <kbd className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">Enter</kbd> para guardar.</div>
+          <div className="text-sm text-amber-800 dark:text-white/60 leading-relaxed flex-1"><strong>Modo Edição Ativo:</strong> Arraste e solte (Vertical e Horizontal). Faça <strong className="underline">duplo clique</strong> num nome para editá-lo. Pressione <kbd className="bg-amber-100 dark:bg-white/10 px-1 rounded text-amber-900 dark:text-white">Enter</kbd> para guardar.</div>
         </div>
       )}
 
@@ -1151,7 +1200,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                   <div onClick={(e) => { if(isEditing) { e.stopPropagation(); toggleNode(bloco.id); } }} className="cursor-pointer shrink-0">
                     {expanded[bloco.id] ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
                   </div>
-                  <Layers className={`w-4 h-4 ${themeColors.text.split(' ')[0]} shrink-0 opacity-70`}/>
+                  <Layers className={`w-4 h-4 ${themeColors.brightText} shrink-0 opacity-70`}/>
                   
                   {isEditing ? (
                      <div className="flex-1 flex items-center gap-2">
@@ -1162,12 +1211,12 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                               onChange={(e) => setInlineEditValue(e.target.value)} 
                               onBlur={() => { if(inlineEditValue.trim()) handleEditBlocoNome(bloco.id, inlineEditValue); setInlineEditingId(null); }} 
                               onKeyDown={(e) => { if(e.key === 'Enter') { if(inlineEditValue.trim()) handleEditBlocoNome(bloco.id, inlineEditValue); setInlineEditingId(null); } if(e.key === 'Escape') setInlineEditingId(null); }} 
-                              className="flex-1 font-black text-xs uppercase tracking-wider text-slate-800 dark:text-white bg-transparent border-b border-orange-500 outline-none w-full" 
+                              className={`flex-1 font-black text-xs uppercase tracking-wider text-slate-800 dark:text-white bg-transparent border-b ${themeColors.borderSolid} outline-none w-full`} 
                            />
                         ) : (
                            <span onDoubleClick={(e) => { e.stopPropagation(); setInlineEditValue(bloco.nome); setInlineEditingId(bloco.id); }} className="flex-1 font-black text-xs text-slate-600 dark:text-white/80 uppercase tracking-wider truncate cursor-text" title="Duplo clique para editar">{bloco.nome}</span>
                         )}
-                        <Pencil onClick={() => { setInlineEditValue(bloco.nome); setInlineEditingId(bloco.id); }} className="w-3.5 h-3.5 text-slate-400 hover:text-orange-500 cursor-pointer opacity-0 group-hover:opacity-100" />
+                        <Pencil onClick={() => { setInlineEditValue(bloco.nome); setInlineEditingId(bloco.id); }} className={`w-3.5 h-3.5 text-slate-400 hover:${themeColors.brightText} cursor-pointer opacity-0 group-hover:opacity-100`} />
                         <Trash2 onClick={() => handleDeleteBlocoClick(bloco.id)} className="w-3.5 h-3.5 text-red-400 hover:text-red-500 cursor-pointer opacity-0 group-hover:opacity-100" />
                      </div>
                   ) : (
@@ -1184,7 +1233,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                       const progressoCircular = totalAssuntosDisc === 0 ? 0 : Math.round((concluidosAssuntosDisc / totalAssuntosDisc) * 100);
                       
                       return (
-                        <div key={disc.id} onClick={() => !isEditing && setSelectedDiscId(disc.id)} className={`group flex items-center gap-2 p-2.5 rounded-xl cursor-pointer transition-all ${isSelected && !isEditing ? `bg-orange-50/50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-500/20 shadow-sm` : 'hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent text-slate-600 dark:text-white/60'}`}>
+                        <div key={disc.id} onClick={() => !isEditing && setSelectedDiscId(disc.id)} className={`group flex items-center gap-2 p-2.5 rounded-xl cursor-pointer transition-all ${isSelected && !isEditing ? `${themeColors.bgSuperLight} ${themeColors.primaryText} border ${themeColors.borderLight} shadow-sm` : 'hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent text-slate-600 dark:text-white/60'}`}>
                           
                           <CircularProgress percent={progressoCircular} themeColors={themeColors} />
                           
@@ -1197,12 +1246,12 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                                      onChange={(e) => setInlineEditValue(e.target.value)} 
                                      onBlur={() => { if(inlineEditValue.trim()) handleEditDiscNome(bloco.id, disc.id, inlineEditValue); setInlineEditingId(null); }} 
                                      onKeyDown={(e) => { if(e.key === 'Enter') { if(inlineEditValue.trim()) handleEditDiscNome(bloco.id, disc.id, inlineEditValue); setInlineEditingId(null); } if(e.key === 'Escape') setInlineEditingId(null); }} 
-                                     className="font-bold text-sm flex-1 bg-transparent border-b border-orange-500 outline-none text-slate-800 dark:text-white w-full" 
+                                     className={`font-bold text-sm flex-1 bg-transparent border-b ${themeColors.borderSolid} outline-none text-slate-800 dark:text-white w-full`} 
                                   />
                                ) : (
                                   <span onDoubleClick={(e) => { e.stopPropagation(); setInlineEditValue(disc.nome); setInlineEditingId(disc.id); }} className="font-bold text-sm flex-1 truncate cursor-text" title="Duplo clique para editar">{disc.nome}</span>
                                )}
-                               <Pencil onClick={() => { setInlineEditValue(disc.nome); setInlineEditingId(disc.id); }} className="w-3.5 h-3.5 text-slate-400 hover:text-orange-500 cursor-pointer opacity-0 group-hover:opacity-100" />
+                               <Pencil onClick={() => { setInlineEditValue(disc.nome); setInlineEditingId(disc.id); }} className={`w-3.5 h-3.5 text-slate-400 hover:${themeColors.brightText} cursor-pointer opacity-0 group-hover:opacity-100`} />
                                <Trash2 onClick={() => handleDeleteDisciplinaClick(bloco.id, disc.id)} className="w-3.5 h-3.5 text-red-400 hover:text-red-500 cursor-pointer opacity-0 group-hover:opacity-100" />
                              </div>
                           ) : (
@@ -1220,7 +1269,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                     
                     {isEditing && (
                       <div className="pt-2">
-                        <button onClick={() => handleAddDisciplina(bloco.id)} className={`w-full flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-white/40 hover:text-orange-500 p-2 rounded-xl transition-colors cursor-pointer`}>
+                        <button onClick={() => handleAddDisciplina(bloco.id)} className={`w-full flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-white/40 hover:${themeColors.brightText} p-2 rounded-xl transition-colors cursor-pointer`}>
                           <Plus className="w-4 h-4"/> Add Disciplina
                         </button>
                       </div>
@@ -1233,7 +1282,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
 
           {isEditing && (
             <div className="pt-5 border-t border-slate-100 dark:border-white/5 mt-auto shrink-0">
-              <button onClick={handleAddBloco} className={`w-full flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest text-slate-500 dark:text-white/50 hover:text-orange-500 dark:hover:text-orange-400 bg-slate-50 dark:bg-white/5 p-3.5 rounded-xl transition-colors border-2 border-dashed border-slate-300 dark:border-white/10 cursor-pointer`}>
+              <button onClick={handleAddBloco} className={`w-full flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest text-slate-500 dark:text-white/50 hover:${themeColors.brightText} dark:hover:${themeColors.brightText} bg-slate-50 dark:bg-white/5 p-3.5 rounded-xl transition-colors border-2 border-dashed border-slate-300 dark:border-white/10 cursor-pointer`}>
                 <Layers className="w-4 h-4"/> Criar Novo Bloco
               </button>
             </div>
@@ -1248,12 +1297,13 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                 icon={BookOpen}
                 title="Biblioteca de Matérias"
                 message="Navegue pelo índice à esquerda. Aqui você tem a visão limpa e estruturada de cada tópico do seu edital."
+                themeColors={themeColors}
              />
           ) : (
             <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-300">
               
               <div className="mb-6 border-b border-slate-100 dark:border-white/5 pb-5">
-                <button onClick={() => setSelectedDiscId(null)} className="md:hidden flex items-center gap-1.5 text-sm font-bold text-orange-500 mb-4 cursor-pointer hover:underline">
+                <button onClick={() => setSelectedDiscId(null)} className={`md:hidden flex items-center gap-1.5 text-sm font-bold ${themeColors.brightText} mb-4 cursor-pointer hover:underline`}>
                   <ArrowLeft className="w-4 h-4" /> Voltar
                 </button>
                 
@@ -1261,7 +1311,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                    <Layers className="w-3.5 h-3.5" />
                    <span className="truncate max-w-[150px]">{activeBloco?.nome}</span>
                    <ChevronRight className="w-3 h-3 opacity-50 shrink-0" />
-                   <span className="text-orange-500 truncate">{activeDisc.nome}</span>
+                   <span className={`${themeColors.brightText} truncate`}>{activeDisc.nome}</span>
                 </div>
                 
                 <div className="flex items-start justify-between gap-4">
@@ -1309,7 +1359,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                           {/* LINHA GUIA DE DROP 4D */}
                           {isDropTarget && isEditing && (
                             <div
-                              className="absolute top-0 left-0 h-1 bg-orange-500 rounded-full z-20 transition-all duration-200 shadow-[0_0_8px_rgba(249,115,22,0.8)] pointer-events-none"
+                              className={`absolute top-0 left-0 h-1 ${themeColors.bgSolid} rounded-full z-20 transition-all duration-200 ${themeColors.glow} pointer-events-none`}
                               style={{
                                 marginLeft: `${dragTargetIndent * 1.5 + 0.75}rem`,
                                 width: `calc(100% - ${dragTargetIndent * 1.5 + 0.75}rem)`
@@ -1327,8 +1377,8 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                               group flex items-center py-2.5 px-3 transition-all duration-200 border-b border-slate-100 dark:border-white/5 
                               ${isEditing ? 'cursor-grab active:cursor-grabbing hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg' : 'hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg'} 
                               ${isParent && !isBeingDragged ? 'mt-4 border-t border-t-slate-200 dark:border-t-white/10 pt-4' : ''} 
-                              ${isSelectedBulk ? 'bg-amber-50 dark:bg-amber-500/10' : ''}
-                              ${isBeingDragged ? 'opacity-40 scale-[0.98] border-dashed border-2 border-orange-400 dark:border-orange-500 z-10 bg-white dark:bg-[#0d1526]' : ''}
+                              ${isSelectedBulk ? `${themeColors.bgSuperLight}` : ''}
+                              ${isBeingDragged ? `opacity-40 scale-[0.98] border-dashed border-2 ${themeColors.borderSolid} z-10 bg-white dark:bg-[#0d1526]` : ''}
                             `}
                           >
                             <div className="flex items-center gap-3 w-full">
@@ -1336,7 +1386,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                               {/* Checkbox de Seleção ou Ícone de Rato no Modo Edição */}
                               {isEditing ? (
                                  <div className="flex items-center gap-2">
-                                   <input type="checkbox" checked={isSelectedBulk} onChange={() => toggleBulkSelect(assunto.id)} className="w-4 h-4 rounded cursor-pointer border-slate-300 dark:border-white/10 text-orange-500 focus:ring-orange-500 shrink-0 bg-transparent" />
+                                   <input type="checkbox" checked={isSelectedBulk} onChange={() => toggleBulkSelect(assunto.id)} className={`w-4 h-4 rounded cursor-pointer border-slate-300 dark:border-white/10 ${themeColors.brightText} ${themeColors.ring} shrink-0 bg-transparent`} />
                                    <GripVertical className="w-4 h-4 text-slate-300 dark:text-white/20 shrink-0" />
                                  </div>
                               ) : (
@@ -1354,7 +1404,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                               >
                                 <div className="flex items-center gap-2 overflow-hidden w-full">
                                   {hasChildren && shouldApplyCollapse && !isEditing && (
-                                    <div className={`p-0.5 rounded shrink-0 transition-colors ${expandedTopics[assunto.id] ? themeColors.text.split(' ')[0] : 'text-slate-400 dark:text-white/40'}`}>
+                                    <div className={`p-0.5 rounded shrink-0 transition-colors ${expandedTopics[assunto.id] ? themeColors.primaryText : 'text-slate-400 dark:text-white/40'}`}>
                                       {expandedTopics[assunto.id] ? <ChevronDown className="w-4 h-4"/> : <ChevronRight className="w-4 h-4"/>}
                                     </div>
                                   )}
@@ -1374,7 +1424,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                                         } 
                                         if(e.key === 'Escape') setInlineEditingId(null); 
                                       }} 
-                                      className="flex-1 bg-transparent border-b border-orange-500 outline-none text-slate-800 dark:text-white font-medium text-sm w-full" 
+                                      className={`flex-1 bg-transparent border-b ${themeColors.borderSolid} outline-none text-slate-800 dark:text-white font-medium text-sm w-full`} 
                                     />
                                   ) : (
                                     <span 
@@ -1387,7 +1437,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                                   )}
                                   
                                   {assunto.linkTec && !isEditing && (
-                                    <a href={assunto.linkTec} onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-orange-500 transition-opacity" title="Abrir Caderno TEC">
+                                    <a href={assunto.linkTec} onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className={`opacity-0 group-hover:opacity-100 text-slate-400 hover:${themeColors.brightText} transition-opacity`} title="Abrir Caderno TEC">
                                       <ExternalLink className="w-3.5 h-3.5" />
                                     </a>
                                   )}
@@ -1399,11 +1449,11 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                                 <div className="opacity-0 group-hover:opacity-100 flex items-center gap-2 transition-opacity shrink-0">
                                   <button 
                                     onClick={(e) => { e.stopPropagation(); if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} 
-                                    className={`text-xs font-bold px-2 py-1.5 rounded border shadow-sm cursor-pointer ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20' : `bg-white dark:bg-[#0d1526] text-orange-500 border-orange-200 dark:border-orange-500/20 hover:bg-orange-50 dark:hover:bg-orange-500/10`}`}
+                                    className={`text-xs font-bold px-2 py-1.5 rounded border shadow-sm cursor-pointer ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20' : `bg-white dark:bg-[#0d1526] ${themeColors.brightText} ${themeColors.borderLight} hover:${themeColors.bgSuperLight}`}`}
                                   >
                                     {isInSprint ? 'Na Sprint' : (mastered ? 'Refazer' : '+ Sprint')}
                                   </button>
-                                  <button onClick={() => startEditTopic(assunto)} className="p-1.5 text-slate-400 hover:text-orange-500" title="Editar Tópico Inteiro"><Pencil className="w-3.5 h-3.5"/></button>
+                                  <button onClick={() => startEditTopic(assunto)} className={`p-1.5 text-slate-400 hover:${themeColors.brightText}`} title="Editar Tópico Inteiro"><Pencil className="w-3.5 h-3.5"/></button>
                                 </div>
                               )}
 
@@ -1420,7 +1470,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                                   
                                   <div className="w-px h-4 bg-slate-200 dark:bg-white/10 mx-1"></div>
                                   
-                                  <button onClick={() => startEditTopic(assunto)} className="p-1 text-slate-400 hover:text-orange-500 cursor-pointer" title="Editar Link/Mais"><Settings className="w-3.5 h-3.5"/></button>
+                                  <button onClick={() => startEditTopic(assunto)} className={`p-1 text-slate-400 hover:${themeColors.brightText} cursor-pointer`} title="Editar Link/Mais"><Settings className="w-3.5 h-3.5"/></button>
                                   <button onClick={() => handleDeleteClick(activeDisc.id, assunto.id)} className={`p-1 ${confirmDeleteId === assunto.id ? 'text-red-600' : 'text-slate-400 hover:text-red-500'} cursor-pointer`} title="Excluir"><Trash2 className="w-3.5 h-3.5"/></button>
                                 </div>
                               )}
@@ -1447,31 +1497,31 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
 
               {isEditing && (
                 <div className="mt-4 pt-5 border-t border-slate-100 dark:border-white/5 shrink-0">
-                  <div className="bg-amber-50 dark:bg-[#0d1526] border border-amber-200 dark:border-white/5 rounded-2xl p-5 flex flex-col gap-4 shadow-sm">
+                  <div className={`bg-amber-50 dark:bg-[#0d1526] border ${themeColors.borderLight} rounded-2xl p-5 flex flex-col gap-4 shadow-sm`}>
                     {bulkInput.discId === activeDisc.id ? (
                       <div className="flex flex-col gap-3 animate-in fade-in">
-                        <h4 className="text-xs font-black uppercase text-amber-700 dark:text-orange-500 flex items-center gap-2 tracking-widest"><ListPlus className="w-4 h-4"/> Importação Rápida</h4>
-                        <textarea rows="4" placeholder="Cole a lista de assuntos aqui... Ex:&#10;Modelagem de Dados&#10;Normalização" value={bulkInput.text} onChange={(e) => setBulkInput({ discId: activeDisc.id, text: e.target.value })} className="w-full p-4 text-sm rounded-xl border border-amber-300 dark:border-white/10 bg-white dark:bg-[#111e36] text-slate-800 dark:text-white outline-none focus:border-orange-500 resize-none transition-colors" />
+                        <h4 className={`text-xs font-black uppercase ${themeColors.brightText} flex items-center gap-2 tracking-widest`}><ListPlus className="w-4 h-4"/> Importação Rápida</h4>
+                        <textarea rows="4" placeholder="Cole a lista de assuntos aqui... Ex:&#10;Modelagem de Dados&#10;Normalização" value={bulkInput.text} onChange={(e) => setBulkInput({ discId: activeDisc.id, text: e.target.value })} className={`w-full p-4 text-sm rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#111e36] text-slate-800 dark:text-white outline-none ${themeColors.ring} resize-none transition-colors`} />
                         <div className="flex gap-3 mt-1">
-                          <button onClick={() => handleBulkAdd(activeDisc.id)} className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md">Gerar Assuntos</button>
+                          <button onClick={() => handleBulkAdd(activeDisc.id)} className={`${themeColors.bgSolid} ${themeColors.bgHover} text-white px-6 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md`}>Gerar Assuntos</button>
                           <button onClick={() => setBulkInput({ discId: null, text: '' })} className="bg-slate-200 dark:bg-white/5 text-slate-700 dark:text-white/70 hover:dark:bg-white/10 px-6 py-3 rounded-xl text-sm font-bold transition-colors cursor-pointer">Cancelar</button>
                         </div>
                       </div>
                     ) : (
                       <>
                         <div className="flex flex-col sm:flex-row gap-3 items-center">
-                          <Plus className="w-5 h-5 text-orange-500 shrink-0 hidden sm:block"/>
+                          <Plus className={`w-5 h-5 ${themeColors.brightText} shrink-0 hidden sm:block`}/>
                           <input 
                             type="text" 
                             placeholder="Adicionar assunto e pressionar Enter..." 
                             value={newTopic.discId === activeDisc.id ? newTopic.titulo : ''} 
                             onChange={(e) => setNewTopic({...newTopic, discId: activeDisc.id, titulo: e.target.value})} 
                             onKeyDown={(e) => { if(e.key === 'Enter') handleAddTopic(activeDisc.id); }}
-                            className="flex-1 w-full p-3.5 text-sm rounded-xl border border-amber-200 dark:border-white/10 bg-white dark:bg-[#111e36] text-slate-800 dark:text-white outline-none focus:border-orange-500 transition-colors" 
+                            className={`flex-1 w-full p-3.5 text-sm rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#111e36] text-slate-800 dark:text-white outline-none ${themeColors.ring} transition-colors`} 
                           />
-                          <button onClick={() => handleAddTopic(activeDisc.id)} className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3.5 rounded-xl text-sm font-bold w-full sm:w-auto transition-all cursor-pointer shadow-md">Adicionar</button>
+                          <button onClick={() => handleAddTopic(activeDisc.id)} className={`${themeColors.bgSolid} ${themeColors.bgHover} text-white px-6 py-3.5 rounded-xl text-sm font-bold w-full sm:w-auto transition-all cursor-pointer shadow-md`}>Adicionar</button>
                         </div>
-                        <button onClick={() => setBulkInput({ discId: activeDisc.id, text: '' })} className="w-full border border-dashed border-amber-400 dark:border-white/10 text-amber-700 dark:text-white/40 hover:bg-amber-100 dark:hover:bg-white/5 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors cursor-pointer mt-1">
+                        <button onClick={() => setBulkInput({ discId: activeDisc.id, text: '' })} className={`w-full border border-dashed ${themeColors.borderLight} ${themeColors.primaryText} hover:${themeColors.bgSuperLight} px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors cursor-pointer mt-1`}>
                           <ListPlus className="w-4 h-4"/> Colar Índice Completo
                         </button>
                       </>
@@ -1533,11 +1583,12 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
         title="Backlog de Sprints" 
         subtitle="O que for agendado aqui será executado na Mesa de Foco." 
         icon={LayoutGrid}
+        themeColors={themeColors}
       />
 
       <div className="flex flex-col lg:flex-row gap-6 items-start">
         <div className="w-full lg:w-1/3 bg-slate-50 dark:bg-[#111e36] rounded-[2rem] p-6 border border-slate-200/60 dark:border-white/5 min-h-[400px]">
-          <h3 className="font-black text-slate-600 dark:text-white uppercase tracking-wider mb-6 flex items-center gap-2 text-sm"><ListPlus className="w-5 h-5 text-orange-500"/> Fila de Sprints ({backlogSprints.length})</h3>
+          <h3 className={`font-black text-slate-600 dark:text-white uppercase tracking-wider mb-6 flex items-center gap-2 text-sm`}><ListPlus className={`w-5 h-5 ${themeColors.brightText}`}/> Fila de Sprints ({backlogSprints.length})</h3>
           
           <div className="space-y-5">
             {backlogSprints.length === 0 ? (
@@ -1547,6 +1598,7 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
                   message="Vá ao Edital Verticalizado para enviar matérias para cá."
                   actionLabel="Ir para Edital"
                   onAction={() => setActiveTab('disciplinas')}
+                  themeColors={themeColors}
                />
             ) : (
               backlogSprints.map((group, groupIdx) => (
@@ -1563,7 +1615,7 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
                          onDragEnter={(e) => handleDragEnter(e, globalIdx)}
                          onDragEnd={handleDragEnd}
                          onDragOver={(e) => e.preventDefault()}
-                         className={`mb-2 last:mb-0 flex items-start gap-2.5 cursor-move hover:bg-slate-50 dark:hover:bg-white/5 p-2.5 rounded-xl transition-all border border-transparent dark:hover:border-orange-500/30 ${isDragging ? 'opacity-40 border-dashed border-orange-500 scale-[0.98]' : ''}`}
+                         className={`mb-2 last:mb-0 flex items-start gap-2.5 cursor-move hover:bg-slate-50 dark:hover:bg-white/5 p-2.5 rounded-xl transition-all border border-transparent dark:hover:${themeColors.borderLight} ${isDragging ? `opacity-40 border-dashed ${themeColors.borderSolid} scale-[0.98]` : ''}`}
                        >
                          <GripVertical className="w-4 h-4 shrink-0 text-slate-300 dark:text-white/20 mt-0.5" />
                          <div>
@@ -1579,11 +1631,11 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
           </div>
         </div>
 
-        <div className={`w-full lg:w-1/3 bg-indigo-50 dark:bg-orange-500/5 rounded-[2rem] p-6 border border-indigo-200 dark:border-orange-500/20 min-h-[400px]`}>
-           <h3 className={`font-black text-indigo-700 dark:text-orange-500 uppercase tracking-wider mb-6 flex items-center gap-2 text-sm`}><PlayCircle className="w-5 h-5"/> Em Curso (Hoje)</h3>
+        <div className={`w-full lg:w-1/3 ${themeColors.bgSuperLight} rounded-[2rem] p-6 border ${themeColors.borderLight} min-h-[400px]`}>
+           <h3 className={`font-black ${themeColors.brightText} uppercase tracking-wider mb-6 flex items-center gap-2 text-sm`}><PlayCircle className="w-5 h-5"/> Em Curso (Hoje)</h3>
            {activeSprint ? (
-             <div className={`bg-white dark:bg-[#0d1526] p-6 rounded-2xl shadow-md border-2 border-indigo-200 dark:border-orange-500/30`}>
-                 <div className={`text-[10px] font-bold text-indigo-500 dark:text-orange-500 mb-4 uppercase tracking-widest`}>Sprint {sprintsCompleted + 1}</div>
+             <div className={`bg-white dark:bg-[#0d1526] p-6 rounded-2xl shadow-md border-2 ${themeColors.borderLight}`}>
+                 <div className={`text-[10px] font-bold ${themeColors.brightText} mb-4 uppercase tracking-widest`}>Sprint {sprintsCompleted + 1}</div>
                  {activeSprint.map((item, localIdx) => {
                    const globalIdx = localIdx;
                    const isDragging = draggedIndex === globalIdx;
@@ -1595,9 +1647,9 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
                        onDragEnter={(e) => handleDragEnter(e, globalIdx)}
                        onDragEnd={handleDragEnd}
                        onDragOver={(e) => e.preventDefault()}
-                       className={`mb-3 last:mb-0 flex items-start gap-3 cursor-move bg-slate-50 dark:bg-[#111e36] p-3.5 rounded-xl transition-all border border-slate-200 dark:border-white/5 hover:border-indigo-400 dark:hover:border-orange-400 shadow-sm ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-[0.98]' : ''}`}
+                       className={`mb-3 last:mb-0 flex items-start gap-3 cursor-move bg-slate-50 dark:bg-[#111e36] p-3.5 rounded-xl transition-all border border-slate-200 dark:border-white/5 hover:${themeColors.borderSolid} shadow-sm ${isDragging ? `opacity-40 border-dashed ${themeColors.borderSolid} scale-[0.98]` : ''}`}
                      >
-                       <GripVertical className={`w-4 h-4 shrink-0 mt-0.5 text-indigo-300 dark:text-orange-500/50`} />
+                       <GripVertical className={`w-4 h-4 shrink-0 mt-0.5 opacity-50 ${themeColors.brightText}`} />
                        <div>
                          <span className="block text-[10px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest truncate">{item.discNome}</span>
                          <span className="block text-sm font-bold text-slate-800 dark:text-white leading-tight mt-1">{item.assTitulo}</span>
@@ -1605,10 +1657,10 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
                      </div>
                    )
                  })}
-                 <button onClick={() => setActiveTab('cronograma')} className={`mt-6 w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-orange-500 dark:hover:bg-orange-600 font-bold text-sm py-3.5 rounded-xl transition-all cursor-pointer text-white shadow-md`}>Ir para Mesa de Foco</button>
+                 <button onClick={() => setActiveTab('cronograma')} className={`mt-6 w-full ${themeColors.bgSolid} ${themeColors.bgHover} font-bold text-sm py-3.5 rounded-xl transition-all cursor-pointer text-white shadow-md`}>Ir para Mesa de Foco</button>
               </div>
            ) : (
-             <div className={`text-sm text-indigo-500 dark:text-orange-500/50 p-8 border-2 border-dashed border-indigo-200 dark:border-orange-500/20 rounded-2xl flex items-center justify-center text-center h-48 font-medium`}>Nenhuma Sprint ativada hoje.</div>
+             <div className={`text-sm ${themeColors.brightText} opacity-80 p-8 border-2 border-dashed ${themeColors.borderLight} rounded-2xl flex items-center justify-center text-center h-48 font-medium`}>Nenhuma Sprint ativada hoje.</div>
            )}
         </div>
 
@@ -1677,8 +1729,9 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
         title="Mesa de Foco" 
         subtitle="Ocultámos as distrações. Marque os passos e ganhe +50 XP." 
         icon={Target}
+        themeColors={themeColors}
         extra={
-          <button disabled={sprintGroups.length === 0} onClick={handleCompleteSprint} className={`w-full md:w-auto px-8 py-3.5 rounded-xl font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${showConfirm ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30' : 'bg-emerald-500 text-white disabled:opacity-50 shadow-md hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/20'}`}>
+          <button disabled={sprintGroups.length === 0} onClick={handleCompleteSprint} className={`w-full md:w-auto px-8 py-3.5 rounded-xl font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${showConfirm ? `${themeColors.bgSolid} text-white shadow-lg ${themeColors.shadowHover}` : 'bg-emerald-500 text-white disabled:opacity-50 shadow-md hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/20'}`}>
             <CheckCircle className="w-5 h-5" /> {showConfirm ? 'Confirmar Fecho (+50 XP)' : 'Concluir Sprint'}
           </button>
         }
@@ -1695,6 +1748,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
            message="Você completou as missões de hoje. Vá ao Planejamento adicionar novas metas."
            actionLabel="Ir para Edital"
            onAction={() => setActiveTab('disciplinas')}
+           themeColors={themeColors}
         />
       ) : (
         <div className="grid gap-6 mt-6">
@@ -1727,10 +1781,10 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
             const isActive = idx === 0;
 
             return (
-              <div key={sprintNum} className={`bg-white dark:bg-[#0d1526] rounded-[2rem] overflow-hidden flex flex-col md:flex-row border border-slate-200/80 dark:border-white/5 shadow-sm transition-all ${isActive ? `ring-2 ring-orange-500 shadow-lg shadow-orange-500/10 scale-[1.01]` : 'opacity-90'}`}>
+              <div key={sprintNum} className={`bg-white dark:bg-[#0d1526] rounded-[2rem] overflow-hidden flex flex-col md:flex-row border border-slate-200/80 dark:border-white/5 shadow-sm transition-all ${isActive ? `ring-2 ${themeColors.ring} shadow-lg ${themeColors.shadowHover} scale-[1.01]` : 'opacity-90'}`}>
                 
-                {/* Lado Laranja / Marcação da Sprint */}
-                <div className={`p-6 w-full md:w-28 shrink-0 flex flex-col items-center justify-center font-black border-b md:border-b-0 md:border-r border-slate-200/80 dark:border-white/5 ${isActive ? `bg-orange-500 text-white` : 'bg-slate-50 dark:bg-[#111e36] text-slate-400 dark:text-white/40'}`}>
+                {/* Lado Destaque / Marcação da Sprint */}
+                <div className={`p-6 w-full md:w-28 shrink-0 flex flex-col items-center justify-center font-black border-b md:border-b-0 md:border-r border-slate-200/80 dark:border-white/5 ${isActive ? `${themeColors.bgSolid} text-white` : 'bg-slate-50 dark:bg-[#111e36] text-slate-400 dark:text-white/40'}`}>
                   <span className="text-[10px] uppercase tracking-widest">Sprint</span><span className="text-5xl mt-1">{sprintNum}</span>
                   {isActive && <span className="text-[10px] bg-white/20 px-2.5 py-1 rounded-md mt-3 font-bold tracking-wider text-white">HOJE</span>}
                 </div>
@@ -1752,35 +1806,35 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                         onDragEnter={(e) => handleDragEnter(e, globalIdx)}
                         onDragEnd={handleDragEnd}
                         onDragOver={(e) => e.preventDefault()}
-                        className={`rounded-2xl p-6 flex flex-col relative transition-all duration-300 cursor-move ${isFlashing ? 'bg-emerald-100 dark:bg-emerald-900/40 border-emerald-400 ring-2 ring-emerald-400 scale-[1.02]' : isActive ? `bg-white dark:bg-[#111e36] border border-slate-200 dark:border-white/10 shadow-sm` : 'bg-slate-50 dark:bg-[#111e36]/50 border border-slate-200 dark:border-white/5'} ${isDragging ? 'opacity-40 border-dashed border-orange-400 scale-95 z-10' : 'hover:shadow-md'}`}
+                        className={`rounded-2xl p-6 flex flex-col relative transition-all duration-300 cursor-move ${isFlashing ? 'bg-emerald-100 dark:bg-emerald-900/40 border-emerald-400 ring-2 ring-emerald-400 scale-[1.02]' : isActive ? `bg-white dark:bg-[#111e36] border border-slate-200 dark:border-white/10 shadow-sm` : 'bg-slate-50 dark:bg-[#111e36]/50 border border-slate-200 dark:border-white/5'} ${isDragging ? `opacity-40 border-dashed ${themeColors.borderSolid} scale-95 z-10` : 'hover:shadow-md'}`}
                       >
                         <div className="absolute top-5 right-12 text-slate-300 dark:text-white/20 hover:text-slate-500 dark:hover:text-white transition-colors" title="Arrastar e Soltar">
                           <GripVertical className="w-5 h-5" />
                         </div>
                         <button onClick={() => setCustomSprint(p => p.filter(i => i.assId !== item.assId))} className="absolute top-5 right-4 text-slate-300 dark:text-white/20 hover:text-red-500 transition-colors cursor-pointer" title="Remover"><Trash2 className="w-5 h-5"/></button>
                         
-                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-orange-500 mb-2 pr-14">{item.discNome}</span>
+                        <span className={`text-[10px] font-black uppercase tracking-widest text-slate-500 dark:${themeColors.brightText} mb-2 pr-14`}>{item.discNome}</span>
                         <p className="font-bold text-lg text-slate-800 dark:text-white mb-6 pr-10 leading-tight">{item.assTitulo}</p>
                         
                         {/* Checkboxes */}
                         <div className="mt-auto space-y-3 pt-5 border-t border-slate-100 dark:border-white/5">
-                          <label className={`flex items-center gap-3.5 cursor-pointer transition-colors ${isEstudado ? 'text-orange-500' : 'text-slate-500 dark:text-white/50 hover:text-slate-800 dark:hover:text-white'}`}>
-                            <input type="checkbox" checked={isEstudado} onChange={() => toggleProgress(item.assId, 'estudado')} disabled={!isActive} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-white/20 bg-transparent text-orange-500 focus:ring-orange-500" />
+                          <label className={`flex items-center gap-3.5 cursor-pointer transition-colors ${isEstudado ? themeColors.primaryText : 'text-slate-500 dark:text-white/50 hover:text-slate-800 dark:hover:text-white'}`}>
+                            <input type="checkbox" checked={isEstudado} onChange={() => toggleProgress(item.assId, 'estudado')} disabled={!isActive} className={`w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-white/20 bg-transparent ${themeColors.primaryText} ${themeColors.ring}`} />
                             <span className="font-bold text-xs uppercase tracking-wide">1. Teoria</span>
                           </label>
 
-                          <label className={`flex items-center gap-3.5 cursor-pointer transition-colors ${isQuestoes ? 'text-orange-500' : 'text-slate-500 dark:text-white/50 hover:text-slate-800 dark:hover:text-white'}`}>
-                            <input type="checkbox" checked={isQuestoes} onChange={() => toggleProgress(item.assId, 'questoes')} disabled={!isActive || !isEstudado} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-white/20 bg-transparent text-orange-500 focus:ring-orange-500" />
+                          <label className={`flex items-center gap-3.5 cursor-pointer transition-colors ${isQuestoes ? themeColors.primaryText : 'text-slate-500 dark:text-white/50 hover:text-slate-800 dark:hover:text-white'}`}>
+                            <input type="checkbox" checked={isQuestoes} onChange={() => toggleProgress(item.assId, 'questoes')} disabled={!isActive || !isEstudado} className={`w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-white/20 bg-transparent ${themeColors.primaryText} ${themeColors.ring}`} />
                             <span className="font-bold text-xs uppercase tracking-wide">2. Questões</span>
                           </label>
 
-                          <label className={`flex items-center gap-3.5 cursor-pointer transition-colors ${isRevisado ? 'text-orange-500' : 'text-slate-500 dark:text-white/50 hover:text-slate-800 dark:hover:text-white'}`}>
-                            <input type="checkbox" checked={isRevisado} onChange={() => toggleProgress(item.assId, 'revisado')} disabled={!isActive || !isQuestoes} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-white/20 bg-transparent text-orange-500 focus:ring-orange-500" />
+                          <label className={`flex items-center gap-3.5 cursor-pointer transition-colors ${isRevisado ? themeColors.primaryText : 'text-slate-500 dark:text-white/50 hover:text-slate-800 dark:hover:text-white'}`}>
+                            <input type="checkbox" checked={isRevisado} onChange={() => toggleProgress(item.assId, 'revisado')} disabled={!isActive || !isQuestoes} className={`w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-white/20 bg-transparent ${themeColors.primaryText} ${themeColors.ring}`} />
                             <span className="font-bold text-xs uppercase tracking-wide">3. Revisão Auto</span>
                           </label>
                           
                           {item.linkTec && isActive && (
-                            <a href={item.linkTec} target="_blank" rel="noopener noreferrer" className={`mt-5 flex items-center justify-center gap-2 w-full py-3 text-xs font-bold rounded-xl bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 transition-all shadow-sm cursor-pointer hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white`}>
+                            <a href={item.linkTec} target="_blank" rel="noopener noreferrer" className={`mt-5 flex items-center justify-center gap-2 w-full py-3 text-xs font-bold rounded-xl ${themeColors.bgSuperLight} ${themeColors.primaryText} transition-all shadow-sm cursor-pointer hover:${themeColors.bgSolid} hover:text-white dark:hover:${themeColors.bgSolid} dark:hover:text-white`}>
                               <ExternalLink className="w-4 h-4" /> Resolver no TEC
                             </a>
                           )}
@@ -1863,6 +1917,7 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
         title="Motor de Revisão" 
         subtitle="Memória ativa guiada por espaçamento ótimo. Avalie os tópicos abaixo." 
         icon={BrainCircuit}
+        themeColors={themeColors}
       />
 
       <div className="grid md:grid-cols-2 gap-8 mt-8">
@@ -1876,6 +1931,7 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
                   icon={CheckCircle}
                   title="Memória em Dia!"
                   message="Nenhum tópico pendente de revisão para hoje."
+                  themeColors={themeColors}
                />
             ) : (
               revisoesPendentes.map((data) => {
@@ -1893,7 +1949,7 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
                         <h4 className="font-bold text-slate-800 dark:text-white text-lg leading-tight">{data.titulo}</h4>
                       </div>
                       {data.linkTec && (
-                        <a href={data.linkTec} target="_blank" rel="noreferrer" title="Abrir Caderno TEC" className={`p-3 rounded-xl bg-slate-50 dark:bg-[#0d1526] text-orange-500 hover:scale-110 transition-transform cursor-pointer shrink-0 shadow-sm border border-slate-100 dark:border-white/5`}>
+                        <a href={data.linkTec} target="_blank" rel="noreferrer" title="Abrir Caderno TEC" className={`p-3 rounded-xl bg-slate-50 dark:bg-[#0d1526] ${themeColors.brightText} hover:scale-110 transition-transform cursor-pointer shrink-0 shadow-sm border border-slate-100 dark:border-white/5`}>
                           <ExternalLink className="w-5 h-5" />
                         </a>
                       )}
@@ -1928,6 +1984,7 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
                   icon={Clock}
                   title="Sem Agendamentos"
                   message="Quando classificar revisões, elas aparecerão aqui."
+                  themeColors={themeColors}
                />
             ) : (
               revisoesConcluidas
@@ -2062,8 +2119,9 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
         title="Painel de Controle" 
         subtitle="Personalize o seu sistema, ajuste o algoritmo e faça backups." 
         icon={Settings}
+        themeColors={themeColors}
         extra={
-          <button onClick={handleSave} className={`w-full md:w-auto bg-orange-500 hover:bg-orange-600 text-white px-8 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 transition-all cursor-pointer`}>
+          <button onClick={handleSave} className={`w-full md:w-auto ${themeColors.bgSolid} ${themeColors.bgHover} text-white px-8 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg ${themeColors.shadowHover} transition-all cursor-pointer`}>
             <Save className="w-5 h-5"/> Salvar Alterações
           </button>
         }
@@ -2080,7 +2138,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
         {/* BLOCO 1: PERSONALIZAÇÃO VISUAL E UX */}
         <div className="bg-white dark:bg-[#111e36] p-8 rounded-[2rem] border border-slate-200/60 dark:border-white/5 shadow-sm">
           <h3 className="text-lg font-black text-slate-800 dark:text-white mb-8 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4">
-            <ImageIcon className={`w-5 h-5 text-orange-500`}/> Identidade & UX
+            <ImageIcon className={`w-5 h-5 ${themeColors.brightText}`}/> Identidade & UX
           </h3>
           
           <div className="space-y-6">
@@ -2091,7 +2149,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                   type="text" 
                   value={localConfig.userName || ''} 
                   onChange={e => setLocalConfig({...localConfig, userName: e.target.value})}
-                  className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-orange-500 transition-colors"
+                  className={`w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none ${themeColors.ring} transition-colors`}
                 />
               </div>
 
@@ -2101,17 +2159,17 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                   <select 
                     value={localConfig.levelSound || 'chimes'} 
                     onChange={e => setLocalConfig({...localConfig, levelSound: e.target.value})}
-                    className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-orange-500 transition-colors cursor-pointer"
+                    className={`w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none ${themeColors.ring} transition-colors cursor-pointer`}
                   >
-                    <option value="mario">Moeda Super Mario (Nostalgia)</option>
-                    <option value="chimes">Sinos Mágicos (Suave)</option>
-                    <option value="arcade">Arcade 8-bits (Retro)</option>
-                    <option value="modern">Notificação Moderna (Limpa)</option>
-                    <option value="epic">Trombetas de Vitória (Épico)</option>
+                    <option value="mario" className="dark:bg-[#0d1526] dark:text-white">Moeda Super Mario (Nostalgia)</option>
+                    <option value="chimes" className="dark:bg-[#0d1526] dark:text-white">Sinos Mágicos (Suave)</option>
+                    <option value="arcade" className="dark:bg-[#0d1526] dark:text-white">Arcade 8-bits (Retro)</option>
+                    <option value="modern" className="dark:bg-[#0d1526] dark:text-white">Notificação Moderna (Limpa)</option>
+                    <option value="epic" className="dark:bg-[#0d1526] dark:text-white">Trombetas de Vitória (Épico)</option>
                   </select>
                   <button 
                     onClick={() => playLevelUpSound(localConfig.levelSound || 'chimes')}
-                    className={`p-4 bg-slate-100 dark:bg-white/5 text-orange-500 rounded-xl hover:scale-105 transition-all cursor-pointer`}
+                    className={`p-4 bg-slate-100 dark:bg-white/5 ${themeColors.brightText} rounded-xl hover:scale-105 transition-all cursor-pointer`}
                     title="Testar Som"
                   >
                     <Play size={20} className="fill-current" />
@@ -2127,7 +2185,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                   type="text" 
                   value={localConfig.appName} 
                   onChange={e => setLocalConfig({...localConfig, appName: e.target.value})}
-                  className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-orange-500 transition-colors"
+                  className={`w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none ${themeColors.ring} transition-colors`}
                 />
               </div>
 
@@ -2136,10 +2194,10 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                 <select 
                   value={localConfig.appTheme || 'default'} 
                   onChange={e => setLocalConfig({...localConfig, appTheme: e.target.value})}
-                  className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-orange-500 transition-colors cursor-pointer font-bold"
+                  className={`w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none ${themeColors.ring} transition-colors cursor-pointer font-bold`}
                 >
                   {Object.entries(THEMES).map(([key, theme]) => (
-                    <option key={key} value={key}>{theme.name}</option>
+                    <option key={key} value={key} className="dark:bg-[#0d1526] dark:text-white">{theme.name}</option>
                   ))}
                 </select>
               </div>
@@ -2156,7 +2214,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                   placeholder="https://..."
                   value={localConfig.logoUrl} 
                   onChange={e => setLocalConfig({...localConfig, logoUrl: e.target.value})}
-                  className="flex-1 p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-orange-500 transition-colors text-sm font-mono"
+                  className={`flex-1 p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none ${themeColors.ring} transition-colors text-sm font-mono`}
                 />
               </div>
             </div>
@@ -2166,7 +2224,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
         {/* BLOCO 2: CONFIGURAÇÕES DE ESTUDO */}
         <div className="bg-white dark:bg-[#111e36] p-8 rounded-[2rem] border border-slate-200/60 dark:border-white/5 shadow-sm">
           <h3 className="text-lg font-black text-slate-800 dark:text-white mb-8 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4">
-            <Target className="w-5 h-5 text-blue-500"/> Configurações do Foco
+            <Target className={`w-5 h-5 ${themeColors.brightText}`}/> Configurações do Foco
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -2176,7 +2234,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                 type="text" 
                 value={localConfig.concurso} 
                 onChange={e => setLocalConfig({...localConfig, concurso: e.target.value})}
-                className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-colors"
+                className={`w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none ${themeColors.ring} transition-colors`}
               />
             </div>
             
@@ -2186,7 +2244,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                 type="text" 
                 value={localConfig.cargo} 
                 onChange={e => setLocalConfig({...localConfig, cargo: e.target.value})}
-                className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-colors"
+                className={`w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none ${themeColors.ring} transition-colors`}
               />
             </div>
 
@@ -2196,7 +2254,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                 type="text" 
                 value={localConfig.banca} 
                 onChange={e => setLocalConfig({...localConfig, banca: e.target.value})}
-                className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-colors"
+                className={`w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none ${themeColors.ring} transition-colors`}
               />
             </div>
 
@@ -2207,7 +2265,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                 step="0.5"
                 value={localConfig.horasDia} 
                 onChange={e => setLocalConfig({...localConfig, horasDia: parseFloat(e.target.value)})}
-                className="w-full md:w-1/2 p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-colors font-black text-xl"
+                className={`w-full md:w-1/2 p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none ${themeColors.ring} transition-colors font-black text-xl`}
               />
             </div>
           </div>
@@ -2601,7 +2659,7 @@ export default function App() {
   }
 
   if (auth && !user) {
-    return <AuthScreen auth={auth} />;
+    return <AuthScreen auth={auth} themeColors={themeColors} />;
   }
 
   const mobileNavItems = [
@@ -2614,8 +2672,16 @@ export default function App() {
 
   return (
     <div className={isDarkMode ? 'dark' : ''}>
+      <style>{`
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 4px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+      `}</style>
+      
       <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-200 flex flex-col md:flex-row font-sans transition-colors duration-300 relative">
-        <ConfettiOverlay fire={confettiFire} />
+        <ConfettiOverlay fire={confettiFire} themeColors={themeColors} />
         <LevelUpModal data={levelUpData} onClose={() => setLevelUpData(null)} />
         {showLevelMap && <LevelMapModal currentXp={gamification.xp} onClose={() => setShowLevelMap(false)} />}
 
@@ -2632,7 +2698,7 @@ export default function App() {
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 bg-slate-50 dark:bg-[#111e36] hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/60 dark:border-white/5 rounded-full transition-colors cursor-pointer shadow-sm`}>
-              {isDarkMode ? <Sun className="w-4 h-4 text-orange-500" /> : <Moon className={`w-4 h-4 text-slate-600`} />}
+              {isDarkMode ? <Sun className={`w-4 h-4 ${themeColors.brightText}`} /> : <Moon className={`w-4 h-4 text-slate-600`} />}
             </button>
           </div>
         </div>
@@ -2642,7 +2708,7 @@ export default function App() {
           <div className={`p-6 bg-slate-50/50 dark:bg-transparent border-b border-slate-200/80 dark:border-white/5 relative transition-colors duration-500 shrink-0`}>
             
             <button onClick={() => setIsDarkMode(!isDarkMode)} className={`absolute top-6 right-6 p-2 bg-white dark:bg-[#111e36] hover:bg-slate-50 dark:hover:bg-white/5 border border-slate-200/60 dark:border-white/5 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-white/40 z-10`}>
-              {isDarkMode ? <Sun className="w-4 h-4 text-orange-500" /> : <Moon className={`w-4 h-4 text-slate-600`} />}
+              {isDarkMode ? <Sun className={`w-4 h-4 ${themeColors.brightText}`} /> : <Moon className={`w-4 h-4 text-slate-600`} />}
             </button>
 
             <div className="flex items-center gap-4 min-w-0 mb-8 pr-10 mt-1">
@@ -2665,7 +2731,7 @@ export default function App() {
                     {projectConfig.banca}
                   </span>
                   <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-[#111e36] px-2.5 py-1.5 rounded-lg text-[9px] uppercase tracking-widest font-bold text-slate-600 dark:text-white/60 border border-slate-200 dark:border-white/5 shadow-sm`}>
-                    <Target size={12} className="text-orange-500" /> {projectConfig.horasDia}h
+                    <Target size={12} className={themeColors.brightText} /> {projectConfig.horasDia}h
                   </span>
                 </div>
               </div>
@@ -2673,21 +2739,21 @@ export default function App() {
               <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-[#111e36] border border-slate-200 dark:border-white/5 p-4 transition-all hover:shadow-md cursor-pointer shadow-sm`}>
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-3">
-                    <Award size={24} className="text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.4)] group-hover:scale-110 transition-transform duration-300" />
+                    <Award size={24} className={`${themeColors.brightText} ${themeColors.glow} group-hover:scale-110 transition-transform duration-300`} />
                     <div className="flex flex-col">
                       <span className="text-sm font-black text-slate-800 dark:text-white leading-none">Lvl {userLevel.nivel}</span>
                       <span className="text-[9px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-widest mt-1 truncate max-w-[90px]">{userLevel.titulo}</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
-                    <div className="flex items-center gap-1 text-orange-500 bg-orange-50 dark:bg-orange-500/10 px-2 py-1 rounded border border-orange-200 dark:border-orange-500/20 flex-shrink-0">
+                    <div className={`flex items-center gap-1 ${themeColors.primaryText} ${themeColors.bgSuperLight} px-2 py-1 rounded border ${themeColors.borderLight} flex-shrink-0`}>
                       <Flame size={12} className="fill-current animate-pulse" />
                       <span className="text-[10px] font-black">{gamification.streak}</span>
                     </div>
                   </div>
                 </div>
                 <div className="relative w-full h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden mt-2">
-                  <div className="absolute left-0 top-0 h-full bg-orange-500 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
+                  <div className={`absolute left-0 top-0 h-full ${themeColors.bgSolid} transition-all duration-1000 ease-out`} style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
                 </div>
               </div>
             </div>
@@ -2702,11 +2768,11 @@ export default function App() {
                     const IconComponent = item.icon;
                     const isActive = activeTab === item.id;
                     return (
-                      <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all font-bold text-sm cursor-pointer ${isActive ? 'bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400 border border-orange-200/50 dark:border-orange-500/20 shadow-sm' : 'text-slate-600 dark:text-white/60 hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent'}`}>
-                        <IconComponent className={`w-5 h-5 ${isActive ? 'text-orange-500' : 'opacity-50'}`} />
+                      <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all font-bold text-sm cursor-pointer ${isActive ? `${themeColors.bgSuperLight} ${themeColors.primaryText} border ${themeColors.borderLight} shadow-sm` : 'text-slate-600 dark:text-white/60 hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent'}`}>
+                        <IconComponent className={`w-5 h-5 ${isActive ? themeColors.brightText : 'opacity-50'}`} />
                         <span className="flex-1 text-left">{item.label}</span>
-                        {item.id === 'cronograma' && customSprint.length > 0 && <span className="bg-emerald-500 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border dark:border-emerald-500/30 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{customSprint.length}</span>}
-                        {item.badge > 0 && <span className="bg-red-500 dark:bg-red-500/20 dark:text-red-400 dark:border dark:border-red-500/30 animate-pulse text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">{item.badge}</span>}
+                        {item.id === 'cronograma' && customSprint.length > 0 && <span className={`bg-emerald-500 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border dark:border-emerald-500/30 text-white text-[10px] font-black px-2 py-0.5 rounded-full`}>{customSprint.length}</span>}
+                        {item.badge > 0 && <span className={`bg-red-500 dark:bg-red-500/20 dark:text-red-400 dark:border dark:border-red-500/30 animate-pulse text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm`}>{item.badge}</span>}
                       </button>
                     );
                   })}
@@ -2745,9 +2811,9 @@ export default function App() {
               <button 
                 key={item.id} 
                 onClick={() => setActiveTab(item.id)}
-                className={`flex flex-col items-center justify-center w-full py-1.5 gap-1 relative transition-colors ${isActive ? 'text-orange-500' : 'text-slate-400 dark:text-white/40 hover:text-slate-600 dark:hover:text-white/70'}`}
+                className={`flex flex-col items-center justify-center w-full py-1.5 gap-1 relative transition-colors ${isActive ? themeColors.brightText : 'text-slate-400 dark:text-white/40 hover:text-slate-600 dark:hover:text-white/70'}`}
               >
-                <div className={`p-1.5 rounded-xl transition-all duration-300 ${isActive ? `bg-orange-50 dark:bg-orange-500/10 scale-110` : ''}`}>
+                <div className={`p-1.5 rounded-xl transition-all duration-300 ${isActive ? `${themeColors.bgSuperLight} scale-110` : ''}`}>
                   <IconComponent className={`w-6 h-6 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
                 </div>
                 <span className={`text-[9px] font-bold tracking-tight transition-all duration-300 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 h-0 overflow-hidden translate-y-2'}`}>
