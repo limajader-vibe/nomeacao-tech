@@ -254,7 +254,6 @@ function PomodoroWidget({ themeColors, handleAutoLog, addXP, triggerConfetti }) 
   );
 }
 
-// 2. UX Avançada: Componente de Arrasto/Swipe (Mobile Friendly)
 const SwipeableItem = ({ children, onSwipeRight, onSwipeLeft, disabled, isCompact }) => {
   const [offset, setOffset] = useState(0);
   const startXRef = useRef(0);
@@ -294,7 +293,6 @@ const SwipeableItem = ({ children, onSwipeRight, onSwipeLeft, disabled, isCompac
   );
 };
 
-// 3. UX Avançada: Anel de Progresso Circular
 const CircularProgress = ({ percent, themeColors }) => {
   const radius = 9;
   const circumference = 2 * Math.PI * radius;
@@ -531,8 +529,6 @@ export default function App() {
   const [isCloudReady, setIsCloudReady] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard'); 
-  const [zoomLevel, setZoomLevel] = useState(() => getStorage('nomeacao_zoom', 100));
-  const [sidebarHovered, setSidebarHovered] = useState(false);
 
   // EFEITOS DE SUCESSO (DOPAMINA)
   const [confettiFire, setConfettiFire] = useState(0);
@@ -552,16 +548,8 @@ export default function App() {
   const [dailyReviewStats, setDailyReviewStats] = useState(() => getStorage('nomeacao_daily_reviews', {})); // UX 3: Linha do Tempo
 
   const themeColors = THEMES[projectConfig.appTheme] || THEMES.default;
-  const isZenModeActive = activeTab === 'cronograma';
-  const hideSidebar = isZenModeActive && !sidebarHovered;
 
-  // 1. INICIALIZAÇÃO E APLICAÇÃO DO ZOOM GLOBAL
-  useEffect(() => {
-    document.documentElement.style.fontSize = `${zoomLevel}%`;
-    setStorage('nomeacao_zoom', zoomLevel);
-  }, [zoomLevel]);
-
-  // 2. INICIALIZAÇÃO DO FIREBASE AUTH
+  // 1. INICIALIZAÇÃO DO FIREBASE AUTH
   useEffect(() => {
     if (!auth) {
       setIsCloudReady(true);
@@ -577,7 +565,7 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // 3. SINCRONIZAÇÃO DE LEITURA (NUVEM -> LOCAL)
+  // 2. SINCRONIZAÇÃO DE LEITURA (NUVEM -> LOCAL)
   useEffect(() => {
     if (!user || !db) return;
     try {
@@ -595,7 +583,6 @@ export default function App() {
           if (data.reviewStats) setReviewStats(data.reviewStats);
           if (data.dailyReviewStats) setDailyReviewStats(data.dailyReviewStats);
           if (data.isDarkMode !== undefined) setIsDarkMode(data.isDarkMode);
-          if (data.zoomLevel !== undefined) setZoomLevel(data.zoomLevel);
         }
         setIsCloudReady(true);
       }, (err) => {
@@ -609,7 +596,7 @@ export default function App() {
     }
   }, [user]);
 
-  // 4. SINCRONIZAÇÃO DE ESCRITA (LOCAL -> NUVEM)
+  // 3. SINCRONIZAÇÃO DE ESCRITA (LOCAL -> NUVEM)
   const saveToCloud = async (key, value) => {
     if (!user || !db || !isCloudReady) return;
     try {
@@ -618,7 +605,6 @@ export default function App() {
   };
 
   useEffect(() => { saveToCloud('isDarkMode', isDarkMode); }, [isDarkMode, isCloudReady]);
-  useEffect(() => { saveToCloud('zoomLevel', zoomLevel); }, [zoomLevel, isCloudReady]);
   useEffect(() => { saveToCloud('config', projectConfig); }, [projectConfig, isCloudReady]);
   useEffect(() => { saveToCloud('edital', edital); }, [edital, isCloudReady]);
   useEffect(() => { saveToCloud('userProgress', userProgress); }, [userProgress, isCloudReady]);
@@ -835,111 +821,95 @@ export default function App() {
           </div>
         </div>
 
-        {/* SIDEBAR DESKTOP (MODO ULTRA-ZEN: Esconde automaticamente na Mesa de Foco) */}
-        <aside 
-          onMouseEnter={() => setSidebarHovered(true)}
-          onMouseLeave={() => setSidebarHovered(false)}
-          className={`hidden md:flex shadow-xl flex-col z-50 border-r sticky top-0 h-screen transition-all duration-300 ${hideSidebar ? `w-2 bg-indigo-500/20 dark:bg-indigo-500/10 cursor-e-resize border-transparent delay-300 opacity-50 hover:opacity-100 hover:bg-indigo-500/50` : `w-72 bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-800 shrink-0`}`}
-        >
-          {/* Invólucro de largura fixa interna para o conteúdo não "esmagar" durante a animação de esconder */}
-          <div className="w-72 h-full flex flex-col relative overflow-hidden">
-            <div className={`p-6 ${themeColors.headerBg} border-b ${themeColors.border} relative transition-colors duration-500 shrink-0`}>
-              
-              <div className="absolute top-6 right-6 flex items-center gap-2 z-10">
-                {/* BOTÕES DE ZOOM GLOBAL */}
-                <div className="flex bg-white dark:bg-slate-800 rounded-full p-1 border border-slate-200/60 dark:border-slate-700 shadow-sm mr-2">
-                  <button onClick={() => setZoomLevel(p => Math.max(70, p - 5))} className="px-2 text-xs font-bold text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors" title="Diminuir Zoom">A-</button>
-                  <span className="px-1 text-[10px] font-black text-indigo-500 flex items-center">{zoomLevel}%</span>
-                  <button onClick={() => setZoomLevel(p => Math.min(130, p + 5))} className="px-2 text-xs font-bold text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors" title="Aumentar Zoom">A+</button>
-                </div>
+        {/* SIDEBAR DESKTOP - Fixa e Sólida */}
+        <aside className={`hidden md:flex w-72 bg-white dark:bg-slate-900 shadow-xl flex-col z-10 shrink-0 border-r border-slate-300 dark:border-slate-800 sticky top-0 h-screen overflow-hidden`}>
+          <div className={`p-6 ${themeColors.headerBg} border-b ${themeColors.border} relative transition-colors duration-500 shrink-0`}>
+            
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`absolute top-6 right-6 p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-slate-400 z-10`}>
+              {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
+            </button>
 
-                <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-slate-400`}>
-                  {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
-                </button>
+            <div className="flex items-center gap-3 min-w-0 mb-6 pr-10 mt-1">
+              <div className={`w-12 h-12 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
+                <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[120px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
+                <h2 className={`font-extrabold text-xl tracking-tight truncate ${themeColors.headerText}`} title={projectConfig.appName}>{projectConfig.appName}</h2>
+              </div>
+            </div>
+            
+            <div className="flex flex-col gap-3">
+              <div>
+                <p className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest leading-tight mb-1.5 truncate`}>{projectConfig.concurso}</p>
+                <h3 className={`text-xl font-black leading-tight truncate mb-2 ${themeColors.headerText}`}>{projectConfig.cargo}</h3>
+                
+                <div className="flex flex-col xl:flex-row gap-2 w-full mb-1">
+                  <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm truncate`} title={projectConfig.banca}>
+                    {projectConfig.banca}
+                  </span>
+                  <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm`}>
+                    <Target size={12} /> {projectConfig.horasDia}h/dia
+                  </span>
+                </div>
               </div>
 
-              <div className="flex items-center gap-3 min-w-0 mb-6 pr-32 mt-1">
-                <div className={`w-12 h-12 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
-                  <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[120px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
-                  <h2 className={`font-extrabold text-xl tracking-tight truncate ${themeColors.headerText}`} title={projectConfig.appName}>{projectConfig.appName}</h2>
-                </div>
-              </div>
-              
-              <div className="flex flex-col gap-3">
-                <div>
-                  <p className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest leading-tight mb-1.5 truncate`}>{projectConfig.concurso}</p>
-                  <h3 className={`text-xl font-black leading-tight truncate mb-2 ${themeColors.headerText}`}>{projectConfig.cargo}</h3>
-                  
-                  <div className="flex flex-col xl:flex-row gap-2 w-full mb-1">
-                    <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm truncate`} title={projectConfig.banca}>
-                      {projectConfig.banca}
-                    </span>
-                    <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm`}>
-                      <Target size={12} /> {projectConfig.horasDia}h/dia
-                    </span>
-                  </div>
-                </div>
-
-                <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 p-4 transition-all hover:shadow-md cursor-pointer shadow-sm`}>
-                  <div className="flex justify-between items-center mb-3">
-                    <div className="flex items-center gap-3">
-                      <Award size={22} className="text-amber-500 dark:text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)] group-hover:scale-110 transition-transform duration-300" />
-                      <div className="flex flex-col">
-                        <span className="text-sm font-black text-slate-800 dark:text-white leading-none">Lvl {userLevel.nivel}</span>
-                        <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1 truncate max-w-[90px]">{userLevel.titulo}</span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/10 px-2 py-1 rounded-md flex-shrink-0 border border-orange-200 dark:border-orange-500/20">
-                        <Flame size={12} className="fill-current animate-pulse" />
-                        <span className="text-[11px] font-black">{gamification.streak}</span>
-                      </div>
+              <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 p-4 transition-all hover:shadow-md cursor-pointer shadow-sm`}>
+                <div className="flex justify-between items-center mb-3">
+                  <div className="flex items-center gap-3">
+                    <Award size={22} className="text-amber-500 dark:text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)] group-hover:scale-110 transition-transform duration-300" />
+                    <div className="flex flex-col">
+                      <span className="text-sm font-black text-slate-800 dark:text-white leading-none">Lvl {userLevel.nivel}</span>
+                      <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1 truncate max-w-[90px]">{userLevel.titulo}</span>
                     </div>
                   </div>
-                  <div className="relative w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
-                    <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
+                  <div className="flex flex-col items-end">
+                    <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/10 px-2 py-1 rounded-md flex-shrink-0 border border-orange-200 dark:border-orange-500/20">
+                      <Flame size={12} className="fill-current animate-pulse" />
+                      <span className="text-[11px] font-black">{gamification.streak}</span>
+                    </div>
                   </div>
+                </div>
+                <div className="relative w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
+                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
                 </div>
               </div>
             </div>
-
-            <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar flex flex-col bg-slate-50/50 dark:bg-slate-900">
-              {navPhases.map((phaseGroup, pIdx) => (
-                <div key={pIdx} className={pIdx > 0 ? "pt-4" : ""}>
-                  <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-4 text-left">{phaseGroup.phase}</h3>
-                  <div className="space-y-1">
-                    {phaseGroup.items.map((item) => {
-                      const IconComponent = item.icon;
-                      return (
-                        <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all font-medium cursor-pointer ${activeTab === item.id ? themeColors.activeTab + ' shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
-                          <IconComponent className={`w-5 h-5 ${activeTab === item.id ? 'opacity-100' : 'opacity-70'}`} />
-                          <span className="flex-1 text-left">{item.label}</span>
-                          {item.id === 'cronograma' && customSprint.length > 0 && <span className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{customSprint.length}</span>}
-                          {item.badge > 0 && <span className="bg-red-500 animate-pulse text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">{item.badge}</span>}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </nav>
-
-            {user && (
-              <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 mt-auto shrink-0">
-                <button onClick={() => { if(window.confirm('Tem certeza que deseja sair do sistema?')) { auth && signOut(auth); } }} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors font-bold text-sm cursor-pointer">
-                  <LogOut className="w-4 h-4" /> Sair do Sistema
-                </button>
-              </div>
-            )}
           </div>
+
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar flex flex-col bg-slate-50/50 dark:bg-slate-900">
+            {navPhases.map((phaseGroup, pIdx) => (
+              <div key={pIdx} className={pIdx > 0 ? "pt-4" : ""}>
+                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-4 text-left">{phaseGroup.phase}</h3>
+                <div className="space-y-1">
+                  {phaseGroup.items.map((item) => {
+                    const IconComponent = item.icon;
+                    return (
+                      <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all font-medium cursor-pointer ${activeTab === item.id ? themeColors.activeTab + ' shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
+                        <IconComponent className={`w-5 h-5 ${activeTab === item.id ? 'opacity-100' : 'opacity-70'}`} />
+                        <span className="flex-1 text-left">{item.label}</span>
+                        {item.id === 'cronograma' && customSprint.length > 0 && <span className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{customSprint.length}</span>}
+                        {item.badge > 0 && <span className="bg-red-500 animate-pulse text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">{item.badge}</span>}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </nav>
+
+          {user && (
+            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 mt-auto shrink-0">
+              <button onClick={() => { if(window.confirm('Tem certeza que deseja sair do sistema?')) { auth && signOut(auth); } }} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors font-bold text-sm cursor-pointer">
+                <LogOut className="w-4 h-4" /> Sair do Sistema
+              </button>
+            </div>
+          )}
         </aside>
 
-        {/* CONTENT AREA */}
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-28 md:pb-8 text-left transition-all duration-300 relative">
-          <div className="max-w-7xl mx-auto w-full transition-all duration-500 h-full flex flex-col">
+        {/* CONTENT AREA EXPANDIDA */}
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-28 md:pb-8 text-left">
+          <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full transition-all duration-500 h-full flex flex-col">
             {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} dailyReviewStats={dailyReviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} />}
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} setUserProgress={setUserProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} setActiveTab={setActiveTab} addXP={addXP} triggerVisualFlash={triggerVisualFlash} flashElementId={flashElementId} />}
             {activeTab === 'planner' && <TabPlanner customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} progress={userProgress} toggleProgress={toggleProgress} flashElementId={flashElementId} />}
@@ -1049,8 +1019,6 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
     }
     return rate;
   });
-  const maxRateStr = Math.max(...lineChartPoints).toFixed(0);
-  const minRateStr = Math.min(...lineChartPoints.filter(r => r > 0)).toFixed(0) || 0;
   
   // Constrói SVG Polyline string: x vai de 0 a 100%, y vai de 100% a 0%
   const xStep = 100 / 13;
