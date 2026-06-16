@@ -5,7 +5,7 @@ import {
   RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Pencil, Settings,
   Edit, AlertTriangle, ChevronUp, Flame, Trophy, TrendingUp, Activity, Award, ListPlus, ArrowRight, ArrowLeft, BarChart2,
   CalendarDays, LayoutGrid, BrainCircuit, ShieldAlert, Download, Sliders, Lock, LogOut,
-  Filter, Play, Pause, Coffee, PartyPopper, X, Menu, Minus, Upload
+  Filter, Play, Pause, Coffee, PartyPopper, X, Menu, Minus, Upload, Image as ImageIcon
 } from 'lucide-react';
 
 // --- FIREBASE CLOUD STORAGE SETUP ---
@@ -496,7 +496,7 @@ const AuthScreen = ({ auth }) => {
 // ==========================================
 // ABA DASHBOARD / CENTRO DE COMANDO
 // ==========================================
-function TabDashboard({ config, progressPerc, gamification, setGamification, dailyLogs, setDailyLogs, userLevel, themeColors, reviewStats, dailyReviewStats, edital, activeSubjectIds, userProgress }) {
+function TabDashboard({ config, progressPerc, gamification, setGamification, dailyLogs, setDailyLogs, userLevel, themeColors, reviewStats, dailyReviewStats, edital, activeSubjectIds, userProgress, pendingReviewsCount, setActiveTab }) {
   const today = new Date().toLocaleDateString();
   const todayHours = dailyLogs[today] || 0;
   
@@ -572,6 +572,22 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
   return (
     <div className="space-y-6 animate-in fade-in pb-10">
       
+      {/* ALERTA TÁTICO: BANNER DE REVISÕES */}
+      {pendingReviewsCount > 0 && (
+        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 p-5 rounded-2xl mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in slide-in-from-top-4 shadow-sm">
+           <div className="flex items-start gap-3">
+              <AlertTriangle className="w-6 h-6 text-red-500 shrink-0 mt-0.5" />
+              <div>
+                 <h4 className="text-red-600 dark:text-red-500 font-black tracking-wide uppercase text-xs mb-1">Alerta Tático de Esquecimento</h4>
+                 <p className="text-sm text-slate-700 dark:text-slate-300">Você tem <strong className="text-red-600 dark:text-white">{pendingReviewsCount} tópicos</strong> evaporando da memória hoje. Faça as suas revisões antes de iniciar novas missões.</p>
+              </div>
+           </div>
+           <button onClick={() => setActiveTab('revisoes')} className="shrink-0 bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md transition-colors w-full md:w-auto cursor-pointer">
+             Ir para Revisões
+           </button>
+        </div>
+      )}
+
       <SectionHeader 
         overline="Visão Geral" 
         title="Centro de Comando" 
@@ -987,7 +1003,6 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => { if (d.id === discId) { return { ...d, assuntos: d.assuntos.map(a => { if (a.id === assId) { const currentIndent = a.indent || 0; const newIndent = Math.max(0, Math.min(3, currentIndent + delta)); return { ...a, indent: newIndent }; } return a; }) }; } return d; }) })));
   };
 
-  // PHase 1: Functional fix - now addTopic directly sets focus or allows rapid entry if needed.
   const handleAddTopic = (discId) => {
     if(!newTopic.titulo) return; const newAssId = `t_${Date.now()}`;
     setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => { if(d.id === discId) return { ...d, assuntos: [...d.assuntos, { id: newAssId, titulo: newTopic.titulo, temp: '⭐ NOVO', linkTec: newTopic.linkTec, indent: 0 }] }; return d; }) })));
@@ -1613,7 +1628,7 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
 // ==========================================
 // ABA 4: MESA DE FOCO (SPRINTS DIÁRIAS)
 // ==========================================
-function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, addXP, triggerConfetti, themeColors, handleAutoLog, flashElementId }) {
+function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, addXP, triggerConfetti, themeColors, handleAutoLog, flashElementId, pendingReviewsCount }) {
   const [showConfirm, setShowConfirm] = useState(false);
   const [draggedIndex, setDraggedIndex] = useState(null);
   const dragItem = useRef(null);
@@ -1673,7 +1688,7 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
       <PomodoroWidget themeColors={themeColors} handleAutoLog={handleAutoLog} addXP={addXP} triggerConfetti={triggerConfetti} />
 
       {/* SPRINTS */}
-      {sprintGroups.length === 0 ? (
+      {sprintGroups.length === 0 && pendingReviewsCount === 0 ? (
         <EmptyState 
            icon={ShoppingCart}
            title="Fila Vazia!"
@@ -1683,6 +1698,30 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
         />
       ) : (
         <div className="grid gap-6 mt-6">
+          
+          {/* SPRINT 0 - AQUECIMENTO (Aparece se houver revisões) */}
+          {pendingReviewsCount > 0 && (
+            <div className="bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-500/10 dark:to-orange-500/5 border border-red-200 dark:border-red-500/20 rounded-[2rem] overflow-hidden flex flex-col md:flex-row shadow-sm ring-1 ring-red-500/10 mb-2 relative animate-in slide-in-from-top-4">
+               <div className="p-6 w-full md:w-28 shrink-0 flex flex-col items-center justify-center font-black border-b md:border-b-0 md:border-r border-red-200 dark:border-red-500/20 bg-red-500 text-white">
+                  <span className="text-[10px] uppercase tracking-widest text-red-100">Sprint</span>
+                  <span className="text-5xl mt-1">0</span>
+               </div>
+               <div className="p-6 flex-1 flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="flex items-start gap-4">
+                     <div className="p-3 bg-red-100 dark:bg-red-500/20 rounded-2xl shrink-0"><BrainCircuit className="w-8 h-8 text-red-500" /></div>
+                     <div>
+                       <span className="text-[10px] font-black uppercase tracking-widest text-red-500 mb-1 block">Aquecimento Diário Obrigatório</span>
+                       <h4 className="text-xl font-bold text-slate-800 dark:text-white mb-1">Limpar Motor de Revisões</h4>
+                       <p className="text-sm text-slate-600 dark:text-white/50">Recupere {pendingReviewsCount} tópicos críticos esquecidos antes de avançar na matéria nova.</p>
+                     </div>
+                  </div>
+                  <button onClick={() => setActiveTab('revisoes')} className="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-xl font-black transition-all shadow-lg hover:shadow-red-500/30 w-full md:w-auto shrink-0 whitespace-nowrap cursor-pointer">
+                     Iniciar Aquecimento
+                  </button>
+               </div>
+            </div>
+          )}
+
           {sprintGroups.map((group, idx) => {
             const sprintNum = sprintsCompleted + idx + 1;
             const isActive = idx === 0;
@@ -1767,9 +1806,9 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
 }
 
 // ==========================================
-// ABA 5: MOTOR DE REVISÃO
+// ABA 5: MOTOR DE REVISÃO (AGORA COM SM-2 LIGHT)
 // ==========================================
-function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeSubjectIds, themeColors, flashElementId }) {
+function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeSubjectIds, themeColors, flashElementId, projectConfig }) {
   let todosAssuntos = [];
   edital.forEach(b => b.disciplinas.forEach(d => {
     d.assuntos.forEach(a => todosAssuntos.push({...a, discNome: d.nome}))
@@ -1777,12 +1816,12 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
 
   const now = new Date().getTime();
 
+  // CORREÇÃO TÁTICA: O filtro agora avalia ESTRITAMENTE o nextReviewTimestamp
   const revisoesPendentes = todosAssuntos.filter(a => {
     if (!activeSubjectIds.has(a.id)) return false;
     const p = progress[a.id];
     if (!p?.estudado) return false;
-    if (p.revisado && p.nextReviewTimestamp && p.nextReviewTimestamp <= now) return true;
-    if (!p.revisado) return true;
+    if (p.nextReviewTimestamp && p.nextReviewTimestamp <= now) return true;
     return false;
   });
 
@@ -1792,7 +1831,6 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
     return p?.estudado && p?.revisado && p?.nextReviewTimestamp && p.nextReviewTimestamp > now;
   });
 
-  // Novo formatador de data para revisões agendadas
   const getFormattedReviewDate = (timestamp) => {
     const diff = Math.ceil((timestamp - now) / (1000 * 3600 * 24));
     const revDate = new Date(timestamp);
@@ -1802,6 +1840,19 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
 
     if (diff === 1) return `${dateStr} (Amanhã)`;
     return `${dateStr} (em ${diff} dias)`;
+  };
+
+  // Motor Multiplicador de Retenção Dinâmico
+  const getNextIntervalDays = (assId, feedbackType) => {
+    const currentInterval = progress[assId]?.reviewInterval || 0;
+    if (feedbackType === 'dificil') return 1;
+    if (feedbackType === 'bom') {
+      return currentInterval <= 1 ? (projectConfig.revBom || 7) : Math.min(365, Math.round(currentInterval * 2));
+    }
+    if (feedbackType === 'facil') {
+      return currentInterval <= 1 ? (projectConfig.revFacil || 15) : Math.min(365, Math.round(currentInterval * 2.5));
+    }
+    return 1;
   };
 
   return (
@@ -1829,6 +1880,11 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
             ) : (
               revisoesPendentes.map((data) => {
                 const isFlashing = flashElementId === data.id;
+                
+                // Calcula os dias dinâmicos para a interface
+                const daysBom = getNextIntervalDays(data.id, 'bom');
+                const daysFacil = getNextIntervalDays(data.id, 'facil');
+
                 return (
                   <div key={data.id} className={`bg-white dark:bg-[#111e36] border p-6 rounded-2xl shadow-sm flex flex-col gap-4 border-l-4 transition-all duration-300 ${isFlashing ? 'border-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 scale-[1.02]' : 'border-slate-200/60 dark:border-white/5 border-l-red-500 hover:shadow-md'}`}>
                     <div className="flex justify-between items-start">
@@ -1843,16 +1899,16 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
                       )}
                     </div>
                     
-                    {/* BOTÕES INLINE DE REVISÃO */}
+                    {/* BOTÕES INLINE DE REVISÃO COM DIAS DINÂMICOS */}
                     <div className="grid grid-cols-3 gap-3 mt-3 pt-5 border-t border-slate-100 dark:border-white/5">
                       <button onClick={() => handleReviewFeedback(data.id, 'dificil')} className="py-3 px-2 bg-red-50 hover:bg-red-500 text-red-600 hover:text-white dark:bg-red-500/10 dark:hover:bg-red-600 dark:text-red-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-red-100 dark:border-red-500/20">
                         <span>Difícil</span><span className="text-[9px] font-bold opacity-70 tracking-widest">Amanhã</span>
                       </button>
                       <button onClick={() => handleReviewFeedback(data.id, 'bom')} className="py-3 px-2 bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white dark:bg-amber-500/10 dark:hover:bg-amber-600 dark:text-amber-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-amber-100 dark:border-amber-500/20">
-                        <span>Bom</span><span className="text-[9px] font-bold opacity-70 tracking-widest">7 Dias</span>
+                        <span>Bom</span><span className="text-[9px] font-bold opacity-70 tracking-widest">{daysBom} Dias</span>
                       </button>
                       <button onClick={() => handleReviewFeedback(data.id, 'facil')} className="py-3 px-2 bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white dark:bg-emerald-500/10 dark:hover:bg-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-emerald-100 dark:border-emerald-500/20">
-                        <span>Fácil</span><span className="text-[9px] font-bold opacity-70 tracking-widest">15 Dias</span>
+                        <span>Fácil</span><span className="text-[9px] font-bold opacity-70 tracking-widest">{daysFacil} Dias</span>
                       </button>
                     </div>
                   </div>
@@ -2160,13 +2216,13 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
         {/* BLOCO 3: MOTOR DE RETENÇÃO (LEITNER) */}
         <div className="bg-white dark:bg-[#111e36] p-8 rounded-[2rem] border border-slate-200/60 dark:border-white/5 shadow-sm">
           <h3 className="text-lg font-black text-slate-800 dark:text-white mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4">
-            <Sliders className="w-5 h-5 text-emerald-500"/> Retenção (Leitner)
+            <Sliders className="w-5 h-5 text-emerald-500"/> Intervalos Base (1ª Revisão)
           </h3>
-          <p className="text-sm text-slate-500 dark:text-white/50 mb-6 leading-relaxed">Ajuste os intervalos em dias para a próxima revisão baseada na sua avaliação no Motor de Revisão.</p>
+          <p className="text-sm text-slate-500 dark:text-white/50 mb-6 leading-relaxed">Defina a base em dias para quando avaliar um tópico pela primeira vez. Dali em diante, o algoritmo SM-2 encarrega-se de multiplicar o espaçamento na proporção ideal.</p>
           
           <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-amber-600 block mb-2">Se avaliar "BOM"</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-amber-600 block mb-2">1º Base "BOM"</label>
               <div className="flex items-center gap-2">
                 <input 
                   type="number" 
@@ -2180,7 +2236,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
             </div>
             
             <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 block mb-2">Se avaliar "FÁCIL"</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 block mb-2">1º Base "FÁCIL"</label>
               <div className="flex items-center gap-2">
                 <input 
                   type="number" 
@@ -2192,7 +2248,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                 <span className="text-xs font-bold text-slate-400 dark:text-white/30 uppercase tracking-widest">Dias</span>
               </div>
             </div>
-            <p className="col-span-2 text-[10px] text-slate-400 dark:text-white/30 mt-2 bg-slate-50 dark:bg-white/5 p-3 rounded-lg border border-slate-100 dark:border-white/5">Nota: Avaliar "Difícil" sempre agenda a revisão para o dia seguinte.</p>
+            <p className="col-span-2 text-[10px] text-slate-400 dark:text-white/30 mt-2 bg-slate-50 dark:bg-white/5 p-3 rounded-lg border border-slate-100 dark:border-white/5">Nota: Avaliar "Difícil" sempre recomeça o espaçamento do zero (revisão marcada para o dia seguinte).</p>
           </div>
         </div>
 
@@ -2416,28 +2472,7 @@ export default function App() {
     });
   }, [dailyLogs, projectConfig.horasDia]);
 
-  const toggleProgress = (assId, type) => {
-    setUserProgress(prev => {
-      const current = prev[assId] || {};
-      const newState = { ...current, [type]: !current[type] };
-      if (type === 'estudado' && !newState.estudado) { newState.questoes = false; newState.revisado = false; }
-      if (type === 'questoes' && !newState.questoes) { newState.revisado = false; }
-      if (type === 'revisado') {
-        if (newState.revisado) {
-          const now = new Date().getTime();
-          newState.lastReviewedTimestamp = now;
-          newState.nextReviewTimestamp = now + (1000 * 60 * 60 * 24 * 1);
-          addXP(10);
-        } else {
-          newState.lastReviewedTimestamp = null;
-          newState.nextReviewTimestamp = null;
-        }
-      }
-      triggerVisualFlash(assId);
-      return { ...prev, [assId]: newState };
-    });
-  };
-
+  // Função core do Algoritmo Multiplicador Dinâmico (SM-2 Light)
   const handleReviewFeedback = (assId, feedbackType) => {
     setReviewStats(prev => ({ ...prev, [feedbackType]: (prev[feedbackType] || 0) + 1 }));
     
@@ -2450,16 +2485,64 @@ export default function App() {
     setUserProgress(prev => {
       const current = prev[assId] || {};
       const now = new Date().getTime();
-      let daysToAdd = 1; 
-      if (feedbackType === 'bom') daysToAdd = projectConfig.revBom || 7;
-      if (feedbackType === 'facil') daysToAdd = projectConfig.revFacil || 15;
+      let currentInterval = current.reviewInterval || 0;
+      let newInterval = 1;
+
+      if (feedbackType === 'dificil') {
+        newInterval = 1; // Voltou ao zero (rever amanhã)
+      } else if (feedbackType === 'bom') {
+        // Se for a primeira vez que avalia, usa a base das configs, senão, multiplica por 2.
+        newInterval = currentInterval <= 1 ? (projectConfig.revBom || 7) : Math.round(currentInterval * 2);
+      } else if (feedbackType === 'facil') {
+        // Se for a primeira vez que avalia, usa a base das configs, senão, multiplica por 2.5.
+        newInterval = currentInterval <= 1 ? (projectConfig.revFacil || 15) : Math.round(currentInterval * 2.5);
+      }
+      
+      // Teto máximo de espaçamento (ex: não passar de 365 dias para não desparecer para sempre)
+      newInterval = Math.min(newInterval, 365);
+
       addXP(15); 
       triggerVisualFlash(assId);
-      return { ...prev, [assId]: { ...current, revisado: true, lastReviewedTimestamp: now, nextReviewTimestamp: now + (1000 * 60 * 60 * 24 * daysToAdd) } };
+      
+      return { 
+        ...prev, 
+        [assId]: { 
+          ...current, 
+          revisado: true, 
+          lastReviewedTimestamp: now, 
+          nextReviewTimestamp: now + (1000 * 60 * 60 * 24 * newInterval),
+          reviewInterval: newInterval // Salva o intervalo na db para usar como multiplicador na próxima
+        } 
+      };
     });
   };
 
-  const resetProgress = (assId) => { setUserProgress(prev => ({ ...prev, [assId]: { estudado: false, questoes: false, revisado: false, lastReviewedTimestamp: null, nextReviewTimestamp: null } })); };
+  const toggleProgress = (assId, type) => {
+    setUserProgress(prev => {
+      const current = prev[assId] || {};
+      const newState = { ...current, [type]: !current[type] };
+      if (type === 'estudado' && !newState.estudado) { newState.questoes = false; newState.revisado = false; }
+      if (type === 'questoes' && !newState.questoes) { newState.revisado = false; }
+      if (type === 'revisado') {
+        if (newState.revisado) {
+          // Quando marca revisto no checkbox manualmente, dispara a "primeira" revisão forçada (ex: amanhã)
+          const now = new Date().getTime();
+          newState.lastReviewedTimestamp = now;
+          newState.nextReviewTimestamp = now + (1000 * 60 * 60 * 24 * 1);
+          newState.reviewInterval = 1; 
+          addXP(10);
+        } else {
+          newState.lastReviewedTimestamp = null;
+          newState.nextReviewTimestamp = null;
+          newState.reviewInterval = 0;
+        }
+      }
+      triggerVisualFlash(assId);
+      return { ...prev, [assId]: newState };
+    });
+  };
+
+  const resetProgress = (assId) => { setUserProgress(prev => ({ ...prev, [assId]: { estudado: false, questoes: false, revisado: false, lastReviewedTimestamp: null, nextReviewTimestamp: null, reviewInterval: 0 } })); };
 
   const toggleSprintItem = (discId, assId, discNome, assTitulo, temp, linkTec) => {
     setCustomSprint(prev => {
@@ -2474,11 +2557,12 @@ export default function App() {
   edital.forEach(b => b.disciplinas.forEach(d => d.assuntos.forEach(a => activeSubjectIds.add(a.id))));
 
   const now = new Date().getTime();
+  
+  // CORREÇÃO: Contagem rigorosa (só conta se a data da revisão agendada já estiver expirada)
   const pendingReviewsCount = Object.entries(userProgress).filter(([id, data]) => {
     if (!activeSubjectIds.has(id)) return false;
     if (!data.estudado) return false;
-    if (data.revisado && data.nextReviewTimestamp && data.nextReviewTimestamp <= now) return true;
-    if (!data.revisado) return true;
+    if (data.nextReviewTimestamp && data.nextReviewTimestamp <= now) return true;
     return false;
   }).length;
 
@@ -2643,11 +2727,11 @@ export default function App() {
         {/* CONTENT AREA EXPANDIDA */}
         <main className="flex-1 p-4 md:p-8 lg:p-10 overflow-y-auto pb-28 md:pb-10 text-left transition-all duration-300 relative">
           <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full transition-all duration-500 h-full flex flex-col">
-            {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} dailyReviewStats={dailyReviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} />}
+            {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} dailyReviewStats={dailyReviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} />}
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} setUserProgress={setUserProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} setActiveTab={setActiveTab} addXP={addXP} triggerVisualFlash={triggerVisualFlash} flashElementId={flashElementId} />}
             {activeTab === 'planner' && <TabPlanner customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} progress={userProgress} toggleProgress={toggleProgress} flashElementId={flashElementId} />}
-            {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} triggerConfetti={triggerConfetti} themeColors={themeColors} handleAutoLog={handleAutoLog} flashElementId={flashElementId} />}
-            {activeTab === 'revisoes' && <TabRevisaoInteligente progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} flashElementId={flashElementId} />}
+            {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} triggerConfetti={triggerConfetti} themeColors={themeColors} handleAutoLog={handleAutoLog} flashElementId={flashElementId} pendingReviewsCount={pendingReviewsCount} />}
+            {activeTab === 'revisoes' && <TabRevisaoInteligente progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} flashElementId={flashElementId} projectConfig={projectConfig} />}
             {activeTab === 'admin' && <TabAdmin auth={auth} config={projectConfig} setConfig={setProjectConfig} userProgress={userProgress} setUserProgress={setUserProgress} gamification={gamification} setGamification={setGamification} edital={edital} setEdital={setEdital} customSprint={customSprint} setCustomSprint={setCustomSprint} initialEdital={initialEdital} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} reviewStats={reviewStats} dailyReviewStats={dailyReviewStats} setDailyReviewStats={setDailyReviewStats} themeColors={themeColors} playLevelUpSound={playLevelUpSound} />}
           </div>
         </main>
