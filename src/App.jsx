@@ -254,45 +254,6 @@ function PomodoroWidget({ themeColors, handleAutoLog, addXP, triggerConfetti }) 
   );
 }
 
-const SwipeableItem = ({ children, onSwipeRight, onSwipeLeft, disabled, isCompact }) => {
-  const [offset, setOffset] = useState(0);
-  const startXRef = useRef(0);
-
-  const handleTouchStart = (e) => {
-      if (disabled) return;
-      startXRef.current = e.touches[0].clientX;
-  };
-  const handleTouchMove = (e) => {
-      if (disabled) return;
-      const diff = e.touches[0].clientX - startXRef.current;
-      if (diff > -80 && diff < 80) setOffset(diff);
-  };
-  const handleTouchEnd = () => {
-      if (disabled) return;
-      if (offset > 50 && onSwipeRight) onSwipeRight();
-      else if (offset < -50 && onSwipeLeft) onSwipeLeft();
-      setOffset(0);
-  };
-
-  return (
-     <div className="relative overflow-hidden rounded-xl">
-        <div className="absolute inset-0 flex items-center justify-between px-4 bg-slate-100 dark:bg-slate-800 rounded-xl">
-           <div className={`text-emerald-500 font-bold flex items-center gap-2 transition-opacity ${offset > 20 ? 'opacity-100' : 'opacity-0'}`}><Target size={18}/> Sprint</div>
-           <div className={`text-blue-500 font-bold flex items-center gap-2 transition-opacity ${offset < -20 ? 'opacity-100' : 'opacity-0'}`}><CheckCircle size={18}/> Dominar</div>
-        </div>
-        <div
-           onTouchStart={handleTouchStart}
-           onTouchMove={handleTouchMove}
-           onTouchEnd={handleTouchEnd}
-           style={{ transform: `translateX(${offset}px)`, transition: offset === 0 ? 'transform 0.3s ease' : 'none' }}
-           className={`relative z-10 w-full`}
-        >
-           {children}
-        </div>
-     </div>
-  );
-};
-
 const CircularProgress = ({ percent, themeColors }) => {
   const radius = 9;
   const circumference = 2 * Math.PI * radius;
@@ -1250,6 +1211,11 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
   // Apenas a Árvore e Seleção em Massa
   const [expandedTopics, setExpandedTopics] = useState({});
   const [selectedAssuntosBulk, setSelectedAssuntosBulk] = useState(new Set());
+  
+  // Controle Visual de Drag & Drop
+  const [dragTargetIndex, setDragTargetIndex] = useState(null);
+  const dragItem = useRef(null); 
+  const dragOverItem = useRef(null);
 
   useEffect(() => {
     if (!selectedDiscId && edital.length > 0 && edital[0].disciplinas.length > 0) {
@@ -1301,14 +1267,51 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     setEdital(prev => prev.map(b => { if (b.id !== blocoId) return b; if (discIndex + direction < 0 || discIndex + direction >= b.disciplinas.length) return b; const newDisciplinas = [...b.disciplinas]; const temp = newDisciplinas[discIndex]; newDisciplinas[discIndex] = newDisciplinas[discIndex + direction]; newDisciplinas[discIndex + direction] = temp; return { ...b, disciplinas: newDisciplinas }; }));
   };
 
-  const dragItem = useRef(null); const dragOverItem = useRef(null);
-  const handleDragStart = (e, position, discId) => { dragItem.current = { position, discId }; e.dataTransfer.effectAllowed = "move"; };
-  const handleDragEnter = (e, position, discId) => { e.preventDefault(); dragOverItem.current = { position, discId }; };
+  // Funções de Arrastar com a Linha Azul
+  const handleDragStart = (e, position, discId) => { 
+    dragItem.current = { position, discId }; 
+    e.dataTransfer.effectAllowed = "move"; 
+  };
+  const handleDragEnter = (e, position, discId) => { 
+    e.preventDefault(); 
+    dragOverItem.current = { position, discId }; 
+    setDragTargetIndex(position); 
+  };
+  const handleDragLeave = () => { setDragTargetIndex(null); };
   const handleDrop = (e) => {
-    e.preventDefault(); if (!dragItem.current || !dragOverItem.current) return; if (dragItem.current.discId !== dragOverItem.current.discId) return;
-    const discId = dragItem.current.discId; const dragIdx = dragItem.current.position; const dropIdx = dragOverItem.current.position;
-    dragItem.current = null; dragOverItem.current = null;
+    e.preventDefault(); 
+    setDragTargetIndex(null);
+    if (!dragItem.current || !dragOverItem.current) return; 
+    if (dragItem.current.discId !== dragOverItem.current.discId) return;
+    
+    const discId = dragItem.current.discId; 
+    const dragIdx = dragItem.current.position; 
+    const dropIdx = dragOverItem.current.position;
+    
+    dragItem.current = null; 
+    dragOverItem.current = null;
+    
     setEdital(prevEdital => prevEdital.map(bloco => ({ ...bloco, disciplinas: bloco.disciplinas.map(disc => { if (disc.id === discId) { const newAssuntos = [...disc.assuntos]; const [draggedTopic] = newAssuntos.splice(dragIdx, 1); newAssuntos.splice(dropIdx, 0, draggedTopic); return { ...disc, assuntos: newAssuntos }; } return disc; }) })));
+  };
+
+  // Ideia 1: Botão de Sobe e Desce Manual para Assuntos
+  const handleMoveAssuntoManual = (discId, assId, direction) => {
+    setEdital(prev => prev.map(b => ({
+      ...b, disciplinas: b.disciplinas.map(d => {
+        if (d.id === discId) {
+          const assuntos = [...d.assuntos];
+          const idx = assuntos.findIndex(a => a.id === assId);
+          if (idx < 0 || idx + direction < 0 || idx + direction >= assuntos.length) return d;
+          
+          // Troca de Posições
+          const temp = assuntos[idx];
+          assuntos[idx] = assuntos[idx + direction];
+          assuntos[idx + direction] = temp;
+          return { ...d, assuntos };
+        }
+        return d;
+      })
+    })));
   };
 
   const handleDeleteClick = (discId, assId) => {
@@ -1406,22 +1409,6 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     return visible;
   }, [filteredAssuntos, shouldApplyCollapse, expandedTopics]);
 
-  const handleSwipeToSprint = (assunto) => {
-     if (isFullyMastered(assunto.id) && !customSprint.some(item => item.assId === assunto.id)) resetProgress(assunto.id);
-     toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec);
-  };
-  const handleSwipeToMaster = (assunto) => {
-     if (!isFullyMastered(assunto.id)) {
-        const now = new Date().getTime();
-        setUserProgress(prev => ({
-           ...prev,
-           [assunto.id]: { estudado: true, questoes: true, revisado: true, lastReviewedTimestamp: now, nextReviewTimestamp: now + (1000 * 60 * 60 * 24 * 15) }
-        }));
-        addXP(25);
-        triggerVisualFlash(assunto.id);
-     }
-  };
-
   return (
     <div className="flex flex-col h-full space-y-6 animate-in fade-in pb-10">
       <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
@@ -1439,7 +1426,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
       {isEditing && (
         <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 shadow-sm">
           <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
-          <div className="text-sm text-amber-800 dark:text-amber-200/80 leading-relaxed flex-1"><strong>Modo Edição Ativo:</strong> Use as caixas de seleção na lista para gerir assuntos em massa.</div>
+          <div className="text-sm text-amber-800 dark:text-amber-200/80 leading-relaxed flex-1"><strong>Modo Edição Ativo:</strong> Arraste e solte para organizar, ou use as setas azuis para subir/descer um item sem esforço.</div>
         </div>
       )}
 
@@ -1547,7 +1534,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
           )}
         </div>
 
-        {/* COLUNA DIREITA: LISTA MINIMALISTA (NOTION STYLE) */}
+        {/* COLUNA DIREITA: LISTA MINIMALISTA */}
         <div className={`flex-1 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-4 md:p-6 ${!isMobileDetailView ? 'hidden md:flex' : 'flex'} flex-col min-h-[500px] relative`}>
           
           {!activeDisc ? (
@@ -1568,7 +1555,6 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                   <ArrowLeft className="w-4 h-4" /> Voltar
                 </button>
                 
-                {/* UX 1: Breadcrumbs Contextuais */}
                 <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 flex-wrap">
                    <Layers className="w-3.5 h-3.5" />
                    <span className="truncate max-w-[150px]">{activeBloco?.nome}</span>
@@ -1599,7 +1585,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                 </div>
               </div>
 
-              {/* LISTA MINIMALISTA */}
+              {/* LISTA MINIMALISTA (Com Suporte ao Arrastar e Linha Azul) */}
               <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 pb-6">
                 {displayAssuntos.length === 0 ? (
                   <div className="text-sm text-slate-500 text-center p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center">
@@ -1614,18 +1600,38 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                     const isParent = (assunto.indent || 0) === 0;
                     const hasChildren = isParent && activeDisc.assuntos[trueIndex + 1]?.indent > 0;
                     const isSelectedBulk = selectedAssuntosBulk.has(assunto.id);
+                    
+                    // Lógica Visual do Arrastar
+                    const isBeingDragged = dragItem.current?.discId === activeDisc.id && dragItem.current?.position === trueIndex;
+                    const isDropTarget = dragTargetIndex === trueIndex && !isBeingDragged;
 
                     return (
                         <div 
                           key={assunto.id}
+                          draggable={isEditing} 
+                          onDragStart={(e) => handleDragStart(e, trueIndex, activeDisc.id)} 
+                          onDragEnter={(e) => handleDragEnter(e, trueIndex, activeDisc.id)} 
+                          onDragLeave={handleDragLeave}
+                          onDragOver={(e) => e.preventDefault()} 
+                          onDrop={handleDrop} 
                           style={{ marginLeft: assunto.indent && shouldApplyCollapse ? `${assunto.indent * 1.5}rem` : '0' }} 
-                          className={`group flex items-center py-2 px-3 transition-colors border-b border-slate-100 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/30 ${isParent ? 'mt-4 border-t border-t-slate-200 dark:border-t-slate-700 pt-3' : ''} ${isSelectedBulk ? 'bg-amber-50 dark:bg-amber-900/10' : ''}`}
+                          className={`
+                            group flex items-center py-2 px-3 transition-colors border-b border-slate-100 dark:border-slate-800/50 
+                            ${isEditing ? 'cursor-grab active:cursor-grabbing hover:bg-slate-100 dark:hover:bg-slate-800/60' : 'hover:bg-slate-50 dark:hover:bg-slate-800/30'} 
+                            ${isParent ? 'mt-4 border-t border-t-slate-200 dark:border-t-slate-700 pt-3' : ''} 
+                            ${isSelectedBulk ? 'bg-amber-50 dark:bg-amber-900/10' : ''}
+                            ${isBeingDragged ? 'opacity-40' : ''}
+                            ${isDropTarget ? 'border-t-4 border-t-blue-500 bg-blue-50/50 dark:bg-blue-900/30 scale-[1.01]' : ''}
+                          `}
                         >
                           <div className="flex items-center gap-3 w-full">
                             
-                            {/* UX 4: Bulk Selection Checkbox (Edit Mode Only) */}
+                            {/* Checkbox de Seleção ou Ícone de Rato no Modo Edição */}
                             {isEditing ? (
-                               <input type="checkbox" checked={isSelectedBulk} onChange={() => toggleBulkSelect(assunto.id)} className="w-4 h-4 rounded cursor-pointer border-slate-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 shrink-0" />
+                               <div className="flex items-center gap-2">
+                                 <input type="checkbox" checked={isSelectedBulk} onChange={() => toggleBulkSelect(assunto.id)} className="w-4 h-4 rounded cursor-pointer border-slate-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 shrink-0" />
+                                 <GripVertical className="w-4 h-4 text-slate-300 shrink-0" />
+                               </div>
                             ) : (
                                getSimpleStatus(assunto.id, isInSprint)
                             )}
@@ -1655,7 +1661,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                               </div>
                             </div>
                             
-                            {/* ACÇÕES OCULTAS NO HOVER (Lipoaspiração) */}
+                            {/* ACÇÕES DE HOVER (Visão Padrão) */}
                             {!isEditing && (
                               <div className="opacity-0 group-hover:opacity-100 flex items-center gap-2 transition-opacity shrink-0">
                                 <button 
@@ -1668,12 +1674,23 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                               </div>
                             )}
 
+                            {/* ACÇÕES DE HOVER (Modo Edição - Botões Sobe e Desce Adicionados) */}
                             {isEditing && (
-                              <div className="flex items-center gap-2 shrink-0">
-                                <button onClick={() => handleIndent(activeDisc.id, assunto.id, -1)} disabled={!assunto.indent || !shouldApplyCollapse} className="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-30 cursor-pointer"><ArrowLeft className="w-3.5 h-3.5"/></button>
-                                <button onClick={() => handleIndent(activeDisc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3 || !shouldApplyCollapse} className="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-30 cursor-pointer"><ArrowRight className="w-3.5 h-3.5"/></button>
-                                <button onClick={() => startEditTopic(assunto)} className="p-1 text-slate-400 hover:text-blue-500 cursor-pointer"><Pencil className="w-3.5 h-3.5"/></button>
-                                <button onClick={() => handleDeleteClick(activeDisc.id, assunto.id)} className={`p-1 ${confirmDeleteId === assunto.id ? 'text-red-600' : 'text-slate-400 hover:text-red-500'} cursor-pointer`}><Trash2 className="w-3.5 h-3.5"/></button>
+                              <div className="opacity-0 group-hover:opacity-100 flex items-center gap-2 shrink-0 transition-opacity bg-slate-50/80 dark:bg-slate-800/80 p-1 rounded-lg">
+                                {/* Botões Matemáticos Verticais */}
+                                <button onClick={() => handleMoveAssuntoManual(activeDisc.id, assunto.id, -1)} disabled={trueIndex === 0} className="p-1 text-blue-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded disabled:opacity-30 cursor-pointer" title="Subir (Vertical)"><ChevronUp className="w-4 h-4"/></button>
+                                <button onClick={() => handleMoveAssuntoManual(activeDisc.id, assunto.id, 1)} disabled={trueIndex === activeDisc.assuntos.length - 1} className="p-1 text-blue-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded disabled:opacity-30 cursor-pointer" title="Descer (Vertical)"><ChevronDown className="w-4 h-4"/></button>
+                                
+                                <div className="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
+                                
+                                {/* Botões Indentação Horizontais */}
+                                <button onClick={() => handleIndent(activeDisc.id, assunto.id, -1)} disabled={!assunto.indent || !shouldApplyCollapse} className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 rounded disabled:opacity-30 cursor-pointer" title="Recuar (Nível)"><ArrowLeft className="w-3.5 h-3.5"/></button>
+                                <button onClick={() => handleIndent(activeDisc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3 || !shouldApplyCollapse} className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 rounded disabled:opacity-30 cursor-pointer" title="Avançar (Nível)"><ArrowRight className="w-3.5 h-3.5"/></button>
+                                
+                                <div className="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
+                                
+                                <button onClick={() => startEditTopic(assunto)} className="p-1 text-slate-400 hover:text-blue-500 cursor-pointer" title="Editar Texto"><Pencil className="w-3.5 h-3.5"/></button>
+                                <button onClick={() => handleDeleteClick(activeDisc.id, assunto.id)} className={`p-1 ${confirmDeleteId === assunto.id ? 'text-red-600' : 'text-slate-400 hover:text-red-500'} cursor-pointer`} title="Excluir"><Trash2 className="w-3.5 h-3.5"/></button>
                               </div>
                             )}
 
