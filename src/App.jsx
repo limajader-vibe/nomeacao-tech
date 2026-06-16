@@ -589,7 +589,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* Cartão 1: Domínio */}
-        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-orange-500">
+        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-orange-500 dark:border-l-orange-500">
           <div className="flex justify-between items-start mb-4">
             <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">Domínio da Trilha</p>
             <div className="p-2.5 rounded-xl border border-orange-200 dark:border-orange-500/20 bg-orange-50/50 dark:bg-orange-500/5">
@@ -609,7 +609,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
         </div>
 
         {/* Cartão 2: Horas */}
-        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-sky-500">
+        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-sky-500 dark:border-l-sky-500">
           <div className="flex justify-between items-start mb-4">
             <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">Horas de Hoje</p>
             <div className="p-2.5 rounded-xl border border-sky-200 dark:border-sky-500/20 bg-sky-50/50 dark:bg-sky-500/5">
@@ -645,7 +645,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
         </div>
 
         {/* Cartão 3: XP */}
-        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-amber-500">
+        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-amber-500 dark:border-l-amber-500">
           <Trophy className="absolute -right-6 -bottom-6 w-40 h-40 text-slate-50 dark:text-white/[0.02] pointer-events-none" />
           
           <div className="flex justify-between items-start mb-4 relative z-10">
@@ -1356,8 +1356,6 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                                           e.preventDefault();
                                           if(inlineEditValue.trim()) saveEditTopic(activeDisc.id, assunto.id, inlineEditValue, assunto.linkTec); 
                                           setInlineEditingId(null); 
-                                          
-                                          // Opcional: tentar focar o próximo elemento, mas salvar e fechar é mais seguro
                                         } 
                                         if(e.key === 'Escape') setInlineEditingId(null); 
                                       }} 
@@ -1794,10 +1792,16 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
     return p?.estudado && p?.revisado && p?.nextReviewTimestamp && p.nextReviewTimestamp > now;
   });
 
-  const getDaysUntil = (timestamp) => {
+  // Novo formatador de data para revisões agendadas
+  const getFormattedReviewDate = (timestamp) => {
     const diff = Math.ceil((timestamp - now) / (1000 * 3600 * 24));
-    if (diff === 1) return 'Amanhã';
-    return `em ${diff} dias`;
+    const revDate = new Date(timestamp);
+    const day = String(revDate.getDate()).padStart(2, '0');
+    const month = String(revDate.getMonth() + 1).padStart(2, '0');
+    const dateStr = `${day}/${month}`;
+
+    if (diff === 1) return `${dateStr} (Amanhã)`;
+    return `${dateStr} (em ${diff} dias)`;
   };
 
   return (
@@ -1882,7 +1886,7 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
                         <h4 className="font-bold text-slate-700 dark:text-white text-sm truncate">{data.titulo}</h4>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="block text-sm font-black text-emerald-500 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-lg">{getDaysUntil(p.nextReviewTimestamp)}</span>
+                        <span className="block text-xs font-black text-emerald-500 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-lg whitespace-nowrap">{getFormattedReviewDate(p.nextReviewTimestamp)}</span>
                       </div>
                     </div>
                   );
