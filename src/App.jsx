@@ -815,10 +815,9 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     setExpandedTopics(allExpanded);
   };
   
-  const handleCollapseAllTopics = () => { 
-    setExpandedTopics({}); 
+  const handleCollapseAllTopics = () => {
+    setExpandedTopics({});
   };
-  const handleCollapseAllTopics = () => { setExpandedTopics({}); };
 
   const handleEditBlocoNome = (blocoId, newNome) => { setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, nome: newNome } : b)); };
   const handleDeleteBlocoClick = (blocoId) => {
