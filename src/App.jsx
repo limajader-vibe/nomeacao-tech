@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { 
   PieChart, Calendar, CheckCircle, Clock, Target, BookOpen, 
-  Layers, FileText, ChevronDown, Folder, FolderOpen, ChevronRight, PlayCircle, 
-  RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Link, Pencil, Settings,
+  Layers, ChevronDown, Folder, ChevronRight, PlayCircle, 
+  RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Pencil, Settings,
   Edit, AlertTriangle, ChevronUp, Flame, Trophy, TrendingUp, Activity, Award, ListPlus, ArrowRight, ArrowLeft, BarChart2,
-  Thermometer, CalendarDays, LayoutGrid, BrainCircuit, Eye, Zap, Image as ImageIcon, ShieldAlert, Download, Sliders, Lock, LogOut,
-  Filter, Play, Pause, Coffee, PartyPopper, X, Menu, Search, Minus, Upload, ChevronsDown, ChevronsUp
+  CalendarDays, LayoutGrid, BrainCircuit, ShieldAlert, Download, Sliders, Lock, LogOut,
+  Filter, Play, Pause, Coffee, PartyPopper, X, Menu, Minus, Upload
 } from 'lucide-react';
 
 // --- FIREBASE CLOUD STORAGE SETUP ---
@@ -271,7 +271,6 @@ const CircularProgress = ({ percent, themeColors }) => {
   );
 };
 
-// Modal de Edição (Limpo, sem Flashcards)
 const ModalEditor = ({ assunto, onSave, onCancel, themeColors }) => {
   const [titulo, setTitulo] = useState(assunto.titulo || '');
   const [link, setLink] = useState(assunto.linkTec || '');
@@ -543,7 +542,6 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
   const maxHours = Math.max(maxHoursLogged, config.horasDia * 1.2, 2); 
   const avgHours = (last14Days.reduce((acc, curr) => acc + (dailyLogs[curr.dateStr] || 0), 0) / 14).toFixed(1);
 
-  // UX 3: Cálculo do Gráfico de Retenção (Linha)
   const lineChartPoints = last14Days.map(day => {
     const stats = dailyReviewStats[day.dateStr];
     let rate = 0;
@@ -558,90 +556,126 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
   const polylineStr = lineChartPoints.map((val, idx) => `${idx * xStep},${100 - val}`).join(' ');
 
   const totalReviews = reviewStats?.facil + reviewStats?.bom + reviewStats?.dificil || 0;
-  const facilPerc = totalReviews > 0 ? Math.round((reviewStats.facil / totalReviews) * 100) : 0;
-  const bomPerc = totalReviews > 0 ? Math.round((reviewStats.bom / totalReviews) * 100) : 0;
-  const dificilPerc = totalReviews > 0 ? Math.round((reviewStats.dificil / totalReviews) * 100) : 0;
   const successRate = totalReviews > 0 ? (((reviewStats.facil + reviewStats.bom) / totalReviews) * 100).toFixed(1) : 0;
+
+  // Formatação de data estilo "terça-feira, 16 de junho"
+  const formattedDate = new Intl.DateTimeFormat('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 
   return (
     <div className="space-y-6 animate-in fade-in pb-10">
-      <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4">
-        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
-          <Activity className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Centro de Comando
-        </h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">A sua fotografia tática. Zero distrações, máximo desempenho.</p>
+      <header className="flex justify-between items-start mb-8 pb-4 border-b border-slate-200/60 dark:border-slate-800/0">
+        <div>
+          <span className="text-[10px] font-black text-orange-500 tracking-widest uppercase mb-1 block">Visão Geral</span>
+          <h2 className="text-3xl font-black text-slate-800 dark:text-white flex items-center gap-2">
+            <Activity className="w-8 h-8 text-orange-500" /> Centro de Comando
+          </h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">
+            Fotografia tática · {formattedDate}
+          </p>
+        </div>
+        <div className="border border-orange-500/30 rounded-xl p-3 flex flex-col items-center justify-center bg-orange-500/5 shadow-sm">
+          <span className="text-[10px] font-black text-orange-500 tracking-widest uppercase mb-0.5">Progresso</span>
+          <span className="text-2xl font-black text-orange-500 leading-none">{progressPerc}%</span>
+        </div>
       </header>
 
-      {/* LINHA 1: OS 3 INDICADORES VITAIS (KPIs) */}
+      {/* LINHA 1: OS 3 INDICADORES VITAIS (KPIs) - REDESIGN PREMIUM */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col justify-center items-center text-center">
-          <div className={`p-3 ${themeColors.lightBg.split(' ')[0]} rounded-2xl mb-3`}><TrendingUp className={`w-6 h-6 ${themeColors.text.split(' ')[0]}`}/></div>
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Domínio da Trilha</p>
-          <span className="text-3xl font-black text-slate-800 dark:text-white mt-1 mb-2">{progressPerc}%</span>
-          <div className="w-full max-w-[140px] h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-            <div className={`h-full transition-all duration-1000 ${themeColors.bg.split(' ')[0]}`} style={{ width: `${progressPerc}%` }}></div>
+        
+        {/* Cartão 1: Domínio da Trilha */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col relative overflow-hidden border-l-4 border-l-orange-500">
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Domínio da Trilha</p>
+            <div className="p-2 bg-orange-50 dark:bg-orange-500/10 rounded-full border border-orange-200 dark:border-orange-500/20">
+              <TrendingUp className="w-4 h-4 text-orange-500"/>
+            </div>
+          </div>
+          <div className="flex-1 flex items-baseline gap-1 mt-2">
+            <span className="text-4xl font-black text-slate-800 dark:text-white leading-none">{progressPerc}</span>
+            <span className="text-xl font-black text-slate-400 dark:text-slate-500">%</span>
+          </div>
+          <div className="mt-5">
+            <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-full overflow-hidden mb-2">
+              <div className="h-full bg-orange-500 transition-all duration-1000" style={{ width: `${progressPerc}%` }}></div>
+            </div>
+            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wide">do edital dominado</p>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col justify-center items-center text-center">
-          <div className="p-3 bg-blue-50 dark:bg-blue-900/30 rounded-2xl mb-3"><Clock className="w-6 h-6 text-blue-500"/></div>
-          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">Horas de Hoje</p>
+        {/* Cartão 2: Horas de Hoje */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col relative overflow-hidden border-l-4 border-l-sky-500">
+          <div className="flex justify-between items-start mb-2">
+            <p className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Horas de Hoje</p>
+            <div className="p-2 bg-sky-50 dark:bg-sky-500/10 rounded-full border border-sky-200 dark:border-sky-500/20">
+              <Clock className="w-4 h-4 text-sky-500"/>
+            </div>
+          </div>
           
-          <div className="flex items-end justify-center gap-1.5 mt-1 mb-2 relative min-h-[40px]">
+          <div className="flex-1 flex items-end gap-1.5 mt-2 relative min-h-[40px]">
             {isEditingHours ? (
               <div className="flex items-center gap-1">
                 <input 
-                  type="number" 
-                  step="0.5" 
-                  min="0" 
-                  autoFocus 
-                  value={editHoursValue} 
-                  onChange={e => setEditHoursValue(e.target.value)} 
-                  onKeyDown={e => e.key === 'Enter' && handleSaveHours()} 
-                  onBlur={handleSaveHours} 
-                  className="w-20 text-3xl font-black text-center border-b-2 border-blue-500 bg-transparent outline-none text-slate-800 dark:text-white pb-1" 
+                  type="number" step="0.5" min="0" autoFocus 
+                  value={editHoursValue} onChange={e => setEditHoursValue(e.target.value)} 
+                  onKeyDown={e => e.key === 'Enter' && handleSaveHours()} onBlur={handleSaveHours} 
+                  className="w-20 text-4xl font-black text-slate-800 dark:text-white bg-transparent border-b-2 border-sky-500 outline-none pb-1" 
                 />
-                <span className="text-sm font-bold text-slate-400 mb-1">h</span>
               </div>
             ) : (
-              <div 
-                className="flex items-end gap-1.5 group cursor-pointer" 
-                onClick={() => setIsEditingHours(true)}
-                title="Clique para editar as horas de hoje"
-              >
-                <span className="text-3xl font-black text-slate-800 dark:text-white transition-colors group-hover:text-blue-500">{todayHours.toFixed(1)}</span>
-                <span className="text-sm font-bold text-slate-400 mb-1">/ {config.horasDia}h</span>
-                <Pencil className="w-4 h-4 text-slate-300 group-hover:text-blue-500 mb-2 ml-1 opacity-0 group-hover:opacity-100 transition-all" />
+              <div className="flex items-baseline gap-1 group cursor-pointer" onClick={() => setIsEditingHours(true)} title="Editar horas manuais">
+                <span className="text-4xl font-black text-slate-800 dark:text-white leading-none transition-colors group-hover:text-sky-500">{todayHours.toFixed(1)}</span>
+                <span className="text-sm font-bold text-slate-400 dark:text-slate-500">/ {config.horasDia}h</span>
+                <Pencil className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 group-hover:text-sky-500 opacity-0 group-hover:opacity-100 transition-all ml-1" />
               </div>
             )}
           </div>
 
-          <div className="w-full max-w-[140px] h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mt-1">
-            <div className="h-full bg-blue-500 transition-all duration-1000" style={{ width: `${Math.min((todayHours / config.horasDia) * 100, 100)}%` }}></div>
+          <div className="mt-5">
+            <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-full overflow-hidden mb-2">
+              <div className="h-full bg-sky-500 transition-all duration-1000" style={{ width: `${Math.min((todayHours / config.horasDia) * 100, 100)}%` }}></div>
+            </div>
+            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wide">meta diária: {config.horasDia}h</p>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-2xl p-5 shadow-md text-white flex flex-col justify-center items-center text-center relative overflow-hidden">
-          <div className="absolute -right-4 -top-4 opacity-20"><Trophy className="w-24 h-24"/></div>
-          <div className="p-3 bg-white/20 rounded-2xl mb-3 z-10"><Award className="w-6 h-6 text-amber-200"/></div>
-          <p className="text-xs font-bold text-amber-200 uppercase tracking-widest z-10">XP Acumulado</p>
-          <span className="text-3xl font-black text-white mt-1 mb-2 z-10">{gamification.xp.toLocaleString()}</span>
-          <p className="text-xs uppercase font-bold text-amber-200 z-10">Nível {userLevel.nivel} • {userLevel.titulo}</p>
+        {/* Cartão 3: XP Acumulado */}
+        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col relative overflow-hidden border-l-4 border-l-amber-500">
+          <Trophy className="absolute -right-4 -bottom-4 w-28 h-28 text-amber-500/5 dark:text-amber-500/10 stroke-[0.5]" />
+          
+          <div className="flex justify-between items-start mb-2 relative z-10">
+            <p className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">XP Acumulado</p>
+            <div className="p-2 bg-amber-50 dark:bg-amber-500/10 rounded-full border border-amber-200 dark:border-amber-500/20">
+              <Award className="w-4 h-4 text-amber-500"/>
+            </div>
+          </div>
+          
+          <div className="flex-1 flex flex-col justify-center mt-2 relative z-10">
+            <span className="text-4xl font-black text-amber-500 dark:text-amber-400 leading-none">{gamification.xp.toLocaleString()}</span>
+          </div>
+          
+          <div className="mt-5 flex items-center gap-3 relative z-10">
+            <div className="flex items-center gap-1 bg-amber-500 text-slate-900 px-2.5 py-1 rounded-lg">
+              <Flame className="w-3.5 h-3.5 fill-current" />
+              <span className="text-[10px] font-black">{gamification.streak} dias</span>
+            </div>
+            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wide">Nível {userLevel.nivel} · {userLevel.titulo}</p>
+          </div>
         </div>
+
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5">
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col h-full min-h-[260px]">
           <div className="flex justify-between items-start mb-5">
             <div>
-              <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><BarChart2 className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Esforço Diário</h3>
+              <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><BarChart2 className={`w-5 h-5 text-sky-500`}/> Esforço Diário</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Média últimos 14d: <strong className="text-slate-700 dark:text-slate-300">{avgHours}h/dia</strong></p>
             </div>
           </div>
           
           <div className="flex-1 flex items-end justify-between gap-1.5 mt-auto pt-4 relative">
-            <div className="absolute w-full border-t border-dashed border-emerald-500/50 flex items-center justify-end pr-1" style={{ bottom: `${(config.horasDia / maxHours) * 100}%` }}>
-              <span className="text-[10px] font-bold text-emerald-500 bg-white dark:bg-slate-900 px-1.5 -translate-y-1/2">Meta: {config.horasDia}h</span>
+            <div className="absolute w-full border-t border-dashed border-sky-500/50 flex items-center justify-end pr-1" style={{ bottom: `${(config.horasDia / maxHours) * 100}%` }}>
+              <span className="text-[10px] font-bold text-sky-500 bg-white dark:bg-slate-900 px-1.5 -translate-y-1/2">Meta: {config.horasDia}h</span>
             </div>
             {last14Days.map((day, i) => {
               const hours = dailyLogs[day.dateStr] || 0;
@@ -650,11 +684,11 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
               return (
                 <div key={i} className="flex flex-col items-center flex-1 group">
                   <div className="w-full h-32 flex items-end justify-center relative">
-                    <div className={`w-full max-w-[20px] rounded-t-md transition-all duration-700 ease-out hover:opacity-80 ${isToday ? themeColors.bg.split(' ')[0] : 'bg-slate-200 dark:bg-slate-700'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '6px' : '0' }}>
+                    <div className={`w-full max-w-[20px] rounded-t-md transition-all duration-700 ease-out hover:opacity-80 ${isToday ? 'bg-sky-500' : 'bg-slate-200 dark:bg-slate-700'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '6px' : '0' }}>
                       <span className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded pointer-events-none transition-opacity z-10 shadow-sm">{hours > 0 ? `${hours}h` : '0h'}</span>
                     </div>
                   </div>
-                  <span className={`text-[10px] font-bold mt-2 uppercase ${isToday ? themeColors.text.split(' ')[0] : 'text-slate-400'}`}>{day.dayLabel}</span>
+                  <span className={`text-[10px] font-bold mt-2 uppercase ${isToday ? 'text-sky-500' : 'text-slate-400'}`}>{day.dayLabel}</span>
                 </div>
               );
             })}
@@ -777,11 +811,15 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
   const [selectedDiscId, setSelectedDiscId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   
+  // Nova Funcionalidade: Edição Inline (Duplo Clique)
+  const [inlineEditingId, setInlineEditingId] = useState(null);
+  const [inlineEditValue, setInlineEditValue] = useState('');
+  
   // Apenas a Árvore e Seleção em Massa
   const [expandedTopics, setExpandedTopics] = useState({});
   const [selectedAssuntosBulk, setSelectedAssuntosBulk] = useState(new Set());
   
-  // Controle Visual de Drag & Drop
+  // Controle Visual de Drag & Drop (Apenas Vertical Original - Estável)
   const [dragTargetIndex, setDragTargetIndex] = useState(null);
   const dragItem = useRef(null); 
   const dragOverItem = useRef(null);
@@ -842,7 +880,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: [...b.disciplinas, newDisc] } : b));
   };
 
-  // Funções de Arrastar com a Linha Azul
+  // Funções de Arrastar VERTICAIS Originais (As mais estáveis)
   const handleDragStart = (e, position, discId) => { 
     dragItem.current = { position, discId }; 
     e.dataTransfer.effectAllowed = "move"; 
@@ -992,7 +1030,7 @@ return (
           </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">A sua Biblioteca. Onde a magia da organização acontece.</p>
         </div>
-        <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); setSelectedAssuntosBulk(new Set()); }} className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700/50'}`}>
+        <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); setSelectedAssuntosBulk(new Set()); setInlineEditingId(null); }} className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700/50'}`}>
           {isEditing ? <Save className="w-5 h-5"/> : <Edit className="w-5 h-5"/>}{isEditing ? 'Concluir Gestão' : 'Gerenciar Matérias'}
         </button>
       </header>
@@ -1000,7 +1038,7 @@ return (
       {isEditing && (
         <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 shadow-sm">
           <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
-          <div className="text-sm text-amber-800 dark:text-amber-200/80 leading-relaxed flex-1"><strong>Modo Edição Ativo:</strong> Arraste e solte para organizar, ou use as setas azuis para subir/descer um item sem esforço.</div>
+          <div className="text-sm text-amber-800 dark:text-amber-200/80 leading-relaxed flex-1"><strong>Modo Edição Ativo:</strong> Use as setas para mover ou identar. Faça <strong className="underline">duplo clique</strong> no nome de um assunto, disciplina ou bloco para editá-lo imediatamente.</div>
         </div>
       )}
 
@@ -1045,8 +1083,19 @@ return (
                   
                   {isEditing ? (
                      <div className="flex-1 flex items-center gap-2">
-                        <span className="flex-1 font-black text-xs text-slate-600 dark:text-slate-400 uppercase tracking-wider truncate">{bloco.nome}</span>
-                        <Pencil onClick={() => {const nn = prompt("Novo nome:", bloco.nome); if(nn) handleEditBlocoNome(bloco.id, nn);}} className="w-3 h-3 text-slate-400 hover:text-blue-500 cursor-pointer opacity-0 group-hover:opacity-100" />
+                        {inlineEditingId === bloco.id ? (
+                           <input 
+                              autoFocus 
+                              value={inlineEditValue} 
+                              onChange={(e) => setInlineEditValue(e.target.value)} 
+                              onBlur={() => { if(inlineEditValue.trim()) handleEditBlocoNome(bloco.id, inlineEditValue); setInlineEditingId(null); }} 
+                              onKeyDown={(e) => { if(e.key === 'Enter') { if(inlineEditValue.trim()) handleEditBlocoNome(bloco.id, inlineEditValue); setInlineEditingId(null); } if(e.key === 'Escape') setInlineEditingId(null); }} 
+                              className="flex-1 font-black text-xs uppercase tracking-wider text-slate-800 dark:text-slate-200 bg-transparent border-b border-blue-500 outline-none w-full" 
+                           />
+                        ) : (
+                           <span onDoubleClick={(e) => { e.stopPropagation(); setInlineEditValue(bloco.nome); setInlineEditingId(bloco.id); }} className="flex-1 font-black text-xs text-slate-600 dark:text-slate-400 uppercase tracking-wider truncate cursor-text" title="Duplo clique para editar">{bloco.nome}</span>
+                        )}
+                        <Pencil onClick={() => { setInlineEditValue(bloco.nome); setInlineEditingId(bloco.id); }} className="w-3 h-3 text-slate-400 hover:text-blue-500 cursor-pointer opacity-0 group-hover:opacity-100" />
                         <Trash2 onClick={() => handleDeleteBlocoClick(bloco.id)} className="w-3 h-3 text-red-400 hover:text-red-500 cursor-pointer opacity-0 group-hover:opacity-100" />
                      </div>
                   ) : (
@@ -1069,8 +1118,19 @@ return (
                           
                           {isEditing ? (
                              <div className="flex-1 flex items-center gap-2">
-                               <span className="font-bold text-sm flex-1 truncate">{disc.nome}</span>
-                               <Pencil onClick={() => {const nn = prompt("Novo nome:", disc.nome); if(nn) handleEditDiscNome(bloco.id, disc.id, nn);}} className="w-3 h-3 text-slate-400 hover:text-blue-500 cursor-pointer opacity-0 group-hover:opacity-100" />
+                               {inlineEditingId === disc.id ? (
+                                  <input 
+                                     autoFocus 
+                                     value={inlineEditValue} 
+                                     onChange={(e) => setInlineEditValue(e.target.value)} 
+                                     onBlur={() => { if(inlineEditValue.trim()) handleEditDiscNome(bloco.id, disc.id, inlineEditValue); setInlineEditingId(null); }} 
+                                     onKeyDown={(e) => { if(e.key === 'Enter') { if(inlineEditValue.trim()) handleEditDiscNome(bloco.id, disc.id, inlineEditValue); setInlineEditingId(null); } if(e.key === 'Escape') setInlineEditingId(null); }} 
+                                     className="font-bold text-sm flex-1 bg-transparent border-b border-blue-500 outline-none text-slate-800 dark:text-slate-200 w-full" 
+                                  />
+                               ) : (
+                                  <span onDoubleClick={(e) => { e.stopPropagation(); setInlineEditValue(disc.nome); setInlineEditingId(disc.id); }} className="font-bold text-sm flex-1 truncate cursor-text" title="Duplo clique para editar">{disc.nome}</span>
+                               )}
+                               <Pencil onClick={() => { setInlineEditValue(disc.nome); setInlineEditingId(disc.id); }} className="w-3 h-3 text-slate-400 hover:text-blue-500 cursor-pointer opacity-0 group-hover:opacity-100" />
                                <Trash2 onClick={() => handleDeleteDisciplinaClick(bloco.id, disc.id)} className="w-3 h-3 text-red-400 hover:text-red-500 cursor-pointer opacity-0 group-hover:opacity-100" />
                              </div>
                           ) : (
@@ -1173,7 +1233,7 @@ return (
                     const hasChildren = isParent && activeDisc.assuntos[trueIndex + 1]?.indent > 0;
                     const isSelectedBulk = selectedAssuntosBulk.has(assunto.id);
                     
-                    // Lógica Visual do Arrastar
+                    // Lógica Visual do Arrastar Original (Vertical)
                     const isBeingDragged = dragItem.current?.discId === activeDisc.id && dragItem.current?.position === trueIndex;
                     const isDropTarget = dragTargetIndex === trueIndex && !isBeingDragged;
 
@@ -1223,7 +1283,13 @@ return (
                                     {expandedTopics[assunto.id] ? <ChevronDown className="w-4 h-4"/> : <ChevronRight className="w-4 h-4"/>}
                                   </div>
                                 )}
-                                <span className={`truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : (isParent ? 'font-black text-slate-800 dark:text-white uppercase tracking-tight text-sm' : 'font-medium text-slate-700 dark:text-slate-300 text-sm')}`}>{assunto.titulo}</span>
+                                <span 
+                                  onDoubleClick={(e) => { if(isEditing) { e.stopPropagation(); startEditTopic(assunto); } }}
+                                  className={`truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : (isParent ? 'font-black text-slate-800 dark:text-white uppercase tracking-tight text-sm' : 'font-medium text-slate-700 dark:text-slate-300 text-sm')} ${isEditing ? 'cursor-text' : ''}`}
+                                  title={isEditing ? "Duplo clique para editar" : ""}
+                                >
+                                  {assunto.titulo}
+                                </span>
                                 
                                 {assunto.linkTec && !isEditing && (
                                   <a href={assunto.linkTec} onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-blue-500 transition-opacity" title="Abrir Caderno TEC">
@@ -1255,7 +1321,7 @@ return (
                                 
                                 <div className="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
                                 
-                                {/* Botões Indentação Horizontais */}
+                                {/* Botões Indentação Horizontais (Alternativa segura ao arrasto horizontal) */}
                                 <button onClick={() => handleIndent(activeDisc.id, assunto.id, -1)} disabled={!assunto.indent || !shouldApplyCollapse} className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 rounded disabled:opacity-30 cursor-pointer" title="Recuar (Nível)"><ArrowLeft className="w-3.5 h-3.5"/></button>
                                 <button onClick={() => handleIndent(activeDisc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3 || !shouldApplyCollapse} className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 rounded disabled:opacity-30 cursor-pointer" title="Avançar (Nível)"><ArrowRight className="w-3.5 h-3.5"/></button>
                                 
@@ -1859,7 +1925,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
         {/* BLOCO 1: PERSONALIZAÇÃO VISUAL E UX */}
         <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/60 dark:border-slate-800 shadow-sm">
           <h3 className="text-lg font-black text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-            <ImageIcon className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Identidade & UX
+            <LayoutGrid className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Identidade & UX
           </h3>
           
           <div className="space-y-5">
