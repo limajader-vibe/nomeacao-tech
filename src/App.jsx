@@ -815,9 +815,10 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     setExpandedTopics(allExpanded);
   };
   
-  const handleCollapseAllTopics = () => {
-    setExpandedTopics({});
+  const handleCollapseAllTopics = () => { 
+    setExpandedTopics({}); 
   };
+  const handleCollapseAllTopics = () => { setExpandedTopics({}); };
 
   const handleEditBlocoNome = (blocoId, newNome) => { setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, nome: newNome } : b)); };
   const handleDeleteBlocoClick = (blocoId) => {
@@ -984,6 +985,18 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     return visible;
   }, [filteredAssuntos, shouldApplyCollapse, expandedTopics]);
 
+  // BOTÕES GLOBAIS DE EXPANDIR/RECOLHER TÓPICOS
+  const handleExpandAllTopics = () => {
+    if(!activeDisc) return;
+    const allExpanded = {};
+    activeDisc.assuntos.forEach(a => { if((a.indent || 0) === 0) allExpanded[a.id] = true; });
+    setExpandedTopics(allExpanded);
+  };
+  
+  const handleCollapseAllTopics = () => {
+    setExpandedTopics({});
+  };
+
   return (
     <div className="flex flex-col h-full space-y-6 animate-in fade-in pb-10">
       <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
@@ -1141,25 +1154,15 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                   <h3 className={`text-2xl font-black ${themeColors.text.split(' ')[0]} flex items-center gap-3`}>
                     {activeDisc.nome}
                     
-                    {/* --- BOTÕES DE EXPANDIR/RECOLHER NA DISCIPLINA --- */}
-                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 ml-2 shadow-inner border border-slate-200/50 dark:border-slate-700/50">
-                      <button 
-                        onClick={handleExpandAllTopics} 
-                        className="p-1.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-all duration-200 cursor-pointer" 
-                        title="Expandir Tópicos"
-                      >
-                        <ChevronsDown className="w-4 h-4" />
+                    {/* BOTÕES DE EXPANDIR E RECOLHER TODOS */}
+                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 shrink-0 ml-2">
+                      <button onClick={handleExpandAllTopics} className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-colors cursor-pointer" title="Expandir Todos">
+                        <ChevronDown className="w-4 h-4" />
                       </button>
-                      <button 
-                        onClick={handleCollapseAllTopics} 
-                        className="p-1.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-all duration-200 cursor-pointer" 
-                        title="Recolher Tópicos"
-                      >
-                        <ChevronsUp className="w-4 h-4" />
+                      <button onClick={handleCollapseAllTopics} className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-colors cursor-pointer" title="Recolher Todos">
+                        <ChevronUp className="w-4 h-4" />
                       </button>
                     </div>
-                    {/* ----------------------------------------------- */}
-
                   </h3>
                   <div className="flex flex-col items-end shrink-0">
                     <span className="text-sm font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
@@ -1169,20 +1172,6 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
                 </div>
               </div>
 
-              <div className="flex flex-col xl:flex-row gap-4 mb-4">
-                <div className="relative flex-1 xl:w-64">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input 
-                    type="text" 
-                    placeholder="Filtrar tópicos..." 
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2 text-sm rounded-xl border border-slate-200/60 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
-                  />
-                </div>
-              </div>
-
-              {/* LISTA MINIMALISTA (Com Suporte ao Arrastar e Linha Azul) */}
               <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 pb-6">
                 {displayAssuntos.length === 0 ? (
                   <div className="text-sm text-slate-500 text-center p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center">
