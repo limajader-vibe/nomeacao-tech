@@ -815,10 +815,9 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     setExpandedTopics(allExpanded);
   };
   
-  const handleCollapseAllTopics = () => { 
-    setExpandedTopics({}); 
+  const handleCollapseAllTopics = () => {
+    setExpandedTopics({});
   };
-  const handleCollapseAllTopics = () => { setExpandedTopics({}); };
 
   const handleEditBlocoNome = (blocoId, newNome) => { setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, nome: newNome } : b)); };
   const handleDeleteBlocoClick = (blocoId) => {
@@ -984,20 +983,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     });
     return visible;
   }, [filteredAssuntos, shouldApplyCollapse, expandedTopics]);
-
-  // BOTÕES GLOBAIS DE EXPANDIR/RECOLHER TÓPICOS
-  const handleExpandAllTopics = () => {
-    if(!activeDisc) return;
-    const allExpanded = {};
-    activeDisc.assuntos.forEach(a => { if((a.indent || 0) === 0) allExpanded[a.id] = true; });
-    setExpandedTopics(allExpanded);
-  };
-  
-  const handleCollapseAllTopics = () => {
-    setExpandedTopics({});
-  };
-
-  return (
+return (
     <div className="flex flex-col h-full space-y-6 animate-in fade-in pb-10">
       <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
         <div>
