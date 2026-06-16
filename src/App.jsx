@@ -70,54 +70,15 @@ const initialConfig = {
 export const THEMES = {
   default: {
     name: 'Azul Foco (Padrão)',
-    sidebar: 'from-blue-700 to-indigo-900 dark:from-slate-800 dark:to-slate-950',
+    sidebar: 'from-blue-700 to-indigo-900 dark:bg-[#0d1526]',
     button: 'bg-indigo-600 hover:bg-indigo-700 text-white',
-    activeTab: 'bg-indigo-600 dark:bg-indigo-500 text-white',
-    icon: 'text-indigo-500',
-    bg: 'bg-indigo-500',
-    lightBg: 'bg-indigo-50 dark:bg-indigo-900/20',
-    headerBg: 'bg-indigo-100/60 dark:bg-indigo-950/40', 
-    border: 'border-indigo-200/60 dark:border-indigo-800/50',
-    text: 'text-indigo-600 dark:text-indigo-400',
-    solidText: 'text-white'
-  },
-  esmeralda: {
-    name: 'Esmeralda (Aprovação)',
-    sidebar: 'from-emerald-700 to-teal-900 dark:from-slate-800 dark:to-slate-950',
-    button: 'bg-emerald-600 hover:bg-emerald-700 text-white',
-    activeTab: 'bg-emerald-600 dark:bg-emerald-500 text-white',
-    icon: 'text-emerald-500',
-    bg: 'bg-emerald-500',
-    lightBg: 'bg-emerald-50 dark:bg-emerald-900/20',
-    headerBg: 'bg-emerald-100/60 dark:bg-teal-950/40', 
-    border: 'border-emerald-200/60 dark:border-emerald-800/50',
-    text: 'text-emerald-600 dark:text-emerald-400',
-    solidText: 'text-white'
-  },
-  caveira: {
-    name: 'Caveira (Preto/Dourado)',
-    sidebar: 'from-slate-900 to-black dark:from-black dark:to-slate-950',
-    button: 'bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold',
-    activeTab: 'bg-amber-500 dark:bg-amber-500 text-slate-900 font-black',
-    icon: 'text-amber-500',
-    bg: 'bg-amber-500',
-    lightBg: 'bg-amber-50 dark:bg-amber-900/20',
-    headerBg: 'bg-amber-100/60 dark:bg-amber-950/40', 
-    border: 'border-amber-200/60 dark:border-amber-800/50',
-    text: 'text-amber-600 dark:text-amber-400',
-    solidText: 'text-slate-900 font-black'
-  },
-  retaFinal: {
-    name: 'Reta Final (Vermelho Alerta)',
-    sidebar: 'from-red-700 to-rose-900 dark:from-slate-800 dark:to-slate-950',
-    button: 'bg-rose-600 hover:bg-rose-700 text-white',
-    activeTab: 'bg-rose-600 dark:bg-rose-500 text-white',
-    icon: 'text-rose-500',
-    bg: 'bg-rose-500',
-    lightBg: 'bg-rose-50 dark:bg-rose-900/20',
-    headerBg: 'bg-rose-100/60 dark:bg-rose-950/40', 
-    border: 'border-rose-200/60 dark:border-rose-800/50',
-    text: 'text-rose-600 dark:text-rose-400',
+    activeTab: 'bg-indigo-600 dark:bg-orange-500/10 dark:text-orange-400 text-white',
+    icon: 'text-indigo-500 dark:text-orange-500',
+    bg: 'bg-indigo-500 dark:bg-orange-500',
+    lightBg: 'bg-indigo-50 dark:bg-orange-500/10',
+    headerBg: 'bg-indigo-100/60 dark:bg-[#0d1526]', 
+    border: 'border-indigo-200/60 dark:border-white/5',
+    text: 'text-indigo-600 dark:text-orange-400',
     solidText: 'text-white'
   }
 };
@@ -190,6 +151,35 @@ export const LEVELS_MAP = [
 // COMPONENTES ISOLADOS E OTIMIZADOS
 // ==========================================
 
+const EmptyState = ({ icon: Icon, title, message, actionLabel, onAction }) => (
+  <div className="bg-white dark:bg-[#111e36] border border-slate-200 dark:border-white/5 border-dashed rounded-3xl p-12 flex flex-col items-center justify-center mt-8 shadow-sm">
+    <div className="w-20 h-20 bg-orange-50 dark:bg-orange-500/10 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(249,115,22,0.1)]">
+      <Icon className="w-10 h-10 text-orange-500" />
+    </div>
+    <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">{title}</h3>
+    <p className="text-base text-slate-500 dark:text-white/40 mb-8 text-center max-w-sm">{message}</p>
+    {actionLabel && onAction && (
+      <button onClick={onAction} className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3.5 rounded-xl text-sm font-bold cursor-pointer transition-all shadow-lg hover:shadow-orange-500/30">
+        {actionLabel}
+      </button>
+    )}
+  </div>
+);
+
+const SectionHeader = ({ overline, title, subtitle, icon: Icon, extra }) => (
+  <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-200/60 dark:border-white/5 pb-5 gap-4">
+    <div>
+      {overline && <span className="text-[10px] font-black text-orange-500 tracking-widest uppercase mb-1.5 block">{overline}</span>}
+      <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
+        {Icon && <Icon className="w-8 h-8 text-orange-500" />}
+        {title}
+      </h2>
+      {subtitle && <p className="text-slate-500 dark:text-white/30 mt-2 text-base font-medium">{subtitle}</p>}
+    </div>
+    {extra && <div className="w-full md:w-auto">{extra}</div>}
+  </header>
+);
+
 function PomodoroWidget({ themeColors, handleAutoLog, addXP, triggerConfetti }) {
   const FOCUS_TIME = 50 * 60; 
   const BREAK_TIME = 10 * 60; 
@@ -225,28 +215,48 @@ function PomodoroWidget({ themeColors, handleAutoLog, addXP, triggerConfetti }) 
     return `${m}:${s}`;
   };
 
+  const totalTime = isPomodoroBreak ? BREAK_TIME : FOCUS_TIME;
+  const progressPerc = ((totalTime - pomodoroTime) / totalTime) * 100;
+  const radius = 30;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (progressPerc / 100) * circumference;
+
   return (
-    <div className="flex items-center justify-between bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 p-4 rounded-2xl shadow-sm mb-8">
-       <div className="flex items-center gap-4">
-         <div className={`p-3 rounded-xl transition-colors duration-500 ${isPomodoroActive && !isPomodoroBreak ? `${themeColors.bg.split(' ')[0]} text-white animate-pulse shadow-md` : isPomodoroBreak ? 'bg-emerald-500 text-white animate-pulse shadow-md' : 'bg-slate-100 dark:bg-slate-800 text-slate-500'}`}>
-           {isPomodoroBreak ? <Coffee className="w-6 h-6" /> : <Clock className="w-6 h-6" />}
+    <div className="flex items-center justify-between bg-white dark:bg-[#111e36] border border-slate-200/60 dark:border-white/5 p-5 rounded-3xl shadow-sm mb-8">
+       <div className="flex items-center gap-5">
+         
+         <div className="relative flex items-center justify-center w-20 h-20 shrink-0">
+            <svg className="w-full h-full transform -rotate-90">
+              <circle cx="40" cy="40" r={radius} stroke="currentColor" strokeWidth="4" fill="transparent" className="text-slate-100 dark:text-white/5" />
+              <circle 
+                cx="40" cy="40" r={radius} 
+                stroke="currentColor" strokeWidth="4" fill="transparent" 
+                strokeDasharray={circumference} strokeDashoffset={offset} 
+                strokeLinecap="round"
+                className={`transition-all duration-1000 ease-linear ${isPomodoroActive && !isPomodoroBreak ? 'text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]' : isPomodoroBreak ? 'text-emerald-500' : 'text-slate-300 dark:text-slate-600'}`} 
+              />
+            </svg>
+            <div className={`absolute inset-0 flex items-center justify-center ${isPomodoroActive && !isPomodoroBreak ? 'animate-pulse' : ''}`}>
+               {isPomodoroBreak ? <Coffee className="w-6 h-6 text-emerald-500" /> : <Clock className={`w-6 h-6 ${isPomodoroActive ? 'text-orange-500' : 'text-slate-400 dark:text-slate-500'}`} />}
+            </div>
          </div>
-         <div className="hidden sm:block">
-           <h3 className="font-bold text-base text-slate-800 dark:text-white leading-none mb-1">{isPomodoroBreak ? 'Pausa' : 'Modo Foco'}</h3>
-           <span className="text-xs text-slate-500 font-medium">50min Estudo / 10min Pausa</span>
+
+         <div>
+           <h3 className="font-extrabold text-lg text-slate-800 dark:text-white leading-none mb-1.5">{isPomodoroBreak ? 'Pausa Ativa' : 'Foco Profundo'}</h3>
+           <span className="text-sm text-slate-500 dark:text-white/40 font-medium">50min Foco / 10min Pausa</span>
          </div>
        </div>
        
-       <div className="flex items-center gap-5 pr-2">
-         <span className={`font-mono text-4xl font-black tracking-tighter w-28 text-center transition-colors duration-500 ${isPomodoroActive && !isPomodoroBreak ? themeColors.text.split(' ')[0] : isPomodoroBreak ? 'text-emerald-500' : 'text-slate-800 dark:text-white'}`}>
+       <div className="flex items-center gap-6 pr-4">
+         <span className={`font-mono text-5xl font-black tracking-tighter w-36 text-center tabular-nums ${isPomodoroActive && !isPomodoroBreak ? 'text-orange-500' : isPomodoroBreak ? 'text-emerald-500' : 'text-slate-800 dark:text-white'}`}>
            {formatTime(pomodoroTime)}
          </span>
-         <div className="flex gap-2">
-           <button onClick={togglePomodoro} className={`p-3 rounded-xl shadow-sm transition-transform hover:scale-105 cursor-pointer ${isPomodoroActive ? 'bg-slate-800 text-white dark:bg-slate-700' : `${themeColors.button.split(' ')[0]} text-white`}`}>
-             {isPomodoroActive ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current" />}
+         <div className="flex gap-3">
+           <button onClick={togglePomodoro} className={`p-4 rounded-2xl shadow-lg transition-all hover:scale-105 cursor-pointer ${isPomodoroActive ? 'bg-slate-800 text-white dark:bg-white/10 dark:hover:bg-white/20' : 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/30'}`}>
+             {isPomodoroActive ? <Pause className="w-6 h-6 fill-current" /> : <Play className="w-6 h-6 fill-current ml-1" />}
            </button>
-           <button onClick={resetPomodoro} className="p-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-xl transition-transform hover:scale-105 cursor-pointer shadow-sm" title="Reiniciar">
-             <RefreshCcw className="w-5 h-5" />
+           <button onClick={resetPomodoro} className="p-4 bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-600 dark:text-slate-300 rounded-2xl transition-all hover:scale-105 cursor-pointer" title="Reiniciar">
+             <RefreshCcw className="w-6 h-6" />
            </button>
          </div>
        </div>
@@ -263,10 +273,10 @@ const CircularProgress = ({ percent, themeColors }) => {
   return (
     <div className="relative flex items-center justify-center w-6 h-6 shrink-0 opacity-80">
       <svg className="w-6 h-6 transform -rotate-90">
-        <circle cx="12" cy="12" r={radius} stroke="currentColor" strokeWidth="2" fill="transparent" className="text-slate-200 dark:text-slate-700" />
+        <circle cx="12" cy="12" r={radius} stroke="currentColor" strokeWidth="2" fill="transparent" className="text-slate-200 dark:text-white/10" />
         <circle cx="12" cy="12" r={radius} stroke="currentColor" strokeWidth="2" fill="transparent" strokeDasharray={circumference} strokeDashoffset={offset} className={`transition-all duration-1000 ${colorClass}`} />
       </svg>
-      {percent === 100 && <CheckCircle className={`absolute w-3.5 h-3.5 text-emerald-500 bg-white dark:bg-slate-900 rounded-full`} />}
+      {percent === 100 && <div className="absolute w-3.5 h-3.5 bg-white dark:bg-[#0d1526] rounded-full flex items-center justify-center"><CheckCircle className={`w-3.5 h-3.5 text-emerald-500 bg-white dark:bg-[#0d1526] rounded-full`} /></div>}
     </div>
   );
 };
@@ -277,21 +287,21 @@ const ModalEditor = ({ assunto, onSave, onCancel, themeColors }) => {
   
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm animate-in fade-in p-4">
-      <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-md animate-in zoom-in-95">
-        <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-4">Editar Assunto</h3>
-        <div className="space-y-4">
+      <div className="bg-white dark:bg-[#0d1526] p-6 rounded-3xl shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-md animate-in zoom-in-95">
+        <h3 className="text-xl font-black text-slate-800 dark:text-white mb-5">Editar Assunto</h3>
+        <div className="space-y-5">
           <div>
-            <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Título do Assunto</label>
-            <input type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500 mt-1" placeholder="Ex: Atributos do Ato Administrativo" autoFocus />
+            <label className="text-[10px] font-bold text-slate-500 dark:text-white/40 uppercase ml-1 tracking-widest">Título do Assunto</label>
+            <input type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} className="w-full p-3.5 text-sm rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#111e36] text-slate-800 dark:text-white outline-none focus:border-orange-500 mt-1 transition-colors" placeholder="Ex: Atributos do Ato Administrativo" autoFocus />
           </div>
           <div>
-            <label className="text-[10px] font-bold text-slate-500 uppercase ml-1">Link de Questões (Opcional)</label>
-            <input type="text" value={link} onChange={(e) => setLink(e.target.value)} className="w-full p-2.5 text-sm rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500 mt-1" placeholder="https://tecconcursos..." />
+            <label className="text-[10px] font-bold text-slate-500 dark:text-white/40 uppercase ml-1 tracking-widest">Link de Questões (Opcional)</label>
+            <input type="text" value={link} onChange={(e) => setLink(e.target.value)} className="w-full p-3.5 text-sm rounded-xl border border-slate-300 dark:border-white/10 bg-white dark:bg-[#111e36] text-slate-800 dark:text-white outline-none focus:border-orange-500 mt-1 transition-colors" placeholder="https://tecconcursos..." />
           </div>
         </div>
-        <div className="flex gap-2 mt-6">
-          <button onClick={() => onSave(titulo, link)} className="bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer w-full">Guardar</button>
-          <button onClick={onCancel} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer w-full">Cancelar</button>
+        <div className="flex gap-3 mt-8">
+          <button onClick={() => onSave(titulo, link)} className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-3.5 rounded-xl text-sm font-bold transition-all shadow-md cursor-pointer w-full">Guardar</button>
+          <button onClick={onCancel} className="bg-slate-200 dark:bg-white/5 text-slate-700 dark:text-white/70 hover:dark:bg-white/10 px-5 py-3.5 rounded-xl text-sm font-bold transition-colors cursor-pointer w-full">Cancelar</button>
         </div>
       </div>
     </div>
@@ -302,8 +312,8 @@ const ConfettiOverlay = ({ fire }) => {
   const [particles, setParticles] = useState([]);
   useEffect(() => {
     if (fire > 0) {
-      const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-      const newParticles = Array.from({ length: 100 }).map((_, i) => ({
+      const colors = ['#f97316', '#f59e0b', '#10b981', '#3b82f6'];
+      const newParticles = Array.from({ length: 120 }).map((_, i) => ({
         id: i, left: Math.random() * 100, delay: Math.random() * 0.5, duration: 1.5 + Math.random() * 2,
         color: colors[Math.floor(Math.random() * colors.length)], size: 6 + Math.random() * 10, tilt: Math.random() * 360
       }));
@@ -327,23 +337,23 @@ const ConfettiOverlay = ({ fire }) => {
 const LevelUpModal = ({ data, onClose }) => {
   if (!data) return null;
   return (
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300 px-4">
-      <div className="bg-gradient-to-b from-amber-100 to-white dark:from-amber-900/60 dark:to-slate-900 p-8 md:p-10 rounded-[2rem] shadow-2xl border-4 border-amber-300 dark:border-amber-700 max-w-sm w-full text-center transform transition-all animate-in zoom-in-90 duration-500 relative overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center opacity-30 animate-spin-slow pointer-events-none" style={{ animationDuration: '15s' }}>
-           <div className="w-[150%] h-4 bg-amber-400 absolute rotate-0"></div><div className="w-[150%] h-4 bg-amber-400 absolute rotate-45"></div><div className="w-[150%] h-4 bg-amber-400 absolute rotate-90"></div><div className="w-[150%] h-4 bg-amber-400 absolute -rotate-45"></div>
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/80 backdrop-blur-md animate-in fade-in duration-300 px-4">
+      <div className="bg-white dark:bg-[#0d1526] p-8 md:p-12 rounded-[2rem] shadow-2xl border border-amber-500/30 max-w-sm w-full text-center transform transition-all animate-in zoom-in-90 duration-500 relative overflow-hidden">
+        <div className="absolute inset-0 flex items-center justify-center opacity-10 animate-spin-slow pointer-events-none" style={{ animationDuration: '20s' }}>
+           <div className="w-[150%] h-32 bg-amber-500 absolute rotate-0 blur-3xl"></div>
         </div>
         <div className="relative z-10">
-          <div className="w-28 h-28 bg-gradient-to-br from-amber-300 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(245,158,11,0.6)]">
-            <Award className="w-14 h-14 text-white" />
+          <div className="w-32 h-32 bg-amber-50 dark:bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_40px_rgba(245,158,11,0.2)] border border-amber-200 dark:border-amber-500/20">
+            <Award className="w-16 h-16 text-amber-500" />
           </div>
-          <h2 className="text-4xl font-black text-amber-600 dark:text-amber-500 mb-2 drop-shadow-sm">Nível {data.nivel}!</h2>
-          <p className="text-slate-600 dark:text-slate-300 mb-6 font-medium">A sua persistência foi recompensada.</p>
-          <div className="bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm p-4 rounded-xl border border-amber-200 dark:border-amber-800/50 mb-8 shadow-inner">
-            <span className="block text-xs font-black uppercase tracking-widest text-amber-600 dark:text-amber-500 mb-1">Nova Patente Adquirida</span>
-            <span className="text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight">{data.titulo}</span>
+          <h2 className="text-5xl font-black text-slate-800 dark:text-white mb-2 tracking-tighter">Nível {data.nivel}!</h2>
+          <p className="text-slate-500 dark:text-white/50 mb-8 font-medium">A sua consistência foi recompensada.</p>
+          <div className="bg-slate-50 dark:bg-[#111e36] p-5 rounded-2xl border border-slate-200 dark:border-white/5 mb-8">
+            <span className="block text-[10px] font-black uppercase tracking-widest text-amber-500 mb-1.5">Nova Patente</span>
+            <span className="text-2xl font-black text-slate-800 dark:text-white tracking-tight">{data.titulo}</span>
           </div>
-          <button onClick={onClose} className="w-full py-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white rounded-xl font-black transition-all shadow-lg hover:shadow-orange-500/40 text-lg flex items-center justify-center gap-2 cursor-pointer">
-            <PartyPopper className="w-5 h-5"/> Continuar a Missão
+          <button onClick={onClose} className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl font-black transition-all shadow-lg hover:shadow-orange-500/30 text-lg flex items-center justify-center gap-2 cursor-pointer">
+            <PartyPopper className="w-5 h-5"/> Continuar Foco
           </button>
         </div>
       </div>
@@ -353,25 +363,25 @@ const LevelUpModal = ({ data, onClose }) => {
 
 const LevelMapModal = ({ onClose, currentXp }) => {
   return (
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300 px-4">
-      <div className="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-[2rem] shadow-2xl border border-slate-200 dark:border-slate-800 max-w-md w-full relative">
-        <button onClick={onClose} className="absolute top-4 right-4 p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full cursor-pointer transition-colors"><X className="w-5 h-5"/></button>
-        <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2 flex items-center gap-2"><Trophy className="text-amber-500"/> Jornada de Aprovação</h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Acompanhe os níveis e a experiência (XP) necessária para evoluir.</p>
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-slate-900/80 backdrop-blur-sm animate-in fade-in duration-300 px-4">
+      <div className="bg-white dark:bg-[#0d1526] p-6 md:p-8 rounded-[2rem] shadow-2xl border border-slate-200 dark:border-white/10 max-w-md w-full relative">
+        <button onClick={onClose} className="absolute top-6 right-6 p-2 text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 rounded-full cursor-pointer transition-colors"><X className="w-5 h-5"/></button>
+        <h3 className="text-2xl font-black text-slate-800 dark:text-white mb-2 flex items-center gap-3"><Trophy className="text-amber-500 w-7 h-7"/> Jornada de Aprovação</h3>
+        <p className="text-sm text-slate-500 dark:text-white/40 mb-8">Acompanhe os níveis e a experiência (XP) necessária.</p>
         <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
           {LEVELS_MAP.map(lvl => {
             const isCurrent = currentXp >= lvl.min && currentXp < lvl.max;
             const isPast = currentXp >= lvl.max;
             return (
-              <div key={lvl.nivel} className={`flex items-center gap-4 p-3 rounded-xl border transition-all ${isCurrent ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700/50 scale-[1.02] shadow-sm' : isPast ? 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/30 opacity-70' : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 opacity-50'}`}>
-                <div className={`w-10 h-10 shrink-0 rounded-full flex items-center justify-center font-black ${isCurrent ? 'bg-amber-500 text-white' : isPast ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
-                  {isPast ? <CheckCircle className="w-5 h-5"/> : lvl.nivel}
+              <div key={lvl.nivel} className={`flex items-center gap-4 p-4 rounded-2xl border transition-all ${isCurrent ? 'bg-amber-50 dark:bg-amber-500/10 border-amber-300 dark:border-amber-500/20 shadow-sm' : isPast ? 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/20 opacity-80' : 'bg-slate-50 dark:bg-white/5 border-slate-200 dark:border-transparent opacity-50'}`}>
+                <div className={`w-12 h-12 shrink-0 rounded-full flex items-center justify-center font-black text-lg ${isCurrent ? 'bg-amber-500 text-white' : isPast ? 'bg-emerald-500 text-white' : 'bg-slate-200 dark:bg-[#111e36] text-slate-400 dark:text-white/30 border dark:border-white/5'}`}>
+                  {isPast ? <CheckCircle className="w-6 h-6"/> : lvl.nivel}
                 </div>
                 <div className="flex-1">
-                  <h4 className={`font-bold ${isCurrent ? 'text-amber-700 dark:text-amber-400' : isPast ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-600 dark:text-slate-400'}`}>{lvl.titulo}</h4>
-                  <p className="text-xs uppercase font-bold text-slate-400">{lvl.min} a {lvl.max} XP</p>
+                  <h4 className={`font-bold text-lg leading-tight mb-0.5 ${isCurrent ? 'text-amber-700 dark:text-amber-400' : isPast ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-600 dark:text-white/60'}`}>{lvl.titulo}</h4>
+                  <p className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">{lvl.min} a {lvl.max} XP</p>
                 </div>
-                {isCurrent && <div className="text-xs font-black uppercase text-amber-500 bg-amber-100 dark:bg-amber-900/40 px-2 py-1 rounded-md">Atual</div>}
+                {isCurrent && <div className="text-[10px] font-black uppercase text-amber-500 bg-white dark:bg-[#0d1526] px-2.5 py-1 rounded border border-amber-200 dark:border-amber-500/20">Atual</div>}
               </div>
             )
           })}
@@ -425,57 +435,56 @@ const AuthScreen = ({ auth }) => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center p-4 text-slate-200 animate-in fade-in">
-      <div className="bg-slate-900 p-8 rounded-[2rem] w-full max-w-md shadow-2xl border border-slate-800 relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-blue-500"></div>
+    <div className="min-h-screen bg-[#0d1526] flex flex-col items-center justify-center p-4 text-slate-200 animate-in fade-in">
+      <div className="bg-[#111e36] p-10 rounded-[2.5rem] w-full max-w-md shadow-2xl border border-white/5 relative overflow-hidden">
         
-        <div className="w-20 h-20 bg-indigo-500/10 text-indigo-500 flex items-center justify-center rounded-full mx-auto mb-6 shadow-inner">
+        <div className="w-20 h-20 bg-orange-500/10 text-orange-500 flex items-center justify-center rounded-full mx-auto mb-6">
           <Lock className="w-10 h-10" />
         </div>
         
-        <h2 className="text-3xl font-black text-center text-white mb-2">Nomeação.Tech</h2>
-        <p className="text-slate-400 text-center mb-8 text-sm px-4">
+        <h2 className="text-3xl font-black text-center text-white mb-2 tracking-tight">Nomeação.Tech</h2>
+        <p className="text-white/40 text-center mb-10 text-sm px-4">
           {isLogin ? 'Faça login para sincronizar a sua Trilha e Sprints em qualquer dispositivo.' : 'Crie a sua conta gratuita para salvar os seus estudos na Nuvem.'}
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5 block ml-1">O seu E-mail</label>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2 block ml-1">O seu E-mail</label>
             <input 
               type="email" required value={email} onChange={e => setEmail(e.target.value)} 
-              className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-white outline-none focus:border-indigo-500 transition-colors shadow-inner" 
+              className="w-full p-4 rounded-xl bg-[#0d1526] border border-white/5 text-white outline-none focus:border-orange-500 transition-colors shadow-inner" 
               placeholder="estudante@concursos.com" 
             />
           </div>
           <div>
-            <label className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1.5 block ml-1">Palavra-passe</label>
+            <label className="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-2 block ml-1">Palavra-passe</label>
             <input 
               type="password" required minLength="6" value={password} onChange={e => setPassword(e.target.value)} 
-              className="w-full p-4 rounded-xl bg-slate-950 border border-slate-800 text-white outline-none focus:border-indigo-500 transition-colors shadow-inner font-black tracking-widest" 
+              className="w-full p-4 rounded-xl bg-[#0d1526] border border-white/5 text-white outline-none focus:border-orange-500 transition-colors shadow-inner font-black tracking-widest" 
               placeholder="••••••••" 
             />
           </div>
           
           {!isLogin && (
             <div className="animate-in fade-in slide-in-from-top-2">
-              <label className="text-xs font-bold uppercase tracking-widest text-amber-500 mb-1.5 block ml-1 flex items-center gap-1"><ShieldAlert className="w-4 h-4"/> Código de Convite (Acesso Restrito)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-orange-500 mb-2 block ml-1 flex items-center gap-1.5"><ShieldAlert className="w-3.5 h-3.5"/> Código de Convite</label>
               <input 
                 type="text" required={!isLogin} value={accessCode} onChange={e => setAccessCode(e.target.value)} 
-                className="w-full p-4 rounded-xl bg-slate-950 border border-amber-500/50 text-amber-500 outline-none focus:border-amber-400 transition-colors shadow-inner font-black tracking-widest uppercase" 
+                className="w-full p-4 rounded-xl bg-[#0d1526] border border-orange-500/30 text-orange-400 outline-none focus:border-orange-500 transition-colors shadow-inner font-black tracking-widest uppercase" 
                 placeholder="Insira o código secreto..." 
               />
             </div>
           )}
           
-          {error && <p className="text-red-400 text-sm font-bold bg-red-400/10 p-3 rounded-lg flex items-center gap-2"><AlertTriangle className="w-5 h-5"/>{error}</p>}
+          {error && <p className="text-red-400 text-sm font-bold bg-red-500/10 border border-red-500/20 p-4 rounded-xl flex items-center gap-3"><AlertTriangle className="w-5 h-5 shrink-0"/>{error}</p>}
 
-          <button type="submit" disabled={loading} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-black py-4 rounded-xl transition-colors mt-4 shadow-lg disabled:opacity-50 cursor-pointer">
-            {loading ? 'A sincronizar com a Nuvem...' : (isLogin ? 'Entrar no Sistema' : 'Criar a Minha Conta')}
+          <button type="submit" disabled={loading} className="w-full bg-orange-500 hover:bg-orange-600 text-white font-black py-4 rounded-xl transition-all mt-6 shadow-lg shadow-orange-500/20 disabled:opacity-50 cursor-pointer">
+            {loading ? 'A conectar...' : (isLogin ? 'Entrar no Sistema' : 'Criar Conta')}
           </button>
         </form>
 
-        <div className="mt-8 text-center border-t border-slate-800 pt-6">
-          <button onClick={() => { setIsLogin(!isLogin); setError(''); }} className="text-sm font-bold text-slate-400 hover:text-white transition-colors cursor-pointer">
+        <div className="mt-10 text-center border-t border-white/5 pt-6">
+          <button onClick={() => { setIsLogin(!isLogin); setError(''); }} className="text-sm font-bold text-white/40 hover:text-white transition-colors cursor-pointer">
             {isLogin ? 'Não tem conta? Clique para criar' : 'Já tem conta? Clique para entrar'}
           </button>
         </div>
@@ -525,9 +534,9 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
   for (let i = daysToLookBack; i >= 0; i--) {
     const d = new Date(todayObj); d.setDate(todayObj.getDate() - i);
     const dateStr = d.toLocaleDateString(); const hours = dailyLogs[dateStr] || 0;
-    let colorClass = 'bg-slate-200/50 dark:bg-slate-800'; 
-    if (hours > 0 && hours < config.horasDia * 0.5) colorClass = 'bg-emerald-200 dark:bg-emerald-900/40';
-    else if (hours >= config.horasDia * 0.5 && hours < config.horasDia) colorClass = 'bg-emerald-300 dark:bg-emerald-700/60';
+    let colorClass = 'bg-slate-200/50 dark:bg-white/5'; 
+    if (hours > 0 && hours < config.horasDia * 0.5) colorClass = 'bg-emerald-200 dark:bg-emerald-500/30';
+    else if (hours >= config.horasDia * 0.5 && hours < config.horasDia) colorClass = 'bg-emerald-300 dark:bg-emerald-500/60';
     else if (hours >= config.horasDia && hours < config.horasDia * 1.5) colorClass = 'bg-emerald-500 dark:bg-emerald-500';
     else if (hours >= config.horasDia * 1.5) colorClass = 'bg-emerald-700 dark:bg-emerald-400 shadow-[0_0_5px_rgba(16,185,129,0.5)] scale-[1.05] z-10'; 
     heatmapDays.push({ date: dateStr, hours, colorClass });
@@ -558,124 +567,121 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
   const totalReviews = reviewStats?.facil + reviewStats?.bom + reviewStats?.dificil || 0;
   const successRate = totalReviews > 0 ? (((reviewStats.facil + reviewStats.bom) / totalReviews) * 100).toFixed(1) : 0;
 
-  // Formatação de data estilo "terça-feira, 16 de junho"
   const formattedDate = new Intl.DateTimeFormat('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
 
   return (
     <div className="space-y-6 animate-in fade-in pb-10">
-      <header className="flex justify-between items-start mb-8 pb-4 border-b border-slate-200/60 dark:border-slate-800/0">
-        <div>
-          <span className="text-[10px] font-black text-orange-500 tracking-widest uppercase mb-1 block">Visão Geral</span>
-          <h2 className="text-3xl font-black text-slate-800 dark:text-white flex items-center gap-2">
-            <Activity className="w-8 h-8 text-orange-500" /> Centro de Comando
-          </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">
-            Fotografia tática · {formattedDate}
-          </p>
-        </div>
-        <div className="border border-orange-500/30 rounded-xl p-3 flex flex-col items-center justify-center bg-orange-500/5 shadow-sm">
-          <span className="text-[10px] font-black text-orange-500 tracking-widest uppercase mb-0.5">Progresso</span>
-          <span className="text-2xl font-black text-orange-500 leading-none">{progressPerc}%</span>
-        </div>
-      </header>
+      
+      <SectionHeader 
+        overline="Visão Geral" 
+        title="Centro de Comando" 
+        subtitle={`Fotografia tática · ${formattedDate}`} 
+        icon={Activity}
+        extra={
+          <div className="border border-orange-500/20 rounded-2xl p-4 flex flex-col items-center justify-center bg-orange-500/5 shadow-sm min-w-[120px]">
+            <span className="text-[10px] font-black text-orange-500 tracking-widest uppercase mb-1">Progresso</span>
+            <span className="text-3xl font-black text-orange-500 leading-none">{progressPerc}%</span>
+          </div>
+        }
+      />
 
-      {/* LINHA 1: OS 3 INDICADORES VITAIS (KPIs) - REDESIGN PREMIUM */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      {/* LINHA 1: KPIs PREMIUM */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        {/* Cartão 1: Domínio da Trilha */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col relative overflow-hidden border-l-4 border-l-orange-500">
-          <div className="flex justify-between items-start mb-2">
-            <p className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Domínio da Trilha</p>
-            <div className="p-2 bg-orange-50 dark:bg-orange-500/10 rounded-full border border-orange-200 dark:border-orange-500/20">
-              <TrendingUp className="w-4 h-4 text-orange-500"/>
+        {/* Cartão 1: Domínio */}
+        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-orange-500">
+          <div className="flex justify-between items-start mb-4">
+            <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">Domínio da Trilha</p>
+            <div className="p-2.5 rounded-xl border border-orange-200 dark:border-orange-500/20 bg-orange-50/50 dark:bg-orange-500/5">
+              <TrendingUp className="w-5 h-5 text-orange-500"/>
             </div>
           </div>
           <div className="flex-1 flex items-baseline gap-1 mt-2">
-            <span className="text-4xl font-black text-slate-800 dark:text-white leading-none">{progressPerc}</span>
-            <span className="text-xl font-black text-slate-400 dark:text-slate-500">%</span>
+            <span className="text-5xl font-black text-slate-800 dark:text-white leading-none">{progressPerc}</span>
+            <span className="text-2xl font-black text-slate-400 dark:text-white/30">%</span>
           </div>
-          <div className="mt-5">
-            <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-full overflow-hidden mb-2">
+          <div className="mt-8">
+            <div className="w-full h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden mb-3">
               <div className="h-full bg-orange-500 transition-all duration-1000" style={{ width: `${progressPerc}%` }}></div>
             </div>
-            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wide">do edital dominado</p>
+            <p className="text-[10px] font-bold text-slate-400 dark:text-white/30 tracking-wide">do edital dominado</p>
           </div>
         </div>
 
-        {/* Cartão 2: Horas de Hoje */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col relative overflow-hidden border-l-4 border-l-sky-500">
-          <div className="flex justify-between items-start mb-2">
-            <p className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Horas de Hoje</p>
-            <div className="p-2 bg-sky-50 dark:bg-sky-500/10 rounded-full border border-sky-200 dark:border-sky-500/20">
-              <Clock className="w-4 h-4 text-sky-500"/>
+        {/* Cartão 2: Horas */}
+        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-sky-500">
+          <div className="flex justify-between items-start mb-4">
+            <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">Horas de Hoje</p>
+            <div className="p-2.5 rounded-xl border border-sky-200 dark:border-sky-500/20 bg-sky-50/50 dark:bg-sky-500/5">
+              <Clock className="w-5 h-5 text-sky-500"/>
             </div>
           </div>
           
-          <div className="flex-1 flex items-end gap-1.5 mt-2 relative min-h-[40px]">
+          <div className="flex-1 flex items-end gap-2 mt-2 relative min-h-[48px]">
             {isEditingHours ? (
               <div className="flex items-center gap-1">
                 <input 
                   type="number" step="0.5" min="0" autoFocus 
                   value={editHoursValue} onChange={e => setEditHoursValue(e.target.value)} 
                   onKeyDown={e => e.key === 'Enter' && handleSaveHours()} onBlur={handleSaveHours} 
-                  className="w-20 text-4xl font-black text-slate-800 dark:text-white bg-transparent border-b-2 border-sky-500 outline-none pb-1" 
+                  className="w-24 text-5xl font-black text-slate-800 dark:text-white bg-transparent border-b-2 border-sky-500 outline-none pb-1" 
                 />
               </div>
             ) : (
-              <div className="flex items-baseline gap-1 group cursor-pointer" onClick={() => setIsEditingHours(true)} title="Editar horas manuais">
-                <span className="text-4xl font-black text-slate-800 dark:text-white leading-none transition-colors group-hover:text-sky-500">{todayHours.toFixed(1)}</span>
-                <span className="text-sm font-bold text-slate-400 dark:text-slate-500">/ {config.horasDia}h</span>
-                <Pencil className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 group-hover:text-sky-500 opacity-0 group-hover:opacity-100 transition-all ml-1" />
+              <div className="flex items-baseline gap-1.5 group cursor-pointer" onClick={() => setIsEditingHours(true)} title="Editar horas manuais">
+                <span className="text-5xl font-black text-slate-800 dark:text-white leading-none transition-colors group-hover:text-sky-500">{todayHours.toFixed(1)}</span>
+                <span className="text-lg font-bold text-slate-400 dark:text-white/30">/ {config.horasDia}h</span>
+                <Pencil className="w-4 h-4 text-slate-300 dark:text-white/20 group-hover:text-sky-500 opacity-0 group-hover:opacity-100 transition-all ml-1 mb-1" />
               </div>
             )}
           </div>
 
-          <div className="mt-5">
-            <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800/80 rounded-full overflow-hidden mb-2">
+          <div className="mt-8">
+            <div className="w-full h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden mb-3">
               <div className="h-full bg-sky-500 transition-all duration-1000" style={{ width: `${Math.min((todayHours / config.horasDia) * 100, 100)}%` }}></div>
             </div>
-            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wide">meta diária: {config.horasDia}h</p>
+            <p className="text-[10px] font-bold text-slate-400 dark:text-white/30 tracking-wide">meta diária: {config.horasDia}h</p>
           </div>
         </div>
 
-        {/* Cartão 3: XP Acumulado */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 shadow-sm border border-slate-200/60 dark:border-slate-800 flex flex-col relative overflow-hidden border-l-4 border-l-amber-500">
-          <Trophy className="absolute -right-4 -bottom-4 w-28 h-28 text-amber-500/5 dark:text-amber-500/10 stroke-[0.5]" />
+        {/* Cartão 3: XP */}
+        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-amber-500">
+          <Trophy className="absolute -right-6 -bottom-6 w-40 h-40 text-slate-50 dark:text-white/[0.02] pointer-events-none" />
           
-          <div className="flex justify-between items-start mb-2 relative z-10">
-            <p className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">XP Acumulado</p>
-            <div className="p-2 bg-amber-50 dark:bg-amber-500/10 rounded-full border border-amber-200 dark:border-amber-500/20">
-              <Award className="w-4 h-4 text-amber-500"/>
+          <div className="flex justify-between items-start mb-4 relative z-10">
+            <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">XP Acumulado</p>
+            <div className="p-2.5 rounded-xl border border-amber-200 dark:border-amber-500/20 bg-amber-50/50 dark:bg-amber-500/5">
+              <Award className="w-5 h-5 text-amber-500"/>
             </div>
           </div>
           
           <div className="flex-1 flex flex-col justify-center mt-2 relative z-10">
-            <span className="text-4xl font-black text-amber-500 dark:text-amber-400 leading-none">{gamification.xp.toLocaleString()}</span>
+            <span className="text-5xl font-black text-amber-500 leading-none drop-shadow-sm">{gamification.xp.toLocaleString()}</span>
           </div>
           
-          <div className="mt-5 flex items-center gap-3 relative z-10">
-            <div className="flex items-center gap-1 bg-amber-500 text-slate-900 px-2.5 py-1 rounded-lg">
-              <Flame className="w-3.5 h-3.5 fill-current" />
-              <span className="text-[10px] font-black">{gamification.streak} dias</span>
+          <div className="mt-8 flex items-center gap-3 relative z-10">
+            <div className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 text-amber-500 px-3 py-1.5 rounded-lg">
+              <Flame className="w-4 h-4 fill-current" />
+              <span className="text-[10px] font-black tracking-widest">{gamification.streak} dias</span>
             </div>
-            <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wide">Nível {userLevel.nivel} · {userLevel.titulo}</p>
+            <p className="text-[10px] font-bold text-slate-400 dark:text-white/30 tracking-wide">Nível {userLevel.nivel} · {userLevel.titulo}</p>
           </div>
         </div>
 
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col h-full min-h-[260px]">
-          <div className="flex justify-between items-start mb-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-8 border border-slate-200/60 dark:border-white/5 shadow-sm flex flex-col h-full min-h-[300px]">
+          <div className="flex justify-between items-start mb-6">
             <div>
               <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><BarChart2 className={`w-5 h-5 text-sky-500`}/> Esforço Diário</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Média últimos 14d: <strong className="text-slate-700 dark:text-slate-300">{avgHours}h/dia</strong></p>
+              <p className="text-xs text-slate-500 dark:text-white/40 mt-1">Média últimos 14d: <strong className="text-slate-700 dark:text-white">{avgHours}h/dia</strong></p>
             </div>
           </div>
           
-          <div className="flex-1 flex items-end justify-between gap-1.5 mt-auto pt-4 relative">
-            <div className="absolute w-full border-t border-dashed border-sky-500/50 flex items-center justify-end pr-1" style={{ bottom: `${(config.horasDia / maxHours) * 100}%` }}>
-              <span className="text-[10px] font-bold text-sky-500 bg-white dark:bg-slate-900 px-1.5 -translate-y-1/2">Meta: {config.horasDia}h</span>
+          <div className="flex-1 flex items-end justify-between gap-2 mt-auto pt-4 relative">
+            <div className="absolute w-full border-t border-dashed border-sky-500/30 flex items-center justify-end pr-1" style={{ bottom: `${(config.horasDia / maxHours) * 100}%` }}>
+              <span className="text-[10px] font-bold text-sky-500 bg-white dark:bg-[#111e36] px-1.5 -translate-y-1/2">Meta: {config.horasDia}h</span>
             </div>
             {last14Days.map((day, i) => {
               const hours = dailyLogs[day.dateStr] || 0;
@@ -683,12 +689,12 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
               const isToday = i === 13;
               return (
                 <div key={i} className="flex flex-col items-center flex-1 group">
-                  <div className="w-full h-32 flex items-end justify-center relative">
-                    <div className={`w-full max-w-[20px] rounded-t-md transition-all duration-700 ease-out hover:opacity-80 ${isToday ? 'bg-sky-500' : 'bg-slate-200 dark:bg-slate-700'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '6px' : '0' }}>
-                      <span className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[10px] font-bold px-2 py-1 rounded pointer-events-none transition-opacity z-10 shadow-sm">{hours > 0 ? `${hours}h` : '0h'}</span>
+                  <div className="w-full h-40 flex items-end justify-center relative">
+                    <div className={`w-full max-w-[24px] rounded-t-lg transition-all duration-700 ease-out hover:opacity-80 ${isToday ? 'bg-sky-500' : 'bg-slate-100 dark:bg-white/5'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '8px' : '0' }}>
+                      <span className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 dark:bg-white dark:text-slate-900 text-white text-[10px] font-black px-2 py-1 rounded pointer-events-none transition-opacity z-10 shadow-sm">{hours > 0 ? `${hours}h` : '0h'}</span>
                     </div>
                   </div>
-                  <span className={`text-[10px] font-bold mt-2 uppercase ${isToday ? 'text-sky-500' : 'text-slate-400'}`}>{day.dayLabel}</span>
+                  <span className={`text-[10px] font-black mt-3 uppercase ${isToday ? 'text-sky-500' : 'text-slate-400 dark:text-white/30'}`}>{day.dayLabel}</span>
                 </div>
               );
             })}
@@ -696,39 +702,39 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
         </div>
 
         {/* UX 3: Evolução da Retenção */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col h-full min-h-[260px]">
+        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-8 border border-slate-200/60 dark:border-white/5 shadow-sm flex flex-col h-full min-h-[300px]">
           <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2 mb-1"><BrainCircuit className="w-5 h-5 text-emerald-500"/> Retenção de Memória</h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mb-6 flex justify-between">
+          <p className="text-xs text-slate-500 dark:text-white/40 mb-8 flex justify-between">
             <span>Gráfico de Evolução (Últimos 14 Dias).</span>
-            <span className="font-bold text-emerald-600 dark:text-emerald-400">Precisão Total: {successRate}%</span>
+            <span className="font-bold text-emerald-500">Precisão Total: {successRate}%</span>
           </p>
           
           {totalReviews === 0 ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-sm">
-              <PieChart className="w-10 h-10 mb-3 opacity-30"/>
-              <p>Faça revisões para gerar o gráfico de evolução.</p>
+            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 dark:text-white/20 text-sm">
+              <PieChart className="w-12 h-12 mb-4 opacity-30"/>
+              <p>Faça revisões para gerar o gráfico.</p>
             </div>
           ) : (
             <div className="flex flex-col flex-1 relative">
                <div className="flex-1 relative w-full h-full">
                  {/* Y Axis Grid Lines */}
                  <div className="absolute inset-0 flex flex-col justify-between">
-                    <div className="w-full border-t border-dashed border-slate-200 dark:border-slate-800 flex justify-start"><span className="text-[9px] text-slate-400 -translate-y-1/2 bg-white dark:bg-slate-900 pr-1">100%</span></div>
-                    <div className="w-full border-t border-dashed border-slate-200 dark:border-slate-800 flex justify-start"><span className="text-[9px] text-slate-400 -translate-y-1/2 bg-white dark:bg-slate-900 pr-1">50%</span></div>
-                    <div className="w-full border-t border-dashed border-slate-200 dark:border-slate-800 flex justify-start"><span className="text-[9px] text-slate-400 -translate-y-1/2 bg-white dark:bg-slate-900 pr-1">0%</span></div>
+                    <div className="w-full border-t border-dashed border-slate-100 dark:border-white/5 flex justify-start"><span className="text-[9px] font-bold text-slate-400 dark:text-white/30 -translate-y-1/2 bg-white dark:bg-[#111e36] pr-2">100%</span></div>
+                    <div className="w-full border-t border-dashed border-slate-100 dark:border-white/5 flex justify-start"><span className="text-[9px] font-bold text-slate-400 dark:text-white/30 -translate-y-1/2 bg-white dark:bg-[#111e36] pr-2">50%</span></div>
+                    <div className="w-full border-t border-dashed border-slate-100 dark:border-white/5 flex justify-start"><span className="text-[9px] font-bold text-slate-400 dark:text-white/30 -translate-y-1/2 bg-white dark:bg-[#111e36] pr-2">0%</span></div>
                  </div>
                  
                  {/* The Line Chart SVG */}
-                 <div className="absolute inset-0 pt-2 pb-2 pl-6">
+                 <div className="absolute inset-0 pt-2 pb-2 pl-8">
                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
                       <polyline 
                         points={polylineStr}
                         fill="none" 
                         stroke="url(#lineGradient)" 
-                        strokeWidth="2.5" 
+                        strokeWidth="3" 
                         strokeLinecap="round" 
                         strokeLinejoin="round" 
-                        className="drop-shadow-[0_4px_3px_rgba(16,185,129,0.3)]"
+                        className="drop-shadow-[0_4px_6px_rgba(16,185,129,0.4)]"
                       />
                       <defs>
                         <linearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
@@ -744,10 +750,10 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
                               key={idx} 
                               cx={idx * xStep} 
                               cy={100 - val} 
-                              r="1.5" 
+                              r="2" 
                               fill="white" 
                               stroke="#10b981" 
-                              strokeWidth="1" 
+                              strokeWidth="1.5" 
                            >
                               <title>Dia {last14Days[idx].dateStr}: {val.toFixed(1)}%</title>
                            </circle>
@@ -758,7 +764,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
                </div>
                
                {/* X Axis Labels */}
-               <div className="flex justify-between mt-3 text-[9px] font-bold text-slate-400 pl-6">
+               <div className="flex justify-between mt-4 text-[9px] font-black text-slate-400 dark:text-white/30 pl-8">
                  {last14Days.map((d, i) => (
                     i % 2 === 0 ? <span key={i} className={i === 13 ? "text-emerald-500" : ""}>{d.dayLabel}</span> : <span key={i}></span>
                  ))}
@@ -768,29 +774,49 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5 items-stretch">
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-6 mt-0 flex flex-col">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 items-stretch">
+        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] shadow-sm border border-slate-200/60 dark:border-white/5 p-8 flex flex-col">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-3">
             <div>
               <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><CalendarDays className="w-5 h-5 text-emerald-500"/> Mapa de Constância</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Últimos 3 meses.</p>
+              <p className="text-xs text-slate-500 dark:text-white/40 mt-1">Últimos 3 meses.</p>
             </div>
-            <div className="flex items-center gap-2 text-[10px] font-bold uppercase text-slate-400">
-              <span>Menos</span><div className="w-3 h-3 rounded-sm bg-slate-100 dark:bg-slate-800"></div><div className="w-3 h-3 rounded-sm bg-emerald-200 dark:bg-emerald-900/40"></div><div className="w-3 h-3 rounded-sm bg-emerald-300 dark:bg-emerald-700/60"></div><div className="w-3 h-3 rounded-sm bg-emerald-500 dark:bg-emerald-500"></div><div className="w-3 h-3 rounded-sm bg-emerald-700 dark:bg-emerald-400"></div><span>Mais</span>
+            <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-white/30">
+              <span>Menos</span>
+              <div className="w-3.5 h-3.5 rounded bg-slate-100 dark:bg-white/5"></div>
+              <div className="w-3.5 h-3.5 rounded bg-emerald-200 dark:bg-emerald-500/30"></div>
+              <div className="w-3.5 h-3.5 rounded bg-emerald-300 dark:bg-emerald-500/60"></div>
+              <div className="w-3.5 h-3.5 rounded bg-emerald-500 dark:bg-emerald-500"></div>
+              <div className="w-3.5 h-3.5 rounded bg-emerald-700 dark:bg-emerald-400"></div>
+              <span>Mais</span>
             </div>
           </div>
           <div className="overflow-x-auto custom-scrollbar pb-2 flex-1 flex items-center">
             <div className="min-w-max flex gap-2 mx-auto">
-              <div className="grid grid-rows-7 gap-1.5 text-[10px] font-bold text-slate-400 pr-2 text-right"><div className="h-3.5 flex items-center justify-end">D</div><div className="h-3.5 flex items-center justify-end">S</div><div className="h-3.5 flex items-center justify-end">T</div><div className="h-3.5 flex items-center justify-end">Q</div><div className="h-3.5 flex items-center justify-end">Q</div><div className="h-3.5 flex items-center justify-end">S</div><div className="h-3.5 flex items-center justify-end">S</div></div>
-              <div className="grid grid-rows-7 grid-flow-col gap-1.5">{heatmapDays.map((day, idx) => (<div key={idx} title={`${day.date}: ${day.hours.toFixed(1)}h estudadas`} className={`w-3.5 h-3.5 rounded-sm transition-all hover:scale-125 cursor-pointer relative ${day.colorClass}`}></div>))}</div>
+              <div className="grid grid-rows-7 gap-1.5 text-[10px] font-black text-slate-400 dark:text-white/30 pr-3 text-right">
+                <div className="h-4 flex items-center justify-end">D</div><div className="h-4 flex items-center justify-end">S</div><div className="h-4 flex items-center justify-end">T</div><div className="h-4 flex items-center justify-end">Q</div><div className="h-4 flex items-center justify-end">Q</div><div className="h-4 flex items-center justify-end">S</div><div className="h-4 flex items-center justify-end">S</div>
+              </div>
+              <div className="grid grid-rows-7 grid-flow-col gap-1.5">
+                {heatmapDays.map((day, idx) => (<div key={idx} title={`${day.date}: ${day.hours.toFixed(1)}h estudadas`} className={`w-4 h-4 rounded transition-all hover:scale-125 cursor-pointer relative ${day.colorClass}`}></div>))}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-6 flex flex-col h-full max-h-[280px]">
-          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-4 flex items-center gap-2 shrink-0"><Filter className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Raio-X por Disciplina</h3>
-          <div className="space-y-4 flex-1 overflow-y-auto pr-4 custom-scrollbar">
-            {radarData.length === 0 ? <div className="text-sm text-slate-400 flex items-center justify-center h-full">Nenhuma disciplina cadastrada.</div> : radarData.map(disc => (<div key={disc.id} className="group"><div className="flex justify-between items-end mb-2"><span className={`text-sm font-bold text-slate-700 dark:text-slate-300 truncate pr-3 hover:${themeColors.text.split(' ')[0]} transition-colors`}>{disc.nome}</span><span className="text-sm font-black text-slate-800 dark:text-white shrink-0">{disc.perc}%</span></div><div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden"><div className={`h-full transition-all duration-1000 rounded-full ${disc.perc === 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : themeColors.bg.split(' ')[0]}`} style={{width: `${disc.perc}%`}}></div></div></div>))}
+        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] shadow-sm border border-slate-200/60 dark:border-white/5 p-8 flex flex-col h-full max-h-[320px]">
+          <h3 className="font-bold text-lg text-slate-800 dark:text-white mb-6 flex items-center gap-2 shrink-0"><Filter className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Raio-X por Disciplina</h3>
+          <div className="space-y-5 flex-1 overflow-y-auto pr-4 custom-scrollbar">
+            {radarData.length === 0 ? <div className="text-sm text-slate-400 dark:text-white/30 flex items-center justify-center h-full">Nenhuma disciplina cadastrada.</div> : radarData.map(disc => (
+              <div key={disc.id} className="group">
+                <div className="flex justify-between items-end mb-2.5">
+                  <span className={`text-sm font-bold text-slate-700 dark:text-slate-300 truncate pr-3 group-hover:${themeColors.text.split(' ')[0]} transition-colors`}>{disc.nome}</span>
+                  <span className="text-sm font-black text-slate-800 dark:text-white shrink-0 tabular-nums">{disc.perc}%</span>
+                </div>
+                <div className="h-2.5 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+                  <div className={`h-full transition-all duration-1000 rounded-full ${disc.perc === 100 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : themeColors.bg.split(' ')[0]}`} style={{width: `${disc.perc}%`}}></div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -819,10 +845,10 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
   const [expandedTopics, setExpandedTopics] = useState({});
   const [selectedAssuntosBulk, setSelectedAssuntosBulk] = useState(new Set());
   
-  // Controle Visual de Drag & Drop (Apenas Vertical Original - Estável)
+  // Controle Visual de Drag & Drop Integrado (4D: Vertical + Horizontal)
   const [dragTargetIndex, setDragTargetIndex] = useState(null);
+  const [dragTargetIndent, setDragTargetIndent] = useState(0);
   const dragItem = useRef(null); 
-  const dragOverItem = useRef(null);
 
   useEffect(() => {
     if (!selectedDiscId && edital.length > 0 && edital[0].disciplinas.length > 0) {
@@ -880,34 +906,61 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: [...b.disciplinas, newDisc] } : b));
   };
 
-  // Funções de Arrastar VERTICAIS Originais (As mais estáveis)
-  const handleDragStart = (e, position, discId) => { 
-    dragItem.current = { position, discId }; 
+  // Funções de Arrastar 4D com Rastreio de Eixo X
+  const handleDragStart = (e, position, discId, currentIndent) => { 
+    dragItem.current = { position, discId, initialX: e.clientX, initialIndent: currentIndent || 0 }; 
+    setDragTargetIndex(position);
+    setDragTargetIndent(currentIndent || 0);
     e.dataTransfer.effectAllowed = "move"; 
+    if (e.dataTransfer.setData) e.dataTransfer.setData('text/plain', position); 
   };
-  const handleDragEnter = (e, position, discId) => { 
+  
+  const handleDragOver = (e, position, discId) => { 
     e.preventDefault(); 
-    dragOverItem.current = { position, discId }; 
-    setDragTargetIndex(position); 
+    if (!dragItem.current || dragItem.current.discId !== discId) return;
+
+    if (dragTargetIndex !== position) {
+      setDragTargetIndex(position);
+    }
+
+    const deltaX = e.clientX - dragItem.current.initialX;
+    const calculatedIndent = Math.max(0, Math.min(3, dragItem.current.initialIndent + Math.floor(deltaX / 35)));
+
+    if (calculatedIndent !== dragTargetIndent) {
+      setDragTargetIndent(calculatedIndent);
+    }
   };
-  const handleDragLeave = () => { setDragTargetIndex(null); };
+
   const handleDrop = (e) => {
     e.preventDefault(); 
-    setDragTargetIndex(null);
-    if (!dragItem.current || !dragOverItem.current) return; 
-    if (dragItem.current.discId !== dragOverItem.current.discId) return;
+    if (!dragItem.current) return; 
     
     const discId = dragItem.current.discId; 
     const dragIdx = dragItem.current.position; 
-    const dropIdx = dragOverItem.current.position;
+    const dropIdx = dragTargetIndex;
+    const finalIndent = dragTargetIndent;
     
     dragItem.current = null; 
-    dragOverItem.current = null;
+    setDragTargetIndex(null);
+    setDragTargetIndent(0);
     
-    setEdital(prevEdital => prevEdital.map(bloco => ({ ...bloco, disciplinas: bloco.disciplinas.map(disc => { if (disc.id === discId) { const newAssuntos = [...disc.assuntos]; const [draggedTopic] = newAssuntos.splice(dragIdx, 1); newAssuntos.splice(dropIdx, 0, draggedTopic); return { ...disc, assuntos: newAssuntos }; } return disc; }) })));
+    if (dragIdx === null || dropIdx === null) return;
+
+    setEdital(prevEdital => prevEdital.map(bloco => ({ 
+      ...bloco, 
+      disciplinas: bloco.disciplinas.map(disc => { 
+        if (disc.id === discId) { 
+          const newAssuntos = [...disc.assuntos]; 
+          const draggedTopic = { ...newAssuntos[dragIdx], indent: finalIndent }; 
+          newAssuntos.splice(dragIdx, 1); 
+          newAssuntos.splice(dropIdx, 0, draggedTopic); 
+          return { ...disc, assuntos: newAssuntos }; 
+        } 
+        return disc; 
+      }) 
+    })));
   };
 
-  // Ideia 1: Botão de Sobe e Desce Manual para Assuntos
   const handleMoveAssuntoManual = (discId, assId, direction) => {
     setEdital(prev => prev.map(b => ({
       ...b, disciplinas: b.disciplinas.map(d => {
@@ -916,7 +969,6 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
           const idx = assuntos.findIndex(a => a.id === assId);
           if (idx < 0 || idx + direction < 0 || idx + direction >= assuntos.length) return d;
           
-          // Troca de Posições
           const temp = assuntos[idx];
           assuntos[idx] = assuntos[idx + direction];
           assuntos[idx + direction] = temp;
@@ -934,11 +986,14 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
   const handleIndent = (discId, assId, delta) => {
     setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => { if (d.id === discId) { return { ...d, assuntos: d.assuntos.map(a => { if (a.id === assId) { const currentIndent = a.indent || 0; const newIndent = Math.max(0, Math.min(3, currentIndent + delta)); return { ...a, indent: newIndent }; } return a; }) }; } return d; }) })));
   };
+
+  // PHase 1: Functional fix - now addTopic directly sets focus or allows rapid entry if needed.
   const handleAddTopic = (discId) => {
     if(!newTopic.titulo) return; const newAssId = `t_${Date.now()}`;
     setEdital(prev => prev.map(b => ({ ...b, disciplinas: b.disciplinas.map(d => { if(d.id === discId) return { ...d, assuntos: [...d.assuntos, { id: newAssId, titulo: newTopic.titulo, temp: '⭐ NOVO', linkTec: newTopic.linkTec, indent: 0 }] }; return d; }) })));
     setNewTopic({ discId: '', titulo: '', linkTec: '' });
   };
+  
   const handleBulkAdd = (discId) => {
     if (!bulkInput.text.trim()) return; const lines = bulkInput.text.split('\n').filter(line => line.trim() !== ''); if (lines.length === 0) return;
     const newAssuntos = lines.map((line, idx) => ({ id: `t_${Date.now()}_${idx}`, titulo: line.trim(), temp: '⭐ NOVO', linkTec: '', indent: 0 }));
@@ -989,7 +1044,7 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     if (mastered) return <CheckCircle className="w-5 h-5 text-emerald-500 shrink-0" />;
     if (isInSprint) return <PlayCircle className="w-5 h-5 text-blue-500 shrink-0" />;
     if (started) return <Activity className="w-5 h-5 text-amber-500 shrink-0" />;
-    return <div className="w-5 h-5 rounded-full border-2 border-slate-300 dark:border-slate-600 shrink-0"></div>;
+    return <div className="w-5 h-5 rounded-full border-2 border-slate-300 dark:border-white/10 shrink-0"></div>;
   };
 
   const activeBloco = edital.find(b => b.disciplinas.some(d => d.id === selectedDiscId));
@@ -1021,24 +1076,26 @@ function TabDisciplinas({ edital, setEdital, progress, setUserProgress, toggleSp
     });
     return visible;
   }, [filteredAssuntos, shouldApplyCollapse, expandedTopics]);
-return (
+
+  return (
     <div className="flex flex-col h-full space-y-6 animate-in fade-in pb-10">
-      <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
-        <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
-            <Folder className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Edital Verticalizado
-          </h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">A sua Biblioteca. Onde a magia da organização acontece.</p>
-        </div>
-        <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); setSelectedAssuntosBulk(new Set()); setInlineEditingId(null); }} className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? 'bg-amber-500 hover:bg-amber-600 text-white' : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700/50'}`}>
-          {isEditing ? <Save className="w-5 h-5"/> : <Edit className="w-5 h-5"/>}{isEditing ? 'Concluir Gestão' : 'Gerenciar Matérias'}
-        </button>
-      </header>
+      
+      <SectionHeader 
+        overline="Planejamento" 
+        title="Edital Verticalizado" 
+        subtitle="A sua Biblioteca. Onde a magia da organização acontece." 
+        icon={Folder}
+        extra={
+          <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); setSelectedAssuntosBulk(new Set()); setInlineEditingId(null); }} className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? 'bg-orange-500 hover:bg-orange-600 text-white shadow-orange-500/20' : 'bg-white dark:bg-[#111e36] text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 border border-slate-200/60 dark:border-white/10'}`}>
+            {isEditing ? <Save className="w-5 h-5"/> : <Edit className="w-5 h-5"/>}{isEditing ? 'Concluir Gestão' : 'Gerenciar Matérias'}
+          </button>
+        }
+      />
 
       {isEditing && (
-        <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 shadow-sm">
+        <div className="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 shadow-sm">
           <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
-          <div className="text-sm text-amber-800 dark:text-amber-200/80 leading-relaxed flex-1"><strong>Modo Edição Ativo:</strong> Use as setas para mover ou identar. Faça <strong className="underline">duplo clique</strong> no nome de um assunto, disciplina ou bloco para editá-lo imediatamente.</div>
+          <div className="text-sm text-amber-800 dark:text-amber-200/80 leading-relaxed flex-1"><strong>Modo Edição Ativo:</strong> Arraste e solte (Vertical e Horizontal). Faça <strong className="underline">duplo clique</strong> num nome para editá-lo. Pressione <kbd className="bg-amber-100 dark:bg-amber-900/50 px-1 rounded">Enter</kbd> para guardar.</div>
         </div>
       )}
 
@@ -1055,27 +1112,27 @@ return (
       <div className="flex flex-col md:flex-row gap-6 items-start flex-1 min-h-[600px] relative">
         
         {/* COLUNA ESQUERDA: MÓDULOS */}
-        <div className={`w-full md:w-1/3 lg:w-1/4 flex-shrink-0 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-4 md:sticky md:top-6 ${isMobileDetailView ? 'hidden md:flex' : 'flex'} flex-col max-h-[85vh] overflow-hidden`}>
-          <div className="flex items-center justify-between mb-4 px-2 shrink-0 border-b border-slate-100 dark:border-slate-800/60 pb-3">
+        <div className={`w-full md:w-1/3 lg:w-1/4 flex-shrink-0 bg-white dark:bg-[#111e36] rounded-[2rem] shadow-sm border border-slate-200/60 dark:border-white/5 p-5 md:sticky md:top-6 ${isMobileDetailView ? 'hidden md:flex' : 'flex'} flex-col max-h-[85vh] overflow-hidden`}>
+          <div className="flex items-center justify-between mb-4 px-2 shrink-0 border-b border-slate-100 dark:border-white/5 pb-4">
             <div className="flex items-center gap-2">
-              <Menu className="w-5 h-5 text-slate-400" />
-              <h3 className="font-bold text-sm text-slate-600 dark:text-slate-300 uppercase tracking-wider">Módulos</h3>
+              <Menu className="w-5 h-5 text-slate-400 dark:text-white/40" />
+              <h3 className="font-black text-sm text-slate-600 dark:text-white/60 uppercase tracking-wider">Módulos</h3>
             </div>
             
-            <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5">
-              <button onClick={handleExpandAll} className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-colors cursor-pointer" title="Expandir Tudo ( + )">
-                <Plus className="w-3.5 h-3.5" />
+            <div className="flex bg-slate-100 dark:bg-[#0d1526] rounded-xl p-1">
+              <button onClick={handleExpandAll} className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg transition-colors cursor-pointer" title="Expandir Tudo ( + )">
+                <Plus className="w-4 h-4" />
               </button>
-              <button onClick={handleCollapseAll} className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-colors cursor-pointer" title="Recolher Tudo ( - )">
-                <Minus className="w-3.5 h-3.5" />
+              <button onClick={handleCollapseAll} className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg transition-colors cursor-pointer" title="Recolher Tudo ( - )">
+                <Minus className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          <div className="overflow-y-auto custom-scrollbar flex-1 pr-2 space-y-4">
+          <div className="overflow-y-auto custom-scrollbar flex-1 pr-2 space-y-4 mt-2">
             {edital.map((bloco, bIndex) => (
               <div key={bloco.id} className="mb-2">
-                <div onClick={() => !isEditing && toggleNode(bloco.id)} className={`group flex items-center gap-2 p-2 rounded-lg transition-colors ${!isEditing ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50' : ''}`}>
+                <div onClick={() => !isEditing && toggleNode(bloco.id)} className={`group flex items-center gap-2 p-2.5 rounded-xl transition-colors ${!isEditing ? 'cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5' : ''}`}>
                   <div onClick={(e) => { if(isEditing) { e.stopPropagation(); toggleNode(bloco.id); } }} className="cursor-pointer shrink-0">
                     {expanded[bloco.id] ? <ChevronDown className="w-4 h-4 text-slate-400" /> : <ChevronRight className="w-4 h-4 text-slate-400" />}
                   </div>
@@ -1090,21 +1147,21 @@ return (
                               onChange={(e) => setInlineEditValue(e.target.value)} 
                               onBlur={() => { if(inlineEditValue.trim()) handleEditBlocoNome(bloco.id, inlineEditValue); setInlineEditingId(null); }} 
                               onKeyDown={(e) => { if(e.key === 'Enter') { if(inlineEditValue.trim()) handleEditBlocoNome(bloco.id, inlineEditValue); setInlineEditingId(null); } if(e.key === 'Escape') setInlineEditingId(null); }} 
-                              className="flex-1 font-black text-xs uppercase tracking-wider text-slate-800 dark:text-slate-200 bg-transparent border-b border-blue-500 outline-none w-full" 
+                              className="flex-1 font-black text-xs uppercase tracking-wider text-slate-800 dark:text-white bg-transparent border-b border-orange-500 outline-none w-full" 
                            />
                         ) : (
-                           <span onDoubleClick={(e) => { e.stopPropagation(); setInlineEditValue(bloco.nome); setInlineEditingId(bloco.id); }} className="flex-1 font-black text-xs text-slate-600 dark:text-slate-400 uppercase tracking-wider truncate cursor-text" title="Duplo clique para editar">{bloco.nome}</span>
+                           <span onDoubleClick={(e) => { e.stopPropagation(); setInlineEditValue(bloco.nome); setInlineEditingId(bloco.id); }} className="flex-1 font-black text-xs text-slate-600 dark:text-white/80 uppercase tracking-wider truncate cursor-text" title="Duplo clique para editar">{bloco.nome}</span>
                         )}
-                        <Pencil onClick={() => { setInlineEditValue(bloco.nome); setInlineEditingId(bloco.id); }} className="w-3 h-3 text-slate-400 hover:text-blue-500 cursor-pointer opacity-0 group-hover:opacity-100" />
-                        <Trash2 onClick={() => handleDeleteBlocoClick(bloco.id)} className="w-3 h-3 text-red-400 hover:text-red-500 cursor-pointer opacity-0 group-hover:opacity-100" />
+                        <Pencil onClick={() => { setInlineEditValue(bloco.nome); setInlineEditingId(bloco.id); }} className="w-3.5 h-3.5 text-slate-400 hover:text-orange-500 cursor-pointer opacity-0 group-hover:opacity-100" />
+                        <Trash2 onClick={() => handleDeleteBlocoClick(bloco.id)} className="w-3.5 h-3.5 text-red-400 hover:text-red-500 cursor-pointer opacity-0 group-hover:opacity-100" />
                      </div>
                   ) : (
-                    <span className="flex-1 font-black text-xs text-slate-600 dark:text-slate-400 uppercase tracking-wider truncate">{bloco.nome}</span>
+                    <span className="flex-1 font-black text-xs text-slate-600 dark:text-white/80 uppercase tracking-wider truncate">{bloco.nome}</span>
                   )}
                 </div>
 
                 {expanded[bloco.id] && (
-                  <div className="pl-6 pr-1 space-y-1 mt-1 border-l-2 border-slate-100 dark:border-slate-800/60 ml-4">
+                  <div className="pl-6 pr-1 space-y-1.5 mt-2 border-l-2 border-slate-100 dark:border-white/5 ml-4">
                     {bloco.disciplinas.map((disc, dIndex) => {
                       const totalAssuntosDisc = disc.assuntos.length;
                       const concluidosAssuntosDisc = disc.assuntos.filter(a => isFullyMastered(a.id)).length;
@@ -1112,7 +1169,7 @@ return (
                       const progressoCircular = totalAssuntosDisc === 0 ? 0 : Math.round((concluidosAssuntosDisc / totalAssuntosDisc) * 100);
                       
                       return (
-                        <div key={disc.id} onClick={() => !isEditing && setSelectedDiscId(disc.id)} className={`group flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-all ${isSelected && !isEditing ? `${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]} border ${themeColors.border.split(' ')[0]} shadow-sm` : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent text-slate-600 dark:text-slate-400'}`}>
+                        <div key={disc.id} onClick={() => !isEditing && setSelectedDiscId(disc.id)} className={`group flex items-center gap-2 p-2.5 rounded-xl cursor-pointer transition-all ${isSelected && !isEditing ? `bg-orange-50/50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-500/20 shadow-sm` : 'hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent text-slate-600 dark:text-white/60'}`}>
                           
                           <CircularProgress percent={progressoCircular} themeColors={themeColors} />
                           
@@ -1125,20 +1182,20 @@ return (
                                      onChange={(e) => setInlineEditValue(e.target.value)} 
                                      onBlur={() => { if(inlineEditValue.trim()) handleEditDiscNome(bloco.id, disc.id, inlineEditValue); setInlineEditingId(null); }} 
                                      onKeyDown={(e) => { if(e.key === 'Enter') { if(inlineEditValue.trim()) handleEditDiscNome(bloco.id, disc.id, inlineEditValue); setInlineEditingId(null); } if(e.key === 'Escape') setInlineEditingId(null); }} 
-                                     className="font-bold text-sm flex-1 bg-transparent border-b border-blue-500 outline-none text-slate-800 dark:text-slate-200 w-full" 
+                                     className="font-bold text-sm flex-1 bg-transparent border-b border-orange-500 outline-none text-slate-800 dark:text-white w-full" 
                                   />
                                ) : (
                                   <span onDoubleClick={(e) => { e.stopPropagation(); setInlineEditValue(disc.nome); setInlineEditingId(disc.id); }} className="font-bold text-sm flex-1 truncate cursor-text" title="Duplo clique para editar">{disc.nome}</span>
                                )}
-                               <Pencil onClick={() => { setInlineEditValue(disc.nome); setInlineEditingId(disc.id); }} className="w-3 h-3 text-slate-400 hover:text-blue-500 cursor-pointer opacity-0 group-hover:opacity-100" />
-                               <Trash2 onClick={() => handleDeleteDisciplinaClick(bloco.id, disc.id)} className="w-3 h-3 text-red-400 hover:text-red-500 cursor-pointer opacity-0 group-hover:opacity-100" />
+                               <Pencil onClick={() => { setInlineEditValue(disc.nome); setInlineEditingId(disc.id); }} className="w-3.5 h-3.5 text-slate-400 hover:text-orange-500 cursor-pointer opacity-0 group-hover:opacity-100" />
+                               <Trash2 onClick={() => handleDeleteDisciplinaClick(bloco.id, disc.id)} className="w-3.5 h-3.5 text-red-400 hover:text-red-500 cursor-pointer opacity-0 group-hover:opacity-100" />
                              </div>
                           ) : (
                             <span className="font-bold text-sm flex-1 truncate">{disc.nome}</span>
                           )}
                           
                           {!isEditing && (
-                            <span className={`text-[10px] font-black shrink-0 px-1.5 py-0.5 rounded-md ${isSelected ? 'bg-white/60 dark:bg-black/20' : 'bg-slate-100 dark:bg-slate-800'}`}>
+                            <span className={`text-[10px] font-black shrink-0 px-2 py-0.5 rounded-md ${isSelected ? 'bg-white/60 dark:bg-[#0d1526]' : 'bg-slate-100 dark:bg-white/5'}`}>
                               {concluidosAssuntosDisc}/{totalAssuntosDisc}
                             </span>
                           )}
@@ -1147,9 +1204,9 @@ return (
                     })}
                     
                     {isEditing && (
-                      <div className="pt-1">
-                        <button onClick={() => handleAddDisciplina(bloco.id)} className={`w-full flex items-center gap-1.5 text-[11px] font-bold text-slate-500 hover:${themeColors.text.split(' ')[0]} p-1.5 rounded-lg transition-colors cursor-pointer`}>
-                          <Plus className="w-3.5 h-3.5"/> Add Disciplina
+                      <div className="pt-2">
+                        <button onClick={() => handleAddDisciplina(bloco.id)} className={`w-full flex items-center gap-1.5 text-xs font-bold text-slate-500 dark:text-white/40 hover:text-orange-500 p-2 rounded-xl transition-colors cursor-pointer`}>
+                          <Plus className="w-4 h-4"/> Add Disciplina
                         </button>
                       </div>
                     )}
@@ -1160,8 +1217,8 @@ return (
           </div>
 
           {isEditing && (
-            <div className="pt-4 border-t border-slate-100 dark:border-slate-800/60 mt-auto shrink-0">
-              <button onClick={handleAddBloco} className={`w-full flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest text-slate-500 hover:${themeColors.text.split(' ')[0]} bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl transition-colors border-2 border-dashed border-slate-300 dark:border-slate-700 cursor-pointer`}>
+            <div className="pt-5 border-t border-slate-100 dark:border-white/5 mt-auto shrink-0">
+              <button onClick={handleAddBloco} className={`w-full flex items-center justify-center gap-2 text-sm font-black uppercase tracking-widest text-slate-500 dark:text-white/50 hover:text-orange-500 dark:hover:text-orange-400 bg-slate-50 dark:bg-white/5 p-3.5 rounded-xl transition-colors border-2 border-dashed border-slate-300 dark:border-white/10 cursor-pointer`}>
                 <Layers className="w-4 h-4"/> Criar Novo Bloco
               </button>
             </div>
@@ -1169,49 +1226,45 @@ return (
         </div>
 
         {/* COLUNA DIREITA: LISTA MINIMALISTA */}
-        <div className={`flex-1 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-800 p-4 md:p-6 ${!isMobileDetailView ? 'hidden md:flex' : 'flex'} flex-col min-h-[500px] relative`}>
+        <div className={`flex-1 bg-white dark:bg-[#111e36] rounded-[2rem] shadow-sm border border-slate-200/60 dark:border-white/5 p-5 md:p-8 ${!isMobileDetailView ? 'hidden md:flex' : 'flex'} flex-col min-h-[500px] relative`}>
           
           {!activeDisc ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-slate-400 text-center p-8 bg-slate-50/50 dark:bg-slate-900/50 rounded-2xl border-2 border-dashed border-slate-200/80 dark:border-slate-800 m-2 animate-in fade-in">
-              <div className="w-24 h-24 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mb-6 shadow-sm border border-slate-100 dark:border-slate-700">
-                <BookOpen className={`w-10 h-10 ${themeColors.text.split(' ')[0]} opacity-80`} />
-              </div>
-              <h3 className="text-2xl font-black text-slate-700 dark:text-slate-200 mb-3 tracking-tight">Biblioteca de Matérias</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
-                Navegue pelo índice à esquerda. Aqui você tem a visão limpa e estruturada de cada tópico do seu edital.
-              </p>
-            </div>
+             <EmptyState 
+                icon={BookOpen}
+                title="Biblioteca de Matérias"
+                message="Navegue pelo índice à esquerda. Aqui você tem a visão limpa e estruturada de cada tópico do seu edital."
+             />
           ) : (
             <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-300">
               
-              <div className="mb-5 border-b border-slate-100 dark:border-slate-800 pb-4">
-                <button onClick={() => setSelectedDiscId(null)} className="md:hidden flex items-center gap-1.5 text-sm font-bold text-blue-500 mb-4 cursor-pointer hover:underline">
+              <div className="mb-6 border-b border-slate-100 dark:border-white/5 pb-5">
+                <button onClick={() => setSelectedDiscId(null)} className="md:hidden flex items-center gap-1.5 text-sm font-bold text-orange-500 mb-4 cursor-pointer hover:underline">
                   <ArrowLeft className="w-4 h-4" /> Voltar
                 </button>
                 
-                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2 flex-wrap">
+                <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-white/40 mb-3 flex-wrap">
                    <Layers className="w-3.5 h-3.5" />
                    <span className="truncate max-w-[150px]">{activeBloco?.nome}</span>
                    <ChevronRight className="w-3 h-3 opacity-50 shrink-0" />
-                   <span className={`${themeColors.text.split(' ')[0]} truncate`}>{activeDisc.nome}</span>
+                   <span className="text-orange-500 truncate">{activeDisc.nome}</span>
                 </div>
                 
                 <div className="flex items-start justify-between gap-4">
-                  <h3 className={`text-2xl font-black ${themeColors.text.split(' ')[0]} flex items-center gap-3`}>
+                  <h3 className={`text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3`}>
                     {activeDisc.nome}
                     
                     {/* BOTÕES DE EXPANDIR E RECOLHER TODOS */}
-                    <div className="flex bg-slate-100 dark:bg-slate-800 rounded-lg p-0.5 shrink-0 ml-2">
-                      <button onClick={handleExpandAllTopics} className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-colors cursor-pointer" title="Expandir Todos">
+                    <div className="flex bg-slate-100 dark:bg-[#0d1526] rounded-xl p-1 shrink-0 ml-2">
+                      <button onClick={handleExpandAllTopics} className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg transition-colors cursor-pointer" title="Expandir Todos">
                         <ChevronDown className="w-4 h-4" />
                       </button>
-                      <button onClick={handleCollapseAllTopics} className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-700 rounded-md transition-colors cursor-pointer" title="Recolher Todos">
+                      <button onClick={handleCollapseAllTopics} className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-white rounded-lg transition-colors cursor-pointer" title="Recolher Todos">
                         <ChevronUp className="w-4 h-4" />
                       </button>
                     </div>
                   </h3>
                   <div className="flex flex-col items-end shrink-0">
-                    <span className="text-sm font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <span className="text-sm font-bold text-slate-500 dark:text-white/60 bg-slate-100 dark:bg-white/5 px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/5">
                       {activeDisc.assuntos.filter(a => isFullyMastered(a.id)).length} de {activeDisc.assuntos.length} Concluídos
                     </span>
                   </div>
@@ -1220,8 +1273,8 @@ return (
 
               <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 pb-6">
                 {displayAssuntos.length === 0 ? (
-                  <div className="text-sm text-slate-500 text-center p-8 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl flex items-center justify-center">
-                    Nenhum assunto encontrado na pesquisa.
+                  <div className="text-sm text-slate-500 dark:text-white/40 text-center p-8 border-2 border-dashed border-slate-200 dark:border-white/10 rounded-2xl flex items-center justify-center">
+                    Nenhum assunto encontrado.
                   </div>
                 ) : (
                   displayAssuntos.map((assunto) => {
@@ -1233,105 +1286,133 @@ return (
                     const hasChildren = isParent && activeDisc.assuntos[trueIndex + 1]?.indent > 0;
                     const isSelectedBulk = selectedAssuntosBulk.has(assunto.id);
                     
-                    // Lógica Visual do Arrastar Original (Vertical)
                     const isBeingDragged = dragItem.current?.discId === activeDisc.id && dragItem.current?.position === trueIndex;
                     const isDropTarget = dragTargetIndex === trueIndex && !isBeingDragged;
 
                     return (
-                        <div 
-                          key={assunto.id}
-                          draggable={isEditing} 
-                          onDragStart={(e) => handleDragStart(e, trueIndex, activeDisc.id)} 
-                          onDragEnter={(e) => handleDragEnter(e, trueIndex, activeDisc.id)} 
-                          onDragLeave={handleDragLeave}
-                          onDragOver={(e) => e.preventDefault()} 
-                          onDrop={handleDrop} 
-                          style={{ marginLeft: assunto.indent && shouldApplyCollapse ? `${assunto.indent * 1.5}rem` : '0' }} 
-                          className={`
-                            group flex items-center py-2 px-3 transition-colors border-b border-slate-100 dark:border-slate-800/50 
-                            ${isEditing ? 'cursor-grab active:cursor-grabbing hover:bg-slate-100 dark:hover:bg-slate-800/60' : 'hover:bg-slate-50 dark:hover:bg-slate-800/30'} 
-                            ${isParent ? 'mt-4 border-t border-t-slate-200 dark:border-t-slate-700 pt-3' : ''} 
-                            ${isSelectedBulk ? 'bg-amber-50 dark:bg-amber-900/10' : ''}
-                            ${isBeingDragged ? 'opacity-40' : ''}
-                            ${isDropTarget ? 'border-t-4 border-t-blue-500 bg-blue-50/50 dark:bg-blue-900/30 scale-[1.01]' : ''}
-                          `}
-                        >
-                          <div className="flex items-center gap-3 w-full">
-                            
-                            {/* Checkbox de Seleção ou Ícone de Rato no Modo Edição */}
-                            {isEditing ? (
-                               <div className="flex items-center gap-2">
-                                 <input type="checkbox" checked={isSelectedBulk} onChange={() => toggleBulkSelect(assunto.id)} className="w-4 h-4 rounded cursor-pointer border-slate-300 dark:border-slate-600 text-amber-500 focus:ring-amber-500 shrink-0" />
-                                 <GripVertical className="w-4 h-4 text-slate-300 shrink-0" />
-                               </div>
-                            ) : (
-                               getSimpleStatus(assunto.id, isInSprint)
-                            )}
-                            
-                            <div 
-                              className={`flex-1 flex items-center overflow-hidden ${hasChildren && shouldApplyCollapse && !isEditing ? 'cursor-pointer' : ''}`}
-                              onClick={(e) => {
-                                if (!isEditing && hasChildren && shouldApplyCollapse) {
-                                  e.stopPropagation();
-                                  setExpandedTopics(prev => ({...prev, [assunto.id]: !prev[assunto.id]}));
-                                }
+                        <div key={assunto.id} className="relative">
+                          {/* LINHA GUIA DE DROP 4D */}
+                          {isDropTarget && isEditing && (
+                            <div
+                              className="absolute top-0 left-0 h-1 bg-orange-500 rounded-full z-20 transition-all duration-200 shadow-[0_0_8px_rgba(249,115,22,0.8)] pointer-events-none"
+                              style={{
+                                marginLeft: `${dragTargetIndent * 1.5 + 0.75}rem`,
+                                width: `calc(100% - ${dragTargetIndent * 1.5 + 0.75}rem)`
                               }}
-                            >
-                              <div className="flex items-center gap-2 overflow-hidden w-full">
-                                {hasChildren && shouldApplyCollapse && !isEditing && (
-                                  <div className={`p-0.5 rounded shrink-0 transition-colors ${expandedTopics[assunto.id] ? themeColors.text.split(' ')[0] : 'text-slate-400'}`}>
-                                    {expandedTopics[assunto.id] ? <ChevronDown className="w-4 h-4"/> : <ChevronRight className="w-4 h-4"/>}
-                                  </div>
-                                )}
-                                <span 
-                                  onDoubleClick={(e) => { if(isEditing) { e.stopPropagation(); startEditTopic(assunto); } }}
-                                  className={`truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-slate-500' : (isParent ? 'font-black text-slate-800 dark:text-white uppercase tracking-tight text-sm' : 'font-medium text-slate-700 dark:text-slate-300 text-sm')} ${isEditing ? 'cursor-text' : ''}`}
-                                  title={isEditing ? "Duplo clique para editar" : ""}
-                                >
-                                  {assunto.titulo}
-                                </span>
-                                
-                                {assunto.linkTec && !isEditing && (
-                                  <a href={assunto.linkTec} onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-blue-500 transition-opacity" title="Abrir Caderno TEC">
-                                    <ExternalLink className="w-3.5 h-3.5" />
-                                  </a>
-                                )}
-                              </div>
-                            </div>
+                            />
+                          )}
+
+                          <div 
+                            draggable={isEditing} 
+                            onDragStart={(e) => handleDragStart(e, trueIndex, activeDisc.id, assunto.indent)} 
+                            onDragOver={(e) => handleDragOver(e, trueIndex, activeDisc.id)} 
+                            onDrop={handleDrop} 
+                            style={{ marginLeft: isBeingDragged ? `${dragTargetIndent * 1.5}rem` : (assunto.indent && shouldApplyCollapse ? `${assunto.indent * 1.5}rem` : '0') }} 
+                            className={`
+                              group flex items-center py-2.5 px-3 transition-all duration-200 border-b border-slate-100 dark:border-white/5 
+                              ${isEditing ? 'cursor-grab active:cursor-grabbing hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg' : 'hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg'} 
+                              ${isParent && !isBeingDragged ? 'mt-4 border-t border-t-slate-200 dark:border-t-white/10 pt-4' : ''} 
+                              ${isSelectedBulk ? 'bg-amber-50 dark:bg-amber-500/10' : ''}
+                              ${isBeingDragged ? 'opacity-40 scale-[0.98] border-dashed border-2 border-orange-400 dark:border-orange-500 z-10 bg-white dark:bg-[#0d1526]' : ''}
+                            `}
+                          >
+                            <div className="flex items-center gap-3 w-full">
+                              
+                              {/* Checkbox de Seleção ou Ícone de Rato no Modo Edição */}
+                              {isEditing ? (
+                                 <div className="flex items-center gap-2">
+                                   <input type="checkbox" checked={isSelectedBulk} onChange={() => toggleBulkSelect(assunto.id)} className="w-4 h-4 rounded cursor-pointer border-slate-300 dark:border-white/10 text-orange-500 focus:ring-orange-500 shrink-0 bg-transparent" />
+                                   <GripVertical className="w-4 h-4 text-slate-300 dark:text-white/20 shrink-0" />
+                                 </div>
+                              ) : (
+                                 getSimpleStatus(assunto.id, isInSprint)
+                              )}
                             
-                            {/* ACÇÕES DE HOVER (Visão Padrão) */}
-                            {!isEditing && (
-                              <div className="opacity-0 group-hover:opacity-100 flex items-center gap-2 transition-opacity shrink-0">
-                                <button 
-                                  onClick={(e) => { e.stopPropagation(); if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} 
-                                  className={`text-xs font-bold px-2 py-1 rounded border shadow-sm cursor-pointer ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200' : `bg-white ${themeColors.text.split(' ')[0]} border-indigo-200 hover:bg-indigo-50`}`}
-                                >
-                                  {isInSprint ? 'Na Sprint' : (mastered ? 'Refazer' : '+ Sprint')}
-                                </button>
-                                <button onClick={() => startEditTopic(assunto)} className="p-1 text-slate-400 hover:text-blue-500" title="Editar"><Pencil className="w-3.5 h-3.5"/></button>
+                              <div 
+                                className={`flex-1 flex items-center overflow-hidden ${hasChildren && shouldApplyCollapse && !isEditing ? 'cursor-pointer' : ''}`}
+                                onClick={(e) => {
+                                  if (!isEditing && hasChildren && shouldApplyCollapse) {
+                                    e.stopPropagation();
+                                    setExpandedTopics(prev => ({...prev, [assunto.id]: !prev[assunto.id]}));
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-2 overflow-hidden w-full">
+                                  {hasChildren && shouldApplyCollapse && !isEditing && (
+                                    <div className={`p-0.5 rounded shrink-0 transition-colors ${expandedTopics[assunto.id] ? themeColors.text.split(' ')[0] : 'text-slate-400 dark:text-white/40'}`}>
+                                      {expandedTopics[assunto.id] ? <ChevronDown className="w-4 h-4"/> : <ChevronRight className="w-4 h-4"/>}
+                                    </div>
+                                  )}
+                                  
+                                  {/* Edição Inline do Título do Assunto */}
+                                  {isEditing && inlineEditingId === assunto.id ? (
+                                    <input 
+                                      autoFocus 
+                                      value={inlineEditValue} 
+                                      onChange={(e) => setInlineEditValue(e.target.value)} 
+                                      onBlur={() => { if(inlineEditValue.trim()) saveEditTopic(activeDisc.id, assunto.id, inlineEditValue, assunto.linkTec); setInlineEditingId(null); }} 
+                                      onKeyDown={(e) => { 
+                                        if(e.key === 'Enter') { 
+                                          e.preventDefault();
+                                          if(inlineEditValue.trim()) saveEditTopic(activeDisc.id, assunto.id, inlineEditValue, assunto.linkTec); 
+                                          setInlineEditingId(null); 
+                                          
+                                          // Opcional: tentar focar o próximo elemento, mas salvar e fechar é mais seguro
+                                        } 
+                                        if(e.key === 'Escape') setInlineEditingId(null); 
+                                      }} 
+                                      className="flex-1 bg-transparent border-b border-orange-500 outline-none text-slate-800 dark:text-white font-medium text-sm w-full" 
+                                    />
+                                  ) : (
+                                    <span 
+                                      onDoubleClick={(e) => { if(isEditing) { e.stopPropagation(); setInlineEditValue(assunto.titulo); setInlineEditingId(assunto.id); } }}
+                                      className={`truncate transition-colors ${mastered && !isEditing ? 'line-through text-slate-400 dark:text-white/30' : (isParent ? 'font-black text-slate-800 dark:text-white uppercase tracking-tight text-sm' : 'font-medium text-slate-700 dark:text-white/80 text-sm')} ${isEditing ? 'cursor-text' : ''}`}
+                                      title={isEditing ? "Duplo clique para editar" : ""}
+                                    >
+                                      {assunto.titulo}
+                                    </span>
+                                  )}
+                                  
+                                  {assunto.linkTec && !isEditing && (
+                                    <a href={assunto.linkTec} onClick={(e) => e.stopPropagation()} target="_blank" rel="noopener noreferrer" className="opacity-0 group-hover:opacity-100 text-slate-400 hover:text-orange-500 transition-opacity" title="Abrir Caderno TEC">
+                                      <ExternalLink className="w-3.5 h-3.5" />
+                                    </a>
+                                  )}
+                                </div>
                               </div>
-                            )}
+                              
+                              {/* ACÇÕES DE HOVER (Visão Padrão) */}
+                              {!isEditing && (
+                                <div className="opacity-0 group-hover:opacity-100 flex items-center gap-2 transition-opacity shrink-0">
+                                  <button 
+                                    onClick={(e) => { e.stopPropagation(); if (mastered && !isInSprint) resetProgress(assunto.id); toggleSprintItem(activeDisc.id, assunto.id, activeDisc.nome, assunto.titulo, assunto.temp, assunto.linkTec); }} 
+                                    className={`text-xs font-bold px-2 py-1.5 rounded border shadow-sm cursor-pointer ${isInSprint ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' : mastered ? 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20' : `bg-white dark:bg-[#0d1526] text-orange-500 border-orange-200 dark:border-orange-500/20 hover:bg-orange-50 dark:hover:bg-orange-500/10`}`}
+                                  >
+                                    {isInSprint ? 'Na Sprint' : (mastered ? 'Refazer' : '+ Sprint')}
+                                  </button>
+                                  <button onClick={() => startEditTopic(assunto)} className="p-1.5 text-slate-400 hover:text-orange-500" title="Editar Tópico Inteiro"><Pencil className="w-3.5 h-3.5"/></button>
+                                </div>
+                              )}
 
-                            {/* ACÇÕES DE HOVER (Modo Edição - Botões Sobe e Desce Adicionados) */}
-                            {isEditing && (
-                              <div className="opacity-0 group-hover:opacity-100 flex items-center gap-2 shrink-0 transition-opacity bg-slate-50/80 dark:bg-slate-800/80 p-1 rounded-lg">
-                                {/* Botões Matemáticos Verticais */}
-                                <button onClick={() => handleMoveAssuntoManual(activeDisc.id, assunto.id, -1)} disabled={trueIndex === 0} className="p-1 text-blue-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded disabled:opacity-30 cursor-pointer" title="Subir (Vertical)"><ChevronUp className="w-4 h-4"/></button>
-                                <button onClick={() => handleMoveAssuntoManual(activeDisc.id, assunto.id, 1)} disabled={trueIndex === activeDisc.assuntos.length - 1} className="p-1 text-blue-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded disabled:opacity-30 cursor-pointer" title="Descer (Vertical)"><ChevronDown className="w-4 h-4"/></button>
-                                
-                                <div className="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
-                                
-                                {/* Botões Indentação Horizontais (Alternativa segura ao arrasto horizontal) */}
-                                <button onClick={() => handleIndent(activeDisc.id, assunto.id, -1)} disabled={!assunto.indent || !shouldApplyCollapse} className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 rounded disabled:opacity-30 cursor-pointer" title="Recuar (Nível)"><ArrowLeft className="w-3.5 h-3.5"/></button>
-                                <button onClick={() => handleIndent(activeDisc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3 || !shouldApplyCollapse} className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 rounded disabled:opacity-30 cursor-pointer" title="Avançar (Nível)"><ArrowRight className="w-3.5 h-3.5"/></button>
-                                
-                                <div className="w-px h-4 bg-slate-300 dark:bg-slate-600 mx-1"></div>
-                                
-                                <button onClick={() => startEditTopic(assunto)} className="p-1 text-slate-400 hover:text-blue-500 cursor-pointer" title="Editar Texto"><Pencil className="w-3.5 h-3.5"/></button>
-                                <button onClick={() => handleDeleteClick(activeDisc.id, assunto.id)} className={`p-1 ${confirmDeleteId === assunto.id ? 'text-red-600' : 'text-slate-400 hover:text-red-500'} cursor-pointer`} title="Excluir"><Trash2 className="w-3.5 h-3.5"/></button>
-                              </div>
-                            )}
+                              {/* ACÇÕES DE HOVER (Modo Edição - Botões Manuais) */}
+                              {isEditing && (
+                                <div className="opacity-0 group-hover:opacity-100 flex items-center gap-1.5 shrink-0 transition-opacity bg-slate-50/80 dark:bg-[#0d1526]/80 p-1.5 rounded-lg border border-slate-200/50 dark:border-white/5">
+                                  <button onClick={() => handleMoveAssuntoManual(activeDisc.id, assunto.id, -1)} disabled={trueIndex === 0 || isBeingDragged} className="p-1 text-sky-500 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-500/10 rounded disabled:opacity-30 cursor-pointer" title="Subir"><ChevronUp className="w-4 h-4"/></button>
+                                  <button onClick={() => handleMoveAssuntoManual(activeDisc.id, assunto.id, 1)} disabled={trueIndex === activeDisc.assuntos.length - 1 || isBeingDragged} className="p-1 text-sky-500 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-500/10 rounded disabled:opacity-30 cursor-pointer" title="Descer"><ChevronDown className="w-4 h-4"/></button>
+                                  
+                                  <div className="w-px h-4 bg-slate-200 dark:bg-white/10 mx-1"></div>
+                                  
+                                  <button onClick={() => handleIndent(activeDisc.id, assunto.id, -1)} disabled={!assunto.indent || !shouldApplyCollapse || isBeingDragged} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded disabled:opacity-30 cursor-pointer" title="Recuar"><ArrowLeft className="w-3.5 h-3.5"/></button>
+                                  <button onClick={() => handleIndent(activeDisc.id, assunto.id, 1)} disabled={(assunto.indent || 0) >= 3 || !shouldApplyCollapse || isBeingDragged} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-white/10 rounded disabled:opacity-30 cursor-pointer" title="Avançar"><ArrowRight className="w-3.5 h-3.5"/></button>
+                                  
+                                  <div className="w-px h-4 bg-slate-200 dark:bg-white/10 mx-1"></div>
+                                  
+                                  <button onClick={() => startEditTopic(assunto)} className="p-1 text-slate-400 hover:text-orange-500 cursor-pointer" title="Editar Link/Mais"><Settings className="w-3.5 h-3.5"/></button>
+                                  <button onClick={() => handleDeleteClick(activeDisc.id, assunto.id)} className={`p-1 ${confirmDeleteId === assunto.id ? 'text-red-600' : 'text-slate-400 hover:text-red-500'} cursor-pointer`} title="Excluir"><Trash2 className="w-3.5 h-3.5"/></button>
+                                </div>
+                              )}
 
+                            </div>
                           </div>
                         </div>
                     );
@@ -1341,36 +1422,43 @@ return (
 
               {/* UX 4: Bulk Actions Floating Bar */}
               {isEditing && selectedAssuntosBulk.size > 0 && (
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 dark:bg-slate-950 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-4 z-50 animate-in slide-in-from-bottom-8 border border-slate-700">
+                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 dark:bg-[#0d1526] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-4 z-50 animate-in slide-in-from-bottom-8 border border-slate-700 dark:border-white/10">
                   <span className="font-bold text-xs bg-white/10 px-3 py-1.5 rounded-lg whitespace-nowrap">{selectedAssuntosBulk.size} selecionados</span>
-                  <div className="w-px h-6 bg-slate-600"></div>
-                  <button onClick={() => handleBulkIndent(-1)} className="p-2 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer" title="Recuar Todos"><ArrowLeft className="w-4 h-4"/></button>
-                  <button onClick={() => handleBulkIndent(1)} className="p-2 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer" title="Avançar Todos"><ArrowRight className="w-4 h-4"/></button>
-                  <div className="w-px h-6 bg-slate-600"></div>
-                  <button onClick={handleBulkDelete} className="p-2 hover:bg-red-500 rounded-lg transition-colors text-red-400 hover:text-white cursor-pointer" title="Excluir Selecionados"><Trash2 className="w-4 h-4"/></button>
+                  <div className="w-px h-6 bg-slate-600 dark:bg-white/10"></div>
+                  <button onClick={() => handleBulkIndent(-1)} className="p-2 hover:bg-slate-700 dark:hover:bg-white/10 rounded-lg transition-colors cursor-pointer" title="Recuar Todos"><ArrowLeft className="w-4 h-4"/></button>
+                  <button onClick={() => handleBulkIndent(1)} className="p-2 hover:bg-slate-700 dark:hover:bg-white/10 rounded-lg transition-colors cursor-pointer" title="Avançar Todos"><ArrowRight className="w-4 h-4"/></button>
+                  <div className="w-px h-6 bg-slate-600 dark:bg-white/10"></div>
+                  <button onClick={handleBulkDelete} className="p-2 hover:bg-red-500/20 rounded-lg transition-colors text-red-400 hover:text-red-300 cursor-pointer" title="Excluir Selecionados"><Trash2 className="w-4 h-4"/></button>
                 </div>
               )}
 
               {isEditing && (
-                <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800 shrink-0">
-                  <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/50 rounded-xl p-4 flex flex-col gap-3 shadow-inner">
+                <div className="mt-4 pt-5 border-t border-slate-100 dark:border-white/5 shrink-0">
+                  <div className="bg-amber-50 dark:bg-[#0d1526] border border-amber-200 dark:border-white/5 rounded-2xl p-5 flex flex-col gap-4 shadow-sm">
                     {bulkInput.discId === activeDisc.id ? (
                       <div className="flex flex-col gap-3 animate-in fade-in">
-                        <h4 className="text-xs font-black uppercase text-amber-700 dark:text-amber-500 flex items-center gap-2"><ListPlus className="w-4 h-4"/> Importação Rápida</h4>
-                        <textarea rows="4" placeholder="Cole a lista de assuntos aqui... Ex:&#10;Modelagem de Dados&#10;Normalização" value={bulkInput.text} onChange={(e) => setBulkInput({ discId: activeDisc.id, text: e.target.value })} className="w-full p-3 text-sm rounded-lg border border-amber-300 dark:border-amber-700/50 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500 resize-none" />
-                        <div className="flex gap-2">
-                          <button onClick={() => handleBulkAdd(activeDisc.id)} className="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2.5 rounded-lg text-sm font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-sm">Gerar Assuntos</button>
-                          <button onClick={() => setBulkInput({ discId: null, text: '' })} className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-5 py-2.5 rounded-lg text-sm font-bold transition-colors cursor-pointer">Cancelar</button>
+                        <h4 className="text-xs font-black uppercase text-amber-700 dark:text-orange-500 flex items-center gap-2 tracking-widest"><ListPlus className="w-4 h-4"/> Importação Rápida</h4>
+                        <textarea rows="4" placeholder="Cole a lista de assuntos aqui... Ex:&#10;Modelagem de Dados&#10;Normalização" value={bulkInput.text} onChange={(e) => setBulkInput({ discId: activeDisc.id, text: e.target.value })} className="w-full p-4 text-sm rounded-xl border border-amber-300 dark:border-white/10 bg-white dark:bg-[#111e36] text-slate-800 dark:text-white outline-none focus:border-orange-500 resize-none transition-colors" />
+                        <div className="flex gap-3 mt-1">
+                          <button onClick={() => handleBulkAdd(activeDisc.id)} className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md">Gerar Assuntos</button>
+                          <button onClick={() => setBulkInput({ discId: null, text: '' })} className="bg-slate-200 dark:bg-white/5 text-slate-700 dark:text-white/70 hover:dark:bg-white/10 px-6 py-3 rounded-xl text-sm font-bold transition-colors cursor-pointer">Cancelar</button>
                         </div>
                       </div>
                     ) : (
                       <>
                         <div className="flex flex-col sm:flex-row gap-3 items-center">
-                          <Plus className="w-5 h-5 text-amber-600 shrink-0 hidden sm:block"/>
-                          <input type="text" placeholder="Adicionar assunto manualmente..." value={newTopic.discId === activeDisc.id ? newTopic.titulo : ''} onChange={(e) => setNewTopic({...newTopic, discId: activeDisc.id, titulo: e.target.value})} className="flex-1 w-full p-3 text-sm rounded-lg border border-amber-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-amber-500" />
-                          <button onClick={() => handleAddTopic(activeDisc.id)} className="bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-lg text-sm font-bold w-full sm:w-auto transition-colors cursor-pointer shadow-sm">Adicionar</button>
+                          <Plus className="w-5 h-5 text-orange-500 shrink-0 hidden sm:block"/>
+                          <input 
+                            type="text" 
+                            placeholder="Adicionar assunto e pressionar Enter..." 
+                            value={newTopic.discId === activeDisc.id ? newTopic.titulo : ''} 
+                            onChange={(e) => setNewTopic({...newTopic, discId: activeDisc.id, titulo: e.target.value})} 
+                            onKeyDown={(e) => { if(e.key === 'Enter') handleAddTopic(activeDisc.id); }}
+                            className="flex-1 w-full p-3.5 text-sm rounded-xl border border-amber-200 dark:border-white/10 bg-white dark:bg-[#111e36] text-slate-800 dark:text-white outline-none focus:border-orange-500 transition-colors" 
+                          />
+                          <button onClick={() => handleAddTopic(activeDisc.id)} className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3.5 rounded-xl text-sm font-bold w-full sm:w-auto transition-all cursor-pointer shadow-md">Adicionar</button>
                         </div>
-                        <button onClick={() => setBulkInput({ discId: activeDisc.id, text: '' })} className="w-full border border-dashed border-amber-400 dark:border-amber-600 text-amber-700 dark:text-amber-500 hover:bg-amber-100 dark:bg-amber-900/40 px-4 py-3 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer mt-1">
+                        <button onClick={() => setBulkInput({ discId: activeDisc.id, text: '' })} className="w-full border border-dashed border-amber-400 dark:border-white/10 text-amber-700 dark:text-white/40 hover:bg-amber-100 dark:hover:bg-white/5 px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition-colors cursor-pointer mt-1">
                           <ListPlus className="w-4 h-4"/> Colar Índice Completo
                         </button>
                       </>
@@ -1426,56 +1514,63 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
 
   return (
     <div className="space-y-6 animate-in fade-in text-left h-full pb-10">
-      <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-        <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-2"><LayoutGrid className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`}/> Backlog de Sprints</h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">A sua visão estratégica. O que for agendado aqui será executado na Mesa de Foco.</p>
-        </div>
-      </header>
+      
+      <SectionHeader 
+        overline="Estratégia" 
+        title="Backlog de Sprints" 
+        subtitle="O que for agendado aqui será executado na Mesa de Foco." 
+        icon={LayoutGrid}
+      />
 
       <div className="flex flex-col lg:flex-row gap-6 items-start">
-        <div className="w-full lg:w-1/3 bg-slate-100/80 dark:bg-slate-800/50 rounded-3xl p-5 border border-slate-200/60 dark:border-slate-700 min-h-[400px]">
-          <h3 className="font-black text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2 text-sm"><ListPlus className="w-5 h-5"/> Fila de Sprints ({backlogSprints.length})</h3>
-          <div className="space-y-4">
-            {backlogSprints.map((group, groupIdx) => (
-              <div key={groupIdx} className="bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-200/60 dark:border-slate-700 transition-colors opacity-90">
-                 <div className="text-xs font-bold text-slate-400 mb-3 uppercase flex justify-between"><span>Sprint {sprintsCompleted + groupIdx + 2}</span></div>
-                 {group.map((item, localIdx) => {
-                   const globalIdx = 2 + (groupIdx * 2) + localIdx;
-                   const isDragging = draggedIndex === globalIdx;
-                   return (
-                     <div 
-                       key={item.assId} 
-                       draggable
-                       onDragStart={(e) => handleDragStart(e, globalIdx)}
-                       onDragEnter={(e) => handleDragEnter(e, globalIdx)}
-                       onDragEnd={handleDragEnd}
-                       onDragOver={(e) => e.preventDefault()}
-                       className={`mb-2 last:mb-0 flex items-start gap-2 pl-1 cursor-move hover:bg-slate-50 dark:hover:bg-slate-800/50 p-2 rounded-xl transition-all border-l-2 border-transparent hover:border-slate-300 dark:hover:border-slate-600 ${isDragging ? 'opacity-40 border-dashed scale-95' : ''}`}
-                     >
-                       <GripVertical className="w-4 h-4 shrink-0 text-slate-300 mt-0.5" />
-                       <div>
-                         <span className="block text-xs font-bold text-slate-400 uppercase tracking-wider truncate">{item.discNome}</span>
-                         <span className="block text-sm font-bold text-slate-700 dark:text-slate-200 leading-tight mt-0.5">{item.assTitulo}</span>
+        <div className="w-full lg:w-1/3 bg-slate-50 dark:bg-[#111e36] rounded-[2rem] p-6 border border-slate-200/60 dark:border-white/5 min-h-[400px]">
+          <h3 className="font-black text-slate-600 dark:text-white uppercase tracking-wider mb-6 flex items-center gap-2 text-sm"><ListPlus className="w-5 h-5 text-orange-500"/> Fila de Sprints ({backlogSprints.length})</h3>
+          
+          <div className="space-y-5">
+            {backlogSprints.length === 0 ? (
+               <EmptyState 
+                  icon={LayoutGrid}
+                  title="Fila Vazia"
+                  message="Vá ao Edital Verticalizado para enviar matérias para cá."
+                  actionLabel="Ir para Edital"
+                  onAction={() => setActiveTab('disciplinas')}
+               />
+            ) : (
+              backlogSprints.map((group, groupIdx) => (
+                <div key={groupIdx} className="bg-white dark:bg-[#0d1526] p-5 rounded-2xl shadow-sm border border-slate-200/60 dark:border-white/5 transition-colors">
+                   <div className="text-[10px] font-bold text-slate-400 dark:text-white/40 mb-3 uppercase tracking-widest flex justify-between"><span>Sprint {sprintsCompleted + groupIdx + 2}</span></div>
+                   {group.map((item, localIdx) => {
+                     const globalIdx = 2 + (groupIdx * 2) + localIdx;
+                     const isDragging = draggedIndex === globalIdx;
+                     return (
+                       <div 
+                         key={item.assId} 
+                         draggable
+                         onDragStart={(e) => handleDragStart(e, globalIdx)}
+                         onDragEnter={(e) => handleDragEnter(e, globalIdx)}
+                         onDragEnd={handleDragEnd}
+                         onDragOver={(e) => e.preventDefault()}
+                         className={`mb-2 last:mb-0 flex items-start gap-2.5 cursor-move hover:bg-slate-50 dark:hover:bg-white/5 p-2.5 rounded-xl transition-all border border-transparent dark:hover:border-orange-500/30 ${isDragging ? 'opacity-40 border-dashed border-orange-500 scale-[0.98]' : ''}`}
+                       >
+                         <GripVertical className="w-4 h-4 shrink-0 text-slate-300 dark:text-white/20 mt-0.5" />
+                         <div>
+                           <span className="block text-[10px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest truncate">{item.discNome}</span>
+                           <span className="block text-sm font-bold text-slate-700 dark:text-white/80 leading-tight mt-0.5">{item.assTitulo}</span>
+                         </div>
                        </div>
-                     </div>
-                   )
-                 })}
-              </div>
-            ))}
-            {backlogSprints.length === 0 && (
-              <div className="text-sm text-slate-400 p-6 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl flex flex-col items-center gap-2 text-center">
-                <p>O seu Backlog está vazio.</p><p className="text-xs">Vá ao Edital Verticalizado para organizar a semana.</p>
-              </div>
+                     )
+                   })}
+                </div>
+              ))
             )}
           </div>
         </div>
 
-        <div className={`w-full lg:w-1/3 ${themeColors.lightBg.split(' ')[0]} rounded-3xl p-5 border ${themeColors.border.split(' ')[0]} min-h-[400px]`}>
-           <h3 className={`font-black ${themeColors.text.split(' ')[0]} uppercase tracking-wider mb-4 flex items-center gap-2 text-sm`}><PlayCircle className="w-5 h-5"/> Em Curso (Hoje)</h3>
+        <div className={`w-full lg:w-1/3 bg-indigo-50 dark:bg-orange-500/5 rounded-[2rem] p-6 border border-indigo-200 dark:border-orange-500/20 min-h-[400px]`}>
+           <h3 className={`font-black text-indigo-700 dark:text-orange-500 uppercase tracking-wider mb-6 flex items-center gap-2 text-sm`}><PlayCircle className="w-5 h-5"/> Em Curso (Hoje)</h3>
            {activeSprint ? (
-             <div className={`bg-white dark:bg-slate-900 p-5 rounded-2xl shadow-md border-2 ${themeColors.border.split(' ')[0]}`}>
-                 <div className={`text-xs font-bold ${themeColors.text.split(' ')[0]} mb-3 uppercase tracking-wider`}>Sprint {sprintsCompleted + 1}</div>
+             <div className={`bg-white dark:bg-[#0d1526] p-6 rounded-2xl shadow-md border-2 border-indigo-200 dark:border-orange-500/30`}>
+                 <div className={`text-[10px] font-bold text-indigo-500 dark:text-orange-500 mb-4 uppercase tracking-widest`}>Sprint {sprintsCompleted + 1}</div>
                  {activeSprint.map((item, localIdx) => {
                    const globalIdx = localIdx;
                    const isDragging = draggedIndex === globalIdx;
@@ -1487,29 +1582,29 @@ function TabPlanner({ customSprint, setCustomSprint, sprintsCompleted, setActive
                        onDragEnter={(e) => handleDragEnter(e, globalIdx)}
                        onDragEnd={handleDragEnd}
                        onDragOver={(e) => e.preventDefault()}
-                       className={`mb-3 last:mb-0 flex items-start gap-2.5 cursor-move bg-white dark:bg-slate-800 p-3 rounded-xl transition-all border border-slate-200 dark:border-slate-700 hover:border-indigo-400 shadow-sm ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95' : ''}`}
+                       className={`mb-3 last:mb-0 flex items-start gap-3 cursor-move bg-slate-50 dark:bg-[#111e36] p-3.5 rounded-xl transition-all border border-slate-200 dark:border-white/5 hover:border-indigo-400 dark:hover:border-orange-400 shadow-sm ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-[0.98]' : ''}`}
                      >
-                       <GripVertical className={`w-4 h-4 shrink-0 mt-0.5 ${themeColors.text.split(' ')[0]} opacity-50`} />
+                       <GripVertical className={`w-4 h-4 shrink-0 mt-0.5 text-indigo-300 dark:text-orange-500/50`} />
                        <div>
-                         <span className="block text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">{item.discNome}</span>
-                         <span className="block text-base font-bold text-slate-800 dark:text-slate-100 leading-tight mt-1">{item.assTitulo}</span>
+                         <span className="block text-[10px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest truncate">{item.discNome}</span>
+                         <span className="block text-sm font-bold text-slate-800 dark:text-white leading-tight mt-1">{item.assTitulo}</span>
                        </div>
                      </div>
                    )
                  })}
-                 <button onClick={() => setActiveTab('cronograma')} className={`mt-5 w-full ${themeColors.button.split(' ')[0]} font-bold text-sm py-2.5 rounded-xl transition-colors cursor-pointer text-white shadow-sm`}>Ir para Mesa de Foco</button>
+                 <button onClick={() => setActiveTab('cronograma')} className={`mt-6 w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-orange-500 dark:hover:bg-orange-600 font-bold text-sm py-3.5 rounded-xl transition-all cursor-pointer text-white shadow-md`}>Ir para Mesa de Foco</button>
               </div>
            ) : (
-             <div className={`text-sm ${themeColors.text.split(' ')[0]} p-8 border-2 border-dashed ${themeColors.border.split(' ')[0]} rounded-2xl flex items-center justify-center text-center`}>Nenhuma Sprint ativada hoje.</div>
+             <div className={`text-sm text-indigo-500 dark:text-orange-500/50 p-8 border-2 border-dashed border-indigo-200 dark:border-orange-500/20 rounded-2xl flex items-center justify-center text-center h-48 font-medium`}>Nenhuma Sprint ativada hoje.</div>
            )}
         </div>
 
-        <div className="w-full lg:w-1/3 bg-emerald-50 dark:bg-emerald-900/10 rounded-3xl p-5 border border-emerald-200/60 dark:border-emerald-900/30 min-h-[400px]">
-           <h3 className="font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-4 flex items-center gap-2 text-sm"><CheckCircle className="w-5 h-5"/> Vitórias</h3>
-           <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-emerald-200/60 dark:border-emerald-800 flex flex-col items-center justify-center h-40">
-             <Trophy className="w-10 h-10 text-emerald-500 mb-3" />
-             <span className="text-4xl font-black text-emerald-600 dark:text-emerald-400 leading-none">{sprintsCompleted}</span>
-             <span className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-2">Sprints Fechadas</span>
+        <div className="w-full lg:w-1/3 bg-emerald-50 dark:bg-emerald-500/5 rounded-[2rem] p-6 border border-emerald-200/60 dark:border-emerald-500/20 min-h-[400px]">
+           <h3 className="font-black text-emerald-700 dark:text-emerald-500 uppercase tracking-wider mb-6 flex items-center gap-2 text-sm"><CheckCircle className="w-5 h-5"/> Vitórias</h3>
+           <div className="bg-white dark:bg-[#0d1526] p-8 rounded-2xl shadow-sm border border-emerald-200/60 dark:border-white/5 flex flex-col items-center justify-center h-48">
+             <Trophy className="w-12 h-12 text-emerald-500 mb-3" />
+             <span className="text-5xl font-black text-emerald-600 dark:text-white leading-none mb-1">{sprintsCompleted}</span>
+             <span className="text-[10px] font-bold text-slate-500 dark:text-white/40 uppercase tracking-widest">Sprints Fechadas</span>
            </div>
         </div>
       </div>
@@ -1563,33 +1658,31 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
 
   return (
     <div className="space-y-6 animate-in fade-in text-left pb-10">
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-200/60 dark:border-slate-800 pb-5 gap-4">
-        <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white">Mesa de Foco</h2>
-          <p className="text-slate-500 mt-2 text-base">Ocultámos as distrações. Marque os passos. Bater a Sprint rende <strong className={`${themeColors.text.split(' ')[0]}`}>+50 XP</strong>.</p>
-        </div>
-        <div className="flex gap-3 items-center w-full md:w-auto">
-          <button disabled={sprintGroups.length === 0} onClick={handleCompleteSprint} className={`w-full md:w-auto px-8 py-3.5 rounded-2xl font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${showConfirm ? 'bg-amber-500 text-white' : 'bg-emerald-500 text-white disabled:opacity-50 shadow-md hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/20'}`}>
+      
+      <SectionHeader 
+        overline="Execução" 
+        title="Mesa de Foco" 
+        subtitle="Ocultámos as distrações. Marque os passos e ganhe +50 XP." 
+        icon={Target}
+        extra={
+          <button disabled={sprintGroups.length === 0} onClick={handleCompleteSprint} className={`w-full md:w-auto px-8 py-3.5 rounded-xl font-black flex items-center justify-center gap-2 transition-all cursor-pointer ${showConfirm ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30' : 'bg-emerald-500 text-white disabled:opacity-50 shadow-md hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/20'}`}>
             <CheckCircle className="w-5 h-5" /> {showConfirm ? 'Confirmar Fecho (+50 XP)' : 'Concluir Sprint'}
           </button>
-        </div>
-      </header>
+        }
+      />
 
       {/* WIDGET POMODORO */}
       <PomodoroWidget themeColors={themeColors} handleAutoLog={handleAutoLog} addXP={addXP} triggerConfetti={triggerConfetti} />
 
       {/* SPRINTS */}
       {sprintGroups.length === 0 ? (
-        <div className="bg-white dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-3xl p-12 flex flex-col items-center justify-center mt-8">
-          <ShoppingCart className="w-12 h-12 text-slate-300 dark:text-slate-600 mb-4" />
-          <h3 className="text-2xl font-bold text-slate-700 dark:text-slate-300 mb-2">Fila Vazia!</h3>
-          <p className="text-base text-slate-500 mb-6 text-center">Planeje a sua semana adicionando matérias.</p>
-          <div className="flex gap-3">
-            <button onClick={() => setActiveTab('disciplinas')} className="bg-slate-200 hover:bg-slate-300 text-slate-700 dark:bg-slate-800 dark:text-slate-300 px-6 py-3 rounded-xl text-base font-bold cursor-pointer transition-colors shadow-sm">
-              Ir para o Edital Verticalizado
-            </button>
-          </div>
-        </div>
+        <EmptyState 
+           icon={ShoppingCart}
+           title="Fila Vazia!"
+           message="Você completou as missões de hoje. Vá ao Planejamento adicionar novas metas."
+           actionLabel="Ir para Edital"
+           onAction={() => setActiveTab('disciplinas')}
+        />
       ) : (
         <div className="grid gap-6 mt-6">
           {sprintGroups.map((group, idx) => {
@@ -1597,15 +1690,15 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
             const isActive = idx === 0;
 
             return (
-              <div key={sprintNum} className={`bg-white dark:bg-slate-900 rounded-2xl overflow-hidden flex flex-col md:flex-row border border-slate-200/80 dark:border-slate-800 shadow-sm transition-all ${isActive ? `ring-2 ${themeColors.border.split(' ')[0].replace(/border-/g, 'ring-')} shadow-lg scale-[1.01]` : 'opacity-90'}`}>
+              <div key={sprintNum} className={`bg-white dark:bg-[#0d1526] rounded-[2rem] overflow-hidden flex flex-col md:flex-row border border-slate-200/80 dark:border-white/5 shadow-sm transition-all ${isActive ? `ring-2 ring-orange-500 shadow-lg shadow-orange-500/10 scale-[1.01]` : 'opacity-90'}`}>
                 
                 {/* Lado Laranja / Marcação da Sprint */}
-                <div className={`p-4 w-full md:w-20 shrink-0 flex flex-col items-center justify-center font-black border-b md:border-b-0 md:border-r border-slate-200/80 dark:border-slate-800 ${isActive ? `${themeColors.bg.split(' ')[0]} ${themeColors.solidText.split(' ')[0]}` : 'bg-slate-50 dark:bg-slate-800/40 text-slate-400'}`}>
-                  <span className="text-[10px] uppercase tracking-widest">Sprint</span><span className="text-4xl mt-1">{sprintNum}</span>
-                  {isActive && <span className="text-[10px] bg-white/20 px-2 py-1 rounded mt-2 font-bold tracking-wider text-white">HOJE</span>}
+                <div className={`p-6 w-full md:w-28 shrink-0 flex flex-col items-center justify-center font-black border-b md:border-b-0 md:border-r border-slate-200/80 dark:border-white/5 ${isActive ? `bg-orange-500 text-white` : 'bg-slate-50 dark:bg-[#111e36] text-slate-400 dark:text-white/40'}`}>
+                  <span className="text-[10px] uppercase tracking-widest">Sprint</span><span className="text-5xl mt-1">{sprintNum}</span>
+                  {isActive && <span className="text-[10px] bg-white/20 px-2.5 py-1 rounded-md mt-3 font-bold tracking-wider text-white">HOJE</span>}
                 </div>
                 
-                <div className="p-4 flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="p-6 flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
                   {group.map((item, localIdx) => {
                     const globalIdx = (idx * 2) + localIdx;
                     const isDragging = draggedIndex === globalIdx;
@@ -1622,35 +1715,35 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                         onDragEnter={(e) => handleDragEnter(e, globalIdx)}
                         onDragEnd={handleDragEnd}
                         onDragOver={(e) => e.preventDefault()}
-                        className={`rounded-xl p-5 flex flex-col relative transition-all duration-300 cursor-move ${isFlashing ? 'bg-emerald-100 dark:bg-emerald-900/40 border-emerald-400 ring-2 ring-emerald-400 scale-[1.02]' : isActive ? `bg-white dark:bg-slate-800 border-2 ${themeColors.border.split(' ')[0]} shadow-sm` : 'bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700'} ${isDragging ? 'opacity-40 border-dashed border-indigo-400 scale-95 z-10' : 'hover:shadow-md'}`}
+                        className={`rounded-2xl p-6 flex flex-col relative transition-all duration-300 cursor-move ${isFlashing ? 'bg-emerald-100 dark:bg-emerald-900/40 border-emerald-400 ring-2 ring-emerald-400 scale-[1.02]' : isActive ? `bg-white dark:bg-[#111e36] border border-slate-200 dark:border-white/10 shadow-sm` : 'bg-slate-50 dark:bg-[#111e36]/50 border border-slate-200 dark:border-white/5'} ${isDragging ? 'opacity-40 border-dashed border-orange-400 scale-95 z-10' : 'hover:shadow-md'}`}
                       >
-                        <div className="absolute top-4 right-10 text-slate-300 hover:text-slate-500 transition-colors" title="Arrastar e Soltar">
+                        <div className="absolute top-5 right-12 text-slate-300 dark:text-white/20 hover:text-slate-500 dark:hover:text-white transition-colors" title="Arrastar e Soltar">
                           <GripVertical className="w-5 h-5" />
                         </div>
-                        <button onClick={() => setCustomSprint(p => p.filter(i => i.assId !== item.assId))} className="absolute top-4 right-3 text-slate-300 hover:text-red-500 transition-colors cursor-pointer" title="Remover"><Trash2 className="w-5 h-5"/></button>
+                        <button onClick={() => setCustomSprint(p => p.filter(i => i.assId !== item.assId))} className="absolute top-5 right-4 text-slate-300 dark:text-white/20 hover:text-red-500 transition-colors cursor-pointer" title="Remover"><Trash2 className="w-5 h-5"/></button>
                         
-                        <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 pr-10">{item.discNome}</span>
-                        <p className="font-bold text-base text-slate-800 dark:text-slate-100 mb-4 pr-10 leading-tight">{item.assTitulo}</p>
+                        <span className="text-[10px] font-black uppercase tracking-widest text-slate-500 dark:text-orange-500 mb-2 pr-14">{item.discNome}</span>
+                        <p className="font-bold text-lg text-slate-800 dark:text-white mb-6 pr-10 leading-tight">{item.assTitulo}</p>
                         
                         {/* Checkboxes */}
-                        <div className="mt-auto space-y-2.5 pt-4 border-t border-slate-200/60 dark:border-slate-700/50">
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isEstudado ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100'}`}>
-                            <input type="checkbox" checked={isEstudado} onChange={() => toggleProgress(item.assId, 'estudado')} disabled={!isActive} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-slate-600" />
+                        <div className="mt-auto space-y-3 pt-5 border-t border-slate-100 dark:border-white/5">
+                          <label className={`flex items-center gap-3.5 cursor-pointer transition-colors ${isEstudado ? 'text-orange-500' : 'text-slate-500 dark:text-white/50 hover:text-slate-800 dark:hover:text-white'}`}>
+                            <input type="checkbox" checked={isEstudado} onChange={() => toggleProgress(item.assId, 'estudado')} disabled={!isActive} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-white/20 bg-transparent text-orange-500 focus:ring-orange-500" />
                             <span className="font-bold text-xs uppercase tracking-wide">1. Teoria</span>
                           </label>
 
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isQuestoes ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100'}`}>
-                            <input type="checkbox" checked={isQuestoes} onChange={() => toggleProgress(item.assId, 'questoes')} disabled={!isActive || !isEstudado} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-slate-600" />
+                          <label className={`flex items-center gap-3.5 cursor-pointer transition-colors ${isQuestoes ? 'text-orange-500' : 'text-slate-500 dark:text-white/50 hover:text-slate-800 dark:hover:text-white'}`}>
+                            <input type="checkbox" checked={isQuestoes} onChange={() => toggleProgress(item.assId, 'questoes')} disabled={!isActive || !isEstudado} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-white/20 bg-transparent text-orange-500 focus:ring-orange-500" />
                             <span className="font-bold text-xs uppercase tracking-wide">2. Questões</span>
                           </label>
 
-                          <label className={`flex items-center gap-3 cursor-pointer transition-colors ${isRevisado ? themeColors.text.split(' ')[0] : 'text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-slate-100'}`}>
-                            <input type="checkbox" checked={isRevisado} onChange={() => toggleProgress(item.assId, 'revisado')} disabled={!isActive || !isQuestoes} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-slate-600" />
+                          <label className={`flex items-center gap-3.5 cursor-pointer transition-colors ${isRevisado ? 'text-orange-500' : 'text-slate-500 dark:text-white/50 hover:text-slate-800 dark:hover:text-white'}`}>
+                            <input type="checkbox" checked={isRevisado} onChange={() => toggleProgress(item.assId, 'revisado')} disabled={!isActive || !isQuestoes} className="w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-white/20 bg-transparent text-orange-500 focus:ring-orange-500" />
                             <span className="font-bold text-xs uppercase tracking-wide">3. Revisão Auto</span>
                           </label>
                           
                           {item.linkTec && isActive && (
-                            <a href={item.linkTec} target="_blank" rel="noopener noreferrer" className={`mt-4 flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold rounded-lg ${themeColors.button.split(' ')[0]} text-white transition-all shadow-sm cursor-pointer hover:shadow-md`}>
+                            <a href={item.linkTec} target="_blank" rel="noopener noreferrer" className={`mt-5 flex items-center justify-center gap-2 w-full py-3 text-xs font-bold rounded-xl bg-orange-50 dark:bg-orange-500/10 text-orange-600 dark:text-orange-400 transition-all shadow-sm cursor-pointer hover:bg-orange-500 hover:text-white dark:hover:bg-orange-500 dark:hover:text-white`}>
                               <ExternalLink className="w-4 h-4" /> Resolver no TEC
                             </a>
                           )}
@@ -1660,9 +1753,9 @@ function TabCronograma({ customSprint, setCustomSprint, sprintsCompleted, setSpr
                   })}
                   {/* Placeholder */}
                   {group.length === 1 && (
-                    <div className="rounded-xl border-2 border-dashed border-slate-200/60 dark:border-slate-700 flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 opacity-60 p-4 min-h-[160px]">
-                      <Target className="w-6 h-6 mb-2" />
-                      <p className="text-xs font-bold uppercase tracking-wider">Espaço Vazio</p>
+                    <div className="rounded-2xl border-2 border-dashed border-slate-200/60 dark:border-white/5 flex flex-col items-center justify-center text-slate-400 dark:text-white/30 opacity-60 p-6 min-h-[200px]">
+                      <Target className="w-8 h-8 mb-3" />
+                      <p className="text-[10px] font-bold uppercase tracking-widest">Slot Livre</p>
                     </div>
                   )}
                 </div>
@@ -1709,52 +1802,53 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
 
   return (
     <div className="space-y-6 animate-in fade-in text-left pb-10">
-      <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4">
-        <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
-          <BrainCircuit className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Motor de Revisão
-        </h2>
-        <p className="text-slate-500 dark:text-slate-400 mt-2 text-base">Retenção ativa guiada por espaçamento ótimo. Faça um esforço mental para lembrar os conceitos e avalie os tópicos abaixo.</p>
-      </header>
+      
+      <SectionHeader 
+        overline="Retenção" 
+        title="Motor de Revisão" 
+        subtitle="Memória ativa guiada por espaçamento ótimo. Avalie os tópicos abaixo." 
+        icon={BrainCircuit}
+      />
 
-      <div className="grid md:grid-cols-2 gap-8 mt-6">
+      <div className="grid md:grid-cols-2 gap-8 mt-8">
         <div>
-          <h3 className="text-lg font-bold text-red-600 dark:text-red-400 flex items-center gap-2 mb-4 border-b border-red-100 dark:border-red-900/30 pb-3">
+          <h3 className="text-lg font-bold text-red-600 dark:text-red-400 flex items-center gap-2 mb-6 border-b border-red-100 dark:border-red-900/30 pb-3">
             <AlertTriangle className="w-5 h-5"/> Tópicos a Revisar (Hoje)
           </h3>
           <div className="space-y-4">
             {revisoesPendentes.length === 0 ? (
-              <div className="text-base font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200/60 dark:border-slate-800 flex flex-col items-center justify-center text-center h-48">
-                <CheckCircle className="w-12 h-12 text-emerald-400 mb-3 opacity-50"/>
-                <p>A sua memória está em dia!</p>
-                <p className="text-sm font-normal mt-1">Nenhum tópico pendente para hoje.</p>
-              </div>
+               <EmptyState 
+                  icon={CheckCircle}
+                  title="Memória em Dia!"
+                  message="Nenhum tópico pendente de revisão para hoje."
+               />
             ) : (
               revisoesPendentes.map((data) => {
                 const isFlashing = flashElementId === data.id;
                 return (
-                  <div key={data.id} className={`bg-white dark:bg-slate-900 border p-5 rounded-2xl shadow-sm flex flex-col gap-4 border-l-4 transition-all duration-300 ${isFlashing ? 'border-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 scale-[1.02]' : 'border-slate-200/60 dark:border-slate-700 border-l-red-500 hover:shadow-md'}`}>
+                  <div key={data.id} className={`bg-white dark:bg-[#111e36] border p-6 rounded-2xl shadow-sm flex flex-col gap-4 border-l-4 transition-all duration-300 ${isFlashing ? 'border-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 scale-[1.02]' : 'border-slate-200/60 dark:border-white/5 border-l-red-500 hover:shadow-md'}`}>
                     <div className="flex justify-between items-start">
                       <div className="pr-4">
-                        <span className="text-xs uppercase font-bold text-slate-400 tracking-wider block mb-1">{data.discNome}</span>
-                        <h4 className="font-bold text-slate-800 dark:text-slate-100 text-lg leading-tight">{data.titulo}</h4>
+                        <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-white/40 tracking-widest block mb-1.5">{data.discNome}</span>
+                        <h4 className="font-bold text-slate-800 dark:text-white text-lg leading-tight">{data.titulo}</h4>
                       </div>
                       {data.linkTec && (
-                        <a href={data.linkTec} target="_blank" rel="noreferrer" title="Abrir Caderno TEC" className={`p-2.5 rounded-xl ${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]} hover:scale-110 transition-transform cursor-pointer shrink-0 shadow-sm`}>
+                        <a href={data.linkTec} target="_blank" rel="noreferrer" title="Abrir Caderno TEC" className={`p-3 rounded-xl bg-slate-50 dark:bg-[#0d1526] text-orange-500 hover:scale-110 transition-transform cursor-pointer shrink-0 shadow-sm border border-slate-100 dark:border-white/5`}>
                           <ExternalLink className="w-5 h-5" />
                         </a>
                       )}
                     </div>
                     
                     {/* BOTÕES INLINE DE REVISÃO */}
-                    <div className="grid grid-cols-3 gap-3 mt-2 pt-4 border-t border-slate-100 dark:border-slate-800">
-                      <button onClick={() => handleReviewFeedback(data.id, 'dificil')} className="py-3 px-2 bg-red-50 hover:bg-red-500 text-red-600 hover:text-white dark:bg-red-900/10 dark:hover:bg-red-600 dark:text-red-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-red-100 dark:border-red-900/30">
-                        <span>Difícil</span><span className="text-[10px] font-bold opacity-70">Amanhã</span>
+                    <div className="grid grid-cols-3 gap-3 mt-3 pt-5 border-t border-slate-100 dark:border-white/5">
+                      <button onClick={() => handleReviewFeedback(data.id, 'dificil')} className="py-3 px-2 bg-red-50 hover:bg-red-500 text-red-600 hover:text-white dark:bg-red-500/10 dark:hover:bg-red-600 dark:text-red-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-red-100 dark:border-red-500/20">
+                        <span>Difícil</span><span className="text-[9px] font-bold opacity-70 tracking-widest">Amanhã</span>
                       </button>
-                      <button onClick={() => handleReviewFeedback(data.id, 'bom')} className="py-3 px-2 bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white dark:bg-amber-900/10 dark:hover:bg-amber-600 dark:text-amber-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-amber-100 dark:border-amber-900/30">
-                        <span>Bom</span><span className="text-[10px] font-bold opacity-70">7 Dias</span>
+                      <button onClick={() => handleReviewFeedback(data.id, 'bom')} className="py-3 px-2 bg-amber-50 hover:bg-amber-500 text-amber-600 hover:text-white dark:bg-amber-500/10 dark:hover:bg-amber-600 dark:text-amber-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-amber-100 dark:border-amber-500/20">
+                        <span>Bom</span><span className="text-[9px] font-bold opacity-70 tracking-widest">7 Dias</span>
                       </button>
-                      <button onClick={() => handleReviewFeedback(data.id, 'facil')} className="py-3 px-2 bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white dark:bg-emerald-900/10 dark:hover:bg-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-emerald-100 dark:border-emerald-900/30">
-                        <span>Fácil</span><span className="text-[10px] font-bold opacity-70">15 Dias</span>
+                      <button onClick={() => handleReviewFeedback(data.id, 'facil')} className="py-3 px-2 bg-emerald-50 hover:bg-emerald-500 text-emerald-600 hover:text-white dark:bg-emerald-500/10 dark:hover:bg-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-black uppercase tracking-wider transition-colors flex flex-col items-center gap-1 cursor-pointer border border-emerald-100 dark:border-emerald-500/20">
+                        <span>Fácil</span><span className="text-[9px] font-bold opacity-70 tracking-widest">15 Dias</span>
                       </button>
                     </div>
                   </div>
@@ -1765,14 +1859,16 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
         </div>
 
         <div>
-          <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2 mb-4 border-b border-emerald-100 dark:border-emerald-900/30 pb-3">
-            <Calendar className="w-5 h-5"/> Memória de Longo Prazo (Agendados)
+          <h3 className="text-lg font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-2 mb-6 border-b border-emerald-100 dark:border-emerald-900/30 pb-3">
+            <Calendar className="w-5 h-5"/> Agendados
           </h3>
           <div className="space-y-4">
             {revisoesConcluidas.length === 0 ? (
-              <div className="text-sm font-bold text-slate-400 dark:text-slate-500 p-8 rounded-2xl border-2 border-dashed border-slate-200/60 dark:border-slate-800 flex items-center justify-center text-center h-48">
-                Quando classificar as suas revisões, elas aparecerão aqui.
-              </div>
+               <EmptyState 
+                  icon={Clock}
+                  title="Sem Agendamentos"
+                  message="Quando classificar revisões, elas aparecerão aqui."
+               />
             ) : (
               revisoesConcluidas
                 .sort((a, b) => progress[a.id].nextReviewTimestamp - progress[b.id].nextReviewTimestamp)
@@ -1780,13 +1876,13 @@ function TabRevisaoInteligente({ progress, handleReviewFeedback, edital, activeS
                   const p = progress[data.id];
                   const isFlashing = flashElementId === data.id;
                   return (
-                    <div key={data.id} className={`bg-slate-50 dark:bg-slate-900 border p-4 rounded-xl flex justify-between items-center transition-all duration-300 ${isFlashing ? 'border-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 opacity-100 scale-[1.02]' : 'border-slate-200/60 dark:border-slate-800 opacity-80 hover:opacity-100'}`}>
+                    <div key={data.id} className={`bg-slate-50 dark:bg-[#111e36] border p-5 rounded-2xl flex justify-between items-center transition-all duration-300 ${isFlashing ? 'border-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 opacity-100 scale-[1.02]' : 'border-slate-200/60 dark:border-white/5 opacity-80 hover:opacity-100'}`}>
                       <div className="truncate pr-4">
-                        <span className="block text-[10px] uppercase font-bold text-slate-400 tracking-wider mb-1">{data.discNome}</span>
-                        <h4 className="font-bold text-slate-700 dark:text-slate-300 text-sm truncate">{data.titulo}</h4>
+                        <span className="block text-[10px] uppercase font-bold text-slate-400 dark:text-white/40 tracking-widest mb-1.5">{data.discNome}</span>
+                        <h4 className="font-bold text-slate-700 dark:text-white text-sm truncate">{data.titulo}</h4>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="block text-sm font-black text-emerald-500 dark:text-emerald-400">{getDaysUntil(p.nextReviewTimestamp)}</span>
+                        <span className="block text-sm font-black text-emerald-500 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1.5 rounded-lg">{getDaysUntil(p.nextReviewTimestamp)}</span>
                       </div>
                     </div>
                   );
@@ -1900,53 +1996,52 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
 
   return (
     <div className="space-y-8 animate-in fade-in text-left pb-10">
-      <header className="border-b border-slate-200/60 dark:border-slate-800 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
-        <div>
-          <h2 className="text-3xl font-extrabold text-slate-800 dark:text-white flex items-center gap-3">
-            <Settings className={`w-8 h-8 ${themeColors.text.split(' ')[0]}`} /> Painel de Controle
-          </h2>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Personalize o seu sistema, ajuste o algoritmo e faça backups.</p>
-        </div>
-        <div className="flex gap-3 w-full md:w-auto">
-          <button onClick={handleSave} className={`w-full md:w-auto ${themeColors.button.split(' ')[0]} text-white px-6 py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer`}>
+      
+      <SectionHeader 
+        overline="Sistema" 
+        title="Painel de Controle" 
+        subtitle="Personalize o seu sistema, ajuste o algoritmo e faça backups." 
+        icon={Settings}
+        extra={
+          <button onClick={handleSave} className={`w-full md:w-auto bg-orange-500 hover:bg-orange-600 text-white px-8 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20 transition-all cursor-pointer`}>
             <Save className="w-5 h-5"/> Salvar Alterações
           </button>
-        </div>
-      </header>
+        }
+      />
 
       {saveStatus && (
-        <div className="bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800 p-4 rounded-xl font-bold flex items-center gap-2 shadow-sm">
-          <CheckCircle className="w-5 h-5"/> {saveStatus}
+        <div className="bg-emerald-50 text-emerald-600 border border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20 p-5 rounded-2xl font-bold flex items-center gap-3 shadow-sm animate-in slide-in-from-top-4">
+          <CheckCircle className="w-6 h-6"/> {saveStatus}
         </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* BLOCO 1: PERSONALIZAÇÃO VISUAL E UX */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/60 dark:border-slate-800 shadow-sm">
-          <h3 className="text-lg font-black text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-            <LayoutGrid className={`w-5 h-5 ${themeColors.text.split(' ')[0]}`}/> Identidade & UX
+        <div className="bg-white dark:bg-[#111e36] p-8 rounded-[2rem] border border-slate-200/60 dark:border-white/5 shadow-sm">
+          <h3 className="text-lg font-black text-slate-800 dark:text-white mb-8 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4">
+            <ImageIcon className={`w-5 h-5 text-orange-500`}/> Identidade & UX
           </h3>
           
-          <div className="space-y-5">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Seu Nome / Apelido</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/40 block mb-2">Seu Nome / Apelido</label>
                 <input 
                   type="text" 
                   value={localConfig.userName || ''} 
                   onChange={e => setLocalConfig({...localConfig, userName: e.target.value})}
-                  className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-orange-500 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Som de Subida de Nível</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/40 block mb-2">Som de Subida de Nível</label>
                 <div className="flex gap-2">
                   <select 
                     value={localConfig.levelSound || 'chimes'} 
                     onChange={e => setLocalConfig({...localConfig, levelSound: e.target.value})}
-                    className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors cursor-pointer"
+                    className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-orange-500 transition-colors cursor-pointer"
                   >
                     <option value="mario">Moeda Super Mario (Nostalgia)</option>
                     <option value="chimes">Sinos Mágicos (Suave)</option>
@@ -1956,7 +2051,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
                   </select>
                   <button 
                     onClick={() => playLevelUpSound(localConfig.levelSound || 'chimes')}
-                    className={`p-3 ${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]} rounded-xl hover:scale-105 transition-all cursor-pointer`}
+                    className={`p-4 bg-slate-100 dark:bg-white/5 text-orange-500 rounded-xl hover:scale-105 transition-all cursor-pointer`}
                     title="Testar Som"
                   >
                     <Play size={20} className="fill-current" />
@@ -1965,23 +2060,23 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Nome do App / Sistema</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/40 block mb-2">Nome do App / Sistema</label>
                 <input 
                   type="text" 
                   value={localConfig.appName} 
                   onChange={e => setLocalConfig({...localConfig, appName: e.target.value})}
-                  className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors"
+                  className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-orange-500 transition-colors"
                 />
               </div>
 
               <div>
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Tema do Sistema (Cores)</label>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/40 block mb-2">Tema do Sistema (Cores)</label>
                 <select 
                   value={localConfig.appTheme || 'default'} 
                   onChange={e => setLocalConfig({...localConfig, appTheme: e.target.value})}
-                  className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors cursor-pointer font-bold"
+                  className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-orange-500 transition-colors cursor-pointer font-bold"
                 >
                   {Object.entries(THEMES).map(([key, theme]) => (
                     <option key={key} value={key}>{theme.name}</option>
@@ -1991,165 +2086,164 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
             </div>
             
             <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">URL da Logo (Imagem)</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/40 block mb-2">URL da Logo (Imagem)</label>
               <div className="flex gap-4 items-center">
-                <div className="w-12 h-12 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex items-center justify-center overflow-hidden shrink-0">
-                  <img src={localConfig.logoUrl} alt="Preview" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-cover" />
+                <div className="w-14 h-14 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] flex items-center justify-center overflow-hidden shrink-0 p-1">
+                  <img src={localConfig.logoUrl} alt="Preview" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain" />
                 </div>
                 <input 
                   type="text" 
                   placeholder="https://..."
                   value={localConfig.logoUrl} 
                   onChange={e => setLocalConfig({...localConfig, logoUrl: e.target.value})}
-                  className="flex-1 p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-indigo-500 transition-colors text-sm font-mono"
+                  className="flex-1 p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-orange-500 transition-colors text-sm font-mono"
                 />
               </div>
-              <p className="text-[10px] text-slate-400 mt-2">Dica: Use imagens transparentes (PNG) hospedadas em sites como Imgur.</p>
             </div>
           </div>
         </div>
 
         {/* BLOCO 2: CONFIGURAÇÕES DE ESTUDO */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/60 dark:border-slate-800 shadow-sm">
-          <h3 className="text-lg font-black text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div className="bg-white dark:bg-[#111e36] p-8 rounded-[2rem] border border-slate-200/60 dark:border-white/5 shadow-sm">
+          <h3 className="text-lg font-black text-slate-800 dark:text-white mb-8 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4">
             <Target className="w-5 h-5 text-blue-500"/> Configurações do Foco
           </h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Concurso Alvo</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/40 block mb-2">Concurso Alvo</label>
               <input 
                 type="text" 
                 value={localConfig.concurso} 
                 onChange={e => setLocalConfig({...localConfig, concurso: e.target.value})}
-                className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-colors"
+                className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-colors"
               />
             </div>
             
             <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Cargo</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/40 block mb-2">Cargo</label>
               <input 
                 type="text" 
                 value={localConfig.cargo} 
                 onChange={e => setLocalConfig({...localConfig, cargo: e.target.value})}
-                className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-colors"
+                className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-colors"
               />
             </div>
 
             <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Banca</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/40 block mb-2">Banca</label>
               <input 
                 type="text" 
                 value={localConfig.banca} 
                 onChange={e => setLocalConfig({...localConfig, banca: e.target.value})}
-                className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-colors"
+                className="w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-colors"
               />
             </div>
 
-            <div className="md:col-span-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-500 block mb-2">Meta Diária (Horas)</label>
+            <div className="md:col-span-2 pt-2 border-t border-slate-100 dark:border-white/5">
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/40 block mb-2">Meta Diária (Horas)</label>
               <input 
                 type="number" 
                 step="0.5"
                 value={localConfig.horasDia} 
                 onChange={e => setLocalConfig({...localConfig, horasDia: parseFloat(e.target.value)})}
-                className="w-full md:w-1/2 p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-colors font-black text-lg"
+                className="w-full md:w-1/2 p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none focus:border-blue-500 transition-colors font-black text-xl"
               />
             </div>
           </div>
         </div>
 
         {/* BLOCO 3: MOTOR DE RETENÇÃO (LEITNER) */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/60 dark:border-slate-800 shadow-sm">
-          <h3 className="text-lg font-black text-slate-800 dark:text-slate-200 mb-6 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
-            <Sliders className="w-5 h-5 text-emerald-500"/> Motor de Retenção (Leitner)
+        <div className="bg-white dark:bg-[#111e36] p-8 rounded-[2rem] border border-slate-200/60 dark:border-white/5 shadow-sm">
+          <h3 className="text-lg font-black text-slate-800 dark:text-white mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4">
+            <Sliders className="w-5 h-5 text-emerald-500"/> Retenção (Leitner)
           </h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Ajuste os intervalos em dias para a próxima revisão baseada na sua avaliação no Deck de Combate.</p>
+          <p className="text-sm text-slate-500 dark:text-white/50 mb-6 leading-relaxed">Ajuste os intervalos em dias para a próxima revisão baseada na sua avaliação no Motor de Revisão.</p>
           
-          <div className="grid grid-cols-2 gap-5">
+          <div className="grid grid-cols-2 gap-6">
             <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-amber-600 block mb-2">Se avaliar "BOM"</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-amber-600 block mb-2">Se avaliar "BOM"</label>
               <div className="flex items-center gap-2">
                 <input 
                   type="number" 
                   min="1"
                   value={localConfig.revBom} 
                   onChange={e => setLocalConfig({...localConfig, revBom: parseInt(e.target.value)})}
-                  className="w-full p-3 rounded-xl border border-amber-200 dark:border-amber-900/50 bg-amber-50 dark:bg-amber-900/10 text-amber-800 dark:text-amber-200 outline-none focus:border-amber-500 transition-colors font-black text-center text-lg"
+                  className="w-full p-4 rounded-xl border border-amber-200 dark:border-amber-500/20 bg-amber-50 dark:bg-amber-500/10 text-amber-800 dark:text-amber-400 outline-none focus:border-amber-500 transition-colors font-black text-center text-xl"
                 />
-                <span className="text-sm font-bold text-slate-400">Dias</span>
+                <span className="text-xs font-bold text-slate-400 dark:text-white/30 uppercase tracking-widest">Dias</span>
               </div>
             </div>
             
             <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-emerald-600 block mb-2">Se avaliar "FÁCIL"</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-emerald-600 block mb-2">Se avaliar "FÁCIL"</label>
               <div className="flex items-center gap-2">
                 <input 
                   type="number" 
                   min="2"
                   value={localConfig.revFacil} 
                   onChange={e => setLocalConfig({...localConfig, revFacil: parseInt(e.target.value)})}
-                  className="w-full p-3 rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-900/10 text-emerald-800 dark:text-emerald-200 outline-none focus:border-emerald-500 transition-colors font-black text-center text-lg"
+                  className="w-full p-4 rounded-xl border border-emerald-200 dark:border-emerald-500/20 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-800 dark:text-emerald-400 outline-none focus:border-emerald-500 transition-colors font-black text-center text-xl"
                 />
-                <span className="text-sm font-bold text-slate-400">Dias</span>
+                <span className="text-xs font-bold text-slate-400 dark:text-white/30 uppercase tracking-widest">Dias</span>
               </div>
             </div>
-            <p className="col-span-2 text-[10px] text-slate-400 mt-1">Nota: Avaliar "Difícil" sempre agenda a revisão para o dia seguinte.</p>
+            <p className="col-span-2 text-[10px] text-slate-400 dark:text-white/30 mt-2 bg-slate-50 dark:bg-white/5 p-3 rounded-lg border border-slate-100 dark:border-white/5">Nota: Avaliar "Difícil" sempre agenda a revisão para o dia seguinte.</p>
           </div>
         </div>
 
         {/* BLOCO 4: BACKUP DE DADOS */}
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200/60 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+        <div className="bg-white dark:bg-[#111e36] p-8 rounded-[2rem] border border-slate-200/60 dark:border-white/5 shadow-sm flex flex-col justify-between">
           <div>
-            <h3 className="text-lg font-black text-slate-800 dark:text-slate-200 mb-2 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+            <h3 className="text-lg font-black text-slate-800 dark:text-white mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4">
               <Download className="w-5 h-5 text-purple-500"/> Backup & Segurança
             </h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 mt-3">Exporte todo o seu progresso, arsenal de matérias e níveis de XP para um arquivo de segurança no seu dispositivo.</p>
+            <p className="text-sm text-slate-500 dark:text-white/50 mb-8 leading-relaxed">Exporte todo o seu progresso, arsenal de matérias e níveis de XP para um arquivo de segurança no seu dispositivo.</p>
           </div>
           
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4">
             <button 
               onClick={handleExportBackup}
-              className="w-full py-3.5 rounded-xl font-bold text-sm bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:hover:bg-purple-900/50 transition-colors flex items-center justify-center gap-2 border border-purple-200 dark:border-purple-800 cursor-pointer shadow-sm"
+              className="w-full py-4 rounded-xl font-bold text-sm bg-purple-50 text-purple-700 hover:bg-purple-100 dark:bg-purple-500/10 dark:text-purple-400 dark:hover:bg-purple-500/20 transition-colors flex items-center justify-center gap-2 border border-purple-200 dark:border-purple-500/20 cursor-pointer shadow-sm"
             >
-              <Download className="w-4 h-4"/> Exportar Meus Dados (.JSON)
+              <Download className="w-5 h-5"/> Exportar Meus Dados (.JSON)
             </button>
             
-            <label className={`w-full py-3.5 rounded-xl font-bold text-sm ${themeColors.lightBg.split(' ')[0]} ${themeColors.text.split(' ')[0]} hover:scale-[1.01] transition-all flex items-center justify-center gap-2 border ${themeColors.border.split(' ')[0]} cursor-pointer shadow-sm`}>
-              <Upload className="w-4 h-4"/> Restaurar Backup Antigo (.JSON)
+            <label className={`w-full py-4 rounded-xl font-bold text-sm bg-slate-50 dark:bg-[#0d1526] text-slate-700 dark:text-white/80 hover:bg-slate-100 dark:hover:bg-white/5 transition-all flex items-center justify-center gap-2 border border-slate-200 dark:border-white/10 cursor-pointer shadow-sm`}>
+              <Upload className="w-5 h-5 opacity-70"/> Restaurar Backup Antigo (.JSON)
               <input type="file" accept=".json" className="hidden" onChange={handleImportBackup} />
             </label>
           </div>
         </div>
 
         {/* BLOCO 5: ZONA DE PERIGO (DANGER ZONE) */}
-        <div className="lg:col-span-2 bg-red-50 dark:bg-red-900/10 p-6 rounded-2xl border border-red-200/60 dark:border-red-900/30 shadow-sm mt-2">
-          <h3 className="text-lg font-black text-red-700 dark:text-red-400 mb-6 flex items-center gap-2 border-b border-red-200 dark:border-red-900/30 pb-3">
+        <div className="lg:col-span-2 bg-red-50 dark:bg-red-500/5 p-8 rounded-[2rem] border border-red-200/60 dark:border-red-500/10 shadow-sm mt-4">
+          <h3 className="text-lg font-black text-red-700 dark:text-red-500 mb-8 flex items-center gap-2 border-b border-red-200 dark:border-red-500/20 pb-4">
             <ShieldAlert className="w-5 h-5"/> Zona de Risco (Gestão Crítica)
           </h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-red-100 dark:border-red-900/50 flex flex-col justify-between shadow-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-white dark:bg-[#111e36] p-6 rounded-2xl border border-red-100 dark:border-white/5 flex flex-col justify-between shadow-sm">
               <div>
-                <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Limpar Progresso</h4>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Zera todas as marcações de estudo, níveis, XP e revisões. O seu Edital Verticalizado será <strong className="text-slate-700 dark:text-slate-300">mantido</strong>.</p>
+                <h4 className="font-bold text-slate-800 dark:text-white mb-2">Limpar Progresso</h4>
+                <p className="text-sm text-slate-500 dark:text-white/40 mb-8 leading-relaxed">Zera todas as marcações de estudo, níveis, XP e revisões. O seu Edital Verticalizado será <strong className="text-slate-700 dark:text-white">mantido</strong>.</p>
               </div>
               <button 
                 onClick={handleResetProgress}
-                className={`w-full py-3 rounded-lg font-bold text-sm transition-all cursor-pointer shadow-sm ${confirmResetProgress ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' : 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50'}`}
+                className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all cursor-pointer shadow-sm ${confirmResetProgress ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' : 'bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20 border border-transparent dark:border-red-500/20'}`}
               >
                 {confirmResetProgress ? 'Tem certeza? Clique para Limpar' : 'Zerar Progresso e Gamificação'}
               </button>
             </div>
 
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-xl border border-red-100 dark:border-red-900/50 flex flex-col justify-between shadow-sm">
+            <div className="bg-white dark:bg-[#111e36] p-6 rounded-2xl border border-red-100 dark:border-white/5 flex flex-col justify-between shadow-sm">
               <div>
-                <h4 className="font-bold text-slate-800 dark:text-slate-200 mb-2">Restaurar Padrão de Fábrica</h4>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">Aviso: Isto apaga <strong className="text-red-500">TUDO</strong>. O progresso e qualquer matéria que tenha adicionado serão destruídos.</p>
+                <h4 className="font-bold text-slate-800 dark:text-white mb-2">Restaurar Padrão de Fábrica</h4>
+                <p className="text-sm text-slate-500 dark:text-white/40 mb-8 leading-relaxed">Aviso: Isto apaga <strong className="text-red-500">TUDO</strong>. O progresso e qualquer matéria que tenha adicionado serão destruídos.</p>
               </div>
               <button 
                 onClick={handleFactoryReset}
-                className={`w-full py-3 rounded-lg font-bold text-sm transition-all cursor-pointer shadow-sm ${confirmFactoryReset ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' : 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50'}`}
+                className={`w-full py-3.5 rounded-xl font-bold text-sm transition-all cursor-pointer shadow-sm ${confirmFactoryReset ? 'bg-red-600 text-white shadow-lg shadow-red-500/30' : 'bg-red-50 text-red-700 hover:bg-red-100 dark:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-500/20 border border-transparent dark:border-red-500/20'}`}
               >
                 {confirmFactoryReset ? 'APAGAR TUDO DEFINITIVAMENTE' : 'Restaurar Sistema a Zero'}
               </button>
@@ -2294,7 +2388,6 @@ export default function App() {
 
   const triggerConfetti = () => setConfettiFire(f => f + 1);
   
-  // UX 4: Reforço Visual Dopamina (Flash Green)
   const triggerVisualFlash = (id) => {
     setFlashElementId(id);
     setTimeout(() => setFlashElementId(null), 800);
@@ -2344,7 +2437,6 @@ export default function App() {
   const handleReviewFeedback = (assId, feedbackType) => {
     setReviewStats(prev => ({ ...prev, [feedbackType]: (prev[feedbackType] || 0) + 1 }));
     
-    // UX 3: Salva no Histórico Diário de Evolução
     const today = new Date().toLocaleDateString();
     setDailyReviewStats(prev => {
       const current = prev[today] || { facil: 0, bom: 0, dificil: 0 };
@@ -2394,7 +2486,6 @@ export default function App() {
   }, 0);
   const progressPerc = totalCheckboxes === 0 ? 0 : Math.round((completedCheckboxes / totalCheckboxes) * 100);
 
-  // UX 1: Renomeação SaaS das Abas
   const navPhases = [
     { phase: 'Cockpit', items: [
       { id: 'dashboard', icon: Activity, label: 'Centro de Comando' }
@@ -2404,7 +2495,7 @@ export default function App() {
       { id: 'planner', icon: LayoutGrid, label: 'Backlog de Sprints' }
     ]},
     { phase: 'Execução', id: 'acao', items: [
-      { id: 'cronograma', icon: Calendar, label: 'Mesa de Foco' }, 
+      { id: 'cronograma', icon: Target, label: 'Mesa de Foco' }, 
       { id: 'revisoes', icon: BrainCircuit, label: 'Motor de Revisão', badge: pendingReviewsCount }
     ]},
     { phase: 'Sistema', id: 'sistema', items: [
@@ -2414,9 +2505,9 @@ export default function App() {
 
   if (!isCloudReady) {
     return (
-      <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center text-white">
-        <div className="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <h2 className="text-xl font-bold animate-pulse">Sincronizando com a Nuvem...</h2>
+      <div className="min-h-screen bg-[#0d1526] flex flex-col items-center justify-center text-white">
+        <div className="w-16 h-16 border-4 border-orange-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <h2 className="text-xl font-bold animate-pulse text-white/50 tracking-widest uppercase text-[10px]">A sincronizar com a Base de Dados...</h2>
       </div>
     );
   }
@@ -2429,104 +2520,105 @@ export default function App() {
     { id: 'dashboard', icon: Activity, label: 'Painel' },
     { id: 'disciplinas', icon: Folder, label: 'Edital' },
     { id: 'planner', icon: LayoutGrid, label: 'Backlog' },
-    { id: 'cronograma', icon: Calendar, label: 'Foco', badge: customSprint.length > 0 ? customSprint.length : 0 },
+    { id: 'cronograma', icon: Target, label: 'Foco', badge: customSprint.length > 0 ? customSprint.length : 0 },
     { id: 'revisoes', icon: BrainCircuit, label: 'Revisões', badge: pendingReviewsCount }
   ];
 
   return (
     <div className={isDarkMode ? 'dark' : ''}>
-      <div className="min-h-screen bg-slate-200 dark:bg-slate-950 text-slate-800 dark:text-slate-200 flex flex-col md:flex-row font-sans transition-colors duration-300 relative">
+      <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-200 flex flex-col md:flex-row font-sans transition-colors duration-300 relative">
         <ConfettiOverlay fire={confettiFire} />
         <LevelUpModal data={levelUpData} onClose={() => setLevelUpData(null)} />
         {showLevelMap && <LevelMapModal currentXp={gamification.xp} onClose={() => setShowLevelMap(false)} />}
 
         {/* MOBILE TOP HEADER */}
-        <div className={`md:hidden flex items-center justify-between p-4 ${themeColors.headerBg} shadow-md border-b ${themeColors.border} z-20 sticky top-0 transition-colors duration-500`}>
+        <div className={`md:hidden flex items-center justify-between p-4 bg-white dark:bg-[#0d1526] shadow-md border-b border-slate-200 dark:border-white/5 z-20 sticky top-0 transition-colors duration-500`}>
           <div className="flex items-center gap-3 min-w-0 pr-2">
-            <div className={`w-11 h-11 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
-              <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1" />
+            <div className={`w-10 h-10 bg-white rounded-xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 dark:border-white/10 shadow-sm p-1`}>
+              <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col min-w-0">
-              <span className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[150px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
-              <h2 className={`font-extrabold text-base leading-tight tracking-tight truncate max-w-[150px] ${themeColors.headerText}`}>{projectConfig.appName}</h2>
+              <span className={`text-[9px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-widest truncate max-w-[150px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
+              <h2 className={`font-black text-sm leading-tight tracking-tight truncate max-w-[150px] text-slate-800 dark:text-white`}>{projectConfig.appName}</h2>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm`}>
-              {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 bg-slate-50 dark:bg-[#111e36] hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/60 dark:border-white/5 rounded-full transition-colors cursor-pointer shadow-sm`}>
+              {isDarkMode ? <Sun className="w-4 h-4 text-orange-500" /> : <Moon className={`w-4 h-4 text-slate-600`} />}
             </button>
           </div>
         </div>
 
-        {/* SIDEBAR DESKTOP - FIXA COMO SOLICITADO NO ROLLBACK */}
-        <aside className={`hidden md:flex w-72 bg-white dark:bg-slate-900 shadow-xl flex-col z-10 shrink-0 border-r border-slate-300 dark:border-slate-800 sticky top-0 h-screen overflow-hidden`}>
-          <div className={`p-6 ${themeColors.headerBg} border-b ${themeColors.border} relative transition-colors duration-500 shrink-0`}>
+        {/* SIDEBAR DESKTOP */}
+        <aside className={`hidden md:flex w-[280px] bg-white dark:bg-[#0d1526] shadow-xl flex-col z-10 shrink-0 border-r border-slate-200/80 dark:border-white/5 sticky top-0 h-screen overflow-hidden transition-colors duration-300`}>
+          <div className={`p-6 bg-slate-50/50 dark:bg-transparent border-b border-slate-200/80 dark:border-white/5 relative transition-colors duration-500 shrink-0`}>
             
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`absolute top-6 right-6 p-2.5 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-slate-400 z-10`}>
-              {isDarkMode ? <Sun className="w-4 h-4 text-amber-500" /> : <Moon className={`w-4 h-4 ${themeColors.text.split(' ')[0]}`} />}
+            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`absolute top-6 right-6 p-2 bg-white dark:bg-[#111e36] hover:bg-slate-50 dark:hover:bg-white/5 border border-slate-200/60 dark:border-white/5 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-white/40 z-10`}>
+              {isDarkMode ? <Sun className="w-4 h-4 text-orange-500" /> : <Moon className={`w-4 h-4 text-slate-600`} />}
             </button>
 
-            <div className="flex items-center gap-3 min-w-0 mb-6 pr-10 mt-1">
-              <div className={`w-12 h-12 bg-white rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 shadow-sm`}>
-                <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain p-1.5" />
+            <div className="flex items-center gap-4 min-w-0 mb-8 pr-10 mt-1">
+              <div className={`w-12 h-12 bg-white dark:bg-white/5 rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 dark:border-white/10 shadow-sm p-1.5`}>
+                <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain" />
               </div>
               <div className="flex flex-col min-w-0">
-                <span className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest truncate max-w-[120px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
-                <h2 className={`font-extrabold text-xl tracking-tight truncate ${themeColors.headerText}`} title={projectConfig.appName}>{projectConfig.appName}</h2>
+                <span className={`text-[9px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-widest truncate max-w-[120px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
+                <h2 className={`font-black text-lg tracking-tight truncate text-slate-800 dark:text-white`} title={projectConfig.appName}>{projectConfig.appName}</h2>
               </div>
             </div>
             
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4">
               <div>
-                <p className={`text-[10px] ${themeColors.headerSubtext} font-bold uppercase tracking-widest leading-tight mb-1.5 truncate`}>{projectConfig.concurso}</p>
-                <h3 className={`text-xl font-black leading-tight truncate mb-2 ${themeColors.headerText}`}>{projectConfig.cargo}</h3>
+                <p className={`text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-widest leading-tight mb-1 truncate`}>{projectConfig.concurso}</p>
+                <h3 className={`text-lg font-black leading-tight truncate mb-3 text-slate-800 dark:text-white`}>{projectConfig.cargo}</h3>
                 
-                <div className="flex flex-col xl:flex-row gap-2 w-full mb-1">
-                  <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm truncate`} title={projectConfig.banca}>
+                <div className="flex flex-col xl:flex-row gap-2 w-full mb-2">
+                  <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-[#111e36] px-2.5 py-1.5 rounded-lg text-[9px] uppercase tracking-widest font-bold text-slate-600 dark:text-white/60 border border-slate-200 dark:border-white/5 shadow-sm truncate`} title={projectConfig.banca}>
                     {projectConfig.banca}
                   </span>
-                  <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-slate-800/80 px-2.5 py-1.5 rounded-xl text-[10px] font-bold ${themeColors.text.split(' ')[0]} border border-slate-300 dark:border-slate-700 shadow-sm`}>
-                    <Target size={12} /> {projectConfig.horasDia}h/dia
+                  <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-[#111e36] px-2.5 py-1.5 rounded-lg text-[9px] uppercase tracking-widest font-bold text-slate-600 dark:text-white/60 border border-slate-200 dark:border-white/5 shadow-sm`}>
+                    <Target size={12} className="text-orange-500" /> {projectConfig.horasDia}h
                   </span>
                 </div>
               </div>
 
-              <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-slate-800/60 border border-slate-300 dark:border-slate-700 p-4 transition-all hover:shadow-md cursor-pointer shadow-sm`}>
+              <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-[#111e36] border border-slate-200 dark:border-white/5 p-4 transition-all hover:shadow-md cursor-pointer shadow-sm`}>
                 <div className="flex justify-between items-center mb-3">
                   <div className="flex items-center gap-3">
-                    <Award size={22} className="text-amber-500 dark:text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.4)] group-hover:scale-110 transition-transform duration-300" />
+                    <Award size={24} className="text-orange-500 drop-shadow-[0_0_8px_rgba(249,115,22,0.4)] group-hover:scale-110 transition-transform duration-300" />
                     <div className="flex flex-col">
                       <span className="text-sm font-black text-slate-800 dark:text-white leading-none">Lvl {userLevel.nivel}</span>
-                      <span className="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1 truncate max-w-[90px]">{userLevel.titulo}</span>
+                      <span className="text-[9px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-widest mt-1 truncate max-w-[90px]">{userLevel.titulo}</span>
                     </div>
                   </div>
                   <div className="flex flex-col items-end">
-                    <div className="flex items-center gap-1 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-500/10 px-2 py-1 rounded-md flex-shrink-0 border border-orange-200 dark:border-orange-500/20">
+                    <div className="flex items-center gap-1 text-orange-500 bg-orange-50 dark:bg-orange-500/10 px-2 py-1 rounded border border-orange-200 dark:border-orange-500/20 flex-shrink-0">
                       <Flame size={12} className="fill-current animate-pulse" />
-                      <span className="text-[11px] font-black">{gamification.streak}</span>
+                      <span className="text-[10px] font-black">{gamification.streak}</span>
                     </div>
                   </div>
                 </div>
-                <div className="relative w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-2">
-                  <div className="absolute left-0 top-0 h-full bg-gradient-to-r from-amber-500 to-yellow-400 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
+                <div className="relative w-full h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden mt-2">
+                  <div className="absolute left-0 top-0 h-full bg-orange-500 transition-all duration-1000 ease-out" style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <nav className="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar flex flex-col bg-slate-50/50 dark:bg-slate-900">
+          <nav className="flex-1 p-5 space-y-2 overflow-y-auto custom-scrollbar flex flex-col bg-transparent">
             {navPhases.map((phaseGroup, pIdx) => (
-              <div key={pIdx} className={pIdx > 0 ? "pt-4" : ""}>
-                <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-4 text-left">{phaseGroup.phase}</h3>
-                <div className="space-y-1">
+              <div key={pIdx} className={pIdx > 0 ? "pt-5" : ""}>
+                <h3 className="text-[9px] font-black text-slate-400 dark:text-white/30 uppercase tracking-widest mb-3 px-3 text-left">{phaseGroup.phase}</h3>
+                <div className="space-y-1.5">
                   {phaseGroup.items.map((item) => {
                     const IconComponent = item.icon;
+                    const isActive = activeTab === item.id;
                     return (
-                      <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-4 py-3.5 rounded-xl text-left transition-all font-medium cursor-pointer ${activeTab === item.id ? themeColors.activeTab + ' shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'}`}>
-                        <IconComponent className={`w-5 h-5 ${activeTab === item.id ? 'opacity-100' : 'opacity-70'}`} />
+                      <button key={item.id} onClick={() => setActiveTab(item.id)} className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-left transition-all font-bold text-sm cursor-pointer ${isActive ? 'bg-orange-50 text-orange-600 dark:bg-orange-500/10 dark:text-orange-400 border border-orange-200/50 dark:border-orange-500/20 shadow-sm' : 'text-slate-600 dark:text-white/60 hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent'}`}>
+                        <IconComponent className={`w-5 h-5 ${isActive ? 'text-orange-500' : 'opacity-50'}`} />
                         <span className="flex-1 text-left">{item.label}</span>
-                        {item.id === 'cronograma' && customSprint.length > 0 && <span className="bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{customSprint.length}</span>}
-                        {item.badge > 0 && <span className="bg-red-500 animate-pulse text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">{item.badge}</span>}
+                        {item.id === 'cronograma' && customSprint.length > 0 && <span className="bg-emerald-500 dark:bg-emerald-500/20 dark:text-emerald-400 dark:border dark:border-emerald-500/30 text-white text-[10px] font-black px-2 py-0.5 rounded-full">{customSprint.length}</span>}
+                        {item.badge > 0 && <span className="bg-red-500 dark:bg-red-500/20 dark:text-red-400 dark:border dark:border-red-500/30 animate-pulse text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">{item.badge}</span>}
                       </button>
                     );
                   })}
@@ -2536,16 +2628,16 @@ export default function App() {
           </nav>
 
           {user && (
-            <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 mt-auto shrink-0">
-              <button onClick={() => { if(window.confirm('Tem certeza que deseja sair do sistema?')) { auth && signOut(auth); } }} className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors font-bold text-sm cursor-pointer">
+            <div className="p-5 border-t border-slate-200/80 dark:border-white/5 bg-transparent mt-auto shrink-0">
+              <button onClick={() => { if(window.confirm('Tem certeza que deseja sair do sistema?')) { auth && signOut(auth); } }} className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-xl text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 dark:hover:border-red-500/20 border border-transparent transition-all font-bold text-sm cursor-pointer">
                 <LogOut className="w-4 h-4" /> Sair do Sistema
               </button>
             </div>
           )}
         </aside>
 
-        {/* CONTENT AREA EXPANDIDA (MAX WIDTH 1600px PARA COCKPIT REAL) */}
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto pb-28 md:pb-8 text-left transition-all duration-300 relative">
+        {/* CONTENT AREA EXPANDIDA */}
+        <main className="flex-1 p-4 md:p-8 lg:p-10 overflow-y-auto pb-28 md:pb-10 text-left transition-all duration-300 relative">
           <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full transition-all duration-500 h-full flex flex-col">
             {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} dailyReviewStats={dailyReviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} />}
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} setUserProgress={setUserProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} setActiveTab={setActiveTab} addXP={addXP} triggerVisualFlash={triggerVisualFlash} flashElementId={flashElementId} />}
@@ -2557,7 +2649,7 @@ export default function App() {
         </main>
 
         {/* MOBILE BOTTOM NAVIGATION BAR */}
-        <nav className="md:hidden fixed bottom-0 left-0 w-full bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex justify-between items-end px-2 py-2 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-50">
+        <nav className="md:hidden fixed bottom-0 left-0 w-full bg-white dark:bg-[#0d1526] border-t border-slate-200 dark:border-white/5 flex justify-between items-end px-2 py-2 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-50">
           {mobileNavItems.map(item => {
             const IconComponent = item.icon;
             const isActive = activeTab === item.id;
@@ -2565,16 +2657,16 @@ export default function App() {
               <button 
                 key={item.id} 
                 onClick={() => setActiveTab(item.id)}
-                className={`flex flex-col items-center justify-center w-full py-1 gap-1 relative transition-colors ${isActive ? themeColors.text.split(' ')[0] : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'}`}
+                className={`flex flex-col items-center justify-center w-full py-1.5 gap-1 relative transition-colors ${isActive ? 'text-orange-500' : 'text-slate-400 dark:text-white/40 hover:text-slate-600 dark:hover:text-white/70'}`}
               >
-                <div className={`p-1.5 rounded-xl transition-all duration-300 ${isActive ? `${themeColors.lightBg.split(' ')[0]} scale-110` : ''}`}>
+                <div className={`p-1.5 rounded-xl transition-all duration-300 ${isActive ? `bg-orange-50 dark:bg-orange-500/10 scale-110` : ''}`}>
                   <IconComponent className={`w-6 h-6 ${isActive ? 'opacity-100' : 'opacity-70'}`} />
                 </div>
                 <span className={`text-[9px] font-bold tracking-tight transition-all duration-300 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 h-0 overflow-hidden translate-y-2'}`}>
                   {item.label}
                 </span>
                 {item.badge > 0 && (
-                  <span className="absolute top-0 right-1/4 translate-x-1/2 -translate-y-1/4 bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full border-2 border-white dark:border-slate-900 shadow-sm">
+                  <span className="absolute top-0 right-1/4 translate-x-1/2 -translate-y-1/4 bg-red-500 dark:bg-red-500 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full border-2 border-white dark:border-[#0d1526] shadow-sm">
                     {item.badge > 9 ? '9+' : item.badge}
                   </span>
                 )}
