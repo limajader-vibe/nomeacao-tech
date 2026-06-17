@@ -5,7 +5,7 @@ import {
   RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Pencil, Settings,
   Edit, AlertTriangle, ChevronUp, Flame, Trophy, TrendingUp, Activity, Award, ListPlus, ArrowRight, ArrowLeft, BarChart2,
   CalendarDays, LayoutGrid, BrainCircuit, ShieldAlert, Download, Sliders, Lock, LogOut,
-  Filter, Play, Pause, Coffee, PartyPopper, X, Menu, Minus, Upload, Image as ImageIcon
+  Filter, Play, Pause, Coffee, PartyPopper, X, Menu, Minus, Upload, Palette
 } from 'lucide-react';
 
 // --- FIREBASE CLOUD STORAGE SETUP ---
@@ -63,10 +63,21 @@ const initialConfig = {
   revFacil: 15
 };
 
-// MOTOR DE TEMAS: 100% Compatível com Cyberpunk/Dark Mode
+// MOTOR DE TEMAS: Retrocompatível e 100% Cyberpunk/Dark Mode
 export const THEMES = {
   default: {
     name: 'Azul Foco (Padrão)',
+    sidebar: 'from-blue-700 to-indigo-900 dark:bg-[#0d1526]',
+    button: 'bg-indigo-600 hover:bg-indigo-700 text-white',
+    activeTab: 'bg-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 text-white',
+    icon: 'text-indigo-500 dark:text-indigo-500',
+    bg: 'bg-indigo-500 dark:bg-indigo-500',
+    lightBg: 'bg-indigo-50 dark:bg-indigo-500/10',
+    headerBg: 'bg-indigo-100/60 dark:bg-[#0d1526]', 
+    border: 'border-indigo-200/60 dark:border-white/5',
+    text: 'text-indigo-600 dark:text-indigo-400',
+    solidText: 'text-white',
+    
     primaryText: 'text-indigo-600 dark:text-indigo-400',
     brightText: 'text-indigo-500 dark:text-indigo-500',
     bgSolid: 'bg-indigo-500',
@@ -79,10 +90,22 @@ export const THEMES = {
     shadow: 'shadow-indigo-500/20',
     shadowHover: 'hover:shadow-indigo-500/30',
     glow: 'drop-shadow-[0_0_8px_rgba(99,102,241,0.6)]',
-    iconGlow: 'shadow-[0_0_30px_rgba(99,102,241,0.15)]'
+    iconGlow: 'shadow-[0_0_30px_rgba(99,102,241,0.15)]',
+    confetti: ['#6366f1', '#8b5cf6', '#3b82f6', '#10b981']
   },
   esmeralda: {
     name: 'Esmeralda (Aprovação)',
+    sidebar: 'from-emerald-700 to-teal-900 dark:bg-[#0d1526]',
+    button: 'bg-emerald-600 hover:bg-emerald-700 text-white',
+    activeTab: 'bg-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 text-white',
+    icon: 'text-emerald-500 dark:text-emerald-500',
+    bg: 'bg-emerald-500 dark:bg-emerald-500',
+    lightBg: 'bg-emerald-50 dark:bg-emerald-500/10',
+    headerBg: 'bg-emerald-100/60 dark:bg-[#0d1526]', 
+    border: 'border-emerald-200/60 dark:border-white/5',
+    text: 'text-emerald-600 dark:text-emerald-400',
+    solidText: 'text-white',
+    
     primaryText: 'text-emerald-600 dark:text-emerald-400',
     brightText: 'text-emerald-500 dark:text-emerald-500',
     bgSolid: 'bg-emerald-500',
@@ -95,10 +118,22 @@ export const THEMES = {
     shadow: 'shadow-emerald-500/20',
     shadowHover: 'hover:shadow-emerald-500/30',
     glow: 'drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]',
-    iconGlow: 'shadow-[0_0_30px_rgba(16,185,129,0.15)]'
+    iconGlow: 'shadow-[0_0_30px_rgba(16,185,129,0.15)]',
+    confetti: ['#10b981', '#34d399', '#059669', '#3b82f6']
   },
   caveira: {
     name: 'Caveira (Laranja Tático)',
+    sidebar: 'from-slate-900 to-black dark:bg-[#0d1526]',
+    button: 'bg-orange-500 hover:bg-orange-600 text-slate-900 font-bold',
+    activeTab: 'bg-orange-500 dark:bg-orange-500/10 dark:text-orange-400 text-slate-900 font-black',
+    icon: 'text-orange-500 dark:text-orange-500',
+    bg: 'bg-orange-500 dark:bg-orange-500',
+    lightBg: 'bg-orange-50 dark:bg-orange-500/10',
+    headerBg: 'bg-orange-100/60 dark:bg-[#0d1526]', 
+    border: 'border-orange-200/60 dark:border-white/5',
+    text: 'text-orange-600 dark:text-orange-400',
+    solidText: 'text-slate-900 font-black',
+
     primaryText: 'text-orange-600 dark:text-orange-400',
     brightText: 'text-orange-500 dark:text-orange-500',
     bgSolid: 'bg-orange-500',
@@ -111,10 +146,22 @@ export const THEMES = {
     shadow: 'shadow-orange-500/20',
     shadowHover: 'hover:shadow-orange-500/30',
     glow: 'drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]',
-    iconGlow: 'shadow-[0_0_30px_rgba(249,115,22,0.15)]'
+    iconGlow: 'shadow-[0_0_30px_rgba(249,115,22,0.15)]',
+    confetti: ['#f97316', '#f59e0b', '#ef4444', '#eab308']
   },
   retaFinal: {
     name: 'Reta Final (Vermelho Alerta)',
+    sidebar: 'from-red-700 to-rose-900 dark:bg-[#0d1526]',
+    button: 'bg-rose-600 hover:bg-rose-700 text-white',
+    activeTab: 'bg-rose-600 dark:bg-rose-500/10 dark:text-rose-400 text-white',
+    icon: 'text-rose-500 dark:text-rose-500',
+    bg: 'bg-rose-500 dark:bg-rose-500',
+    lightBg: 'bg-rose-50 dark:bg-rose-500/10',
+    headerBg: 'bg-rose-100/60 dark:bg-[#0d1526]', 
+    border: 'border-rose-200/60 dark:border-white/5',
+    text: 'text-rose-600 dark:text-rose-400',
+    solidText: 'text-white',
+
     primaryText: 'text-rose-600 dark:text-rose-400',
     brightText: 'text-rose-500 dark:text-rose-500',
     bgSolid: 'bg-rose-500',
@@ -127,7 +174,8 @@ export const THEMES = {
     shadow: 'shadow-rose-500/20',
     shadowHover: 'hover:shadow-rose-500/30',
     glow: 'drop-shadow-[0_0_8px_rgba(244,63,94,0.6)]',
-    iconGlow: 'shadow-[0_0_30px_rgba(244,63,94,0.15)]'
+    iconGlow: 'shadow-[0_0_30px_rgba(244,63,94,0.15)]',
+    confetti: ['#f43f5e', '#e11d48', '#be123c', '#fb7185']
   }
 };
 
@@ -754,7 +802,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
               return (
                 <div key={i} className="flex flex-col items-center flex-1 group">
                   <div className="w-full h-40 flex items-end justify-center relative">
-                    <div className={`w-full max-w-[24px] rounded-t-lg transition-all duration-700 ease-out hover:opacity-80 ${isToday ? 'bg-sky-500' : 'bg-slate-100 dark:bg-[#0d1526] border dark:border-white/5'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '8px' : '0' }}>
+                    <div className={`w-full max-w-[24px] rounded-t-lg transition-all duration-700 ease-out hover:opacity-80 ${isToday ? 'bg-sky-500' : 'bg-slate-100 dark:bg-white/5'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '8px' : '0' }}>
                       <span className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 dark:bg-white dark:text-slate-900 text-white text-[10px] font-black px-2 py-1 rounded pointer-events-none transition-opacity z-10 shadow-sm">{hours > 0 ? `${hours}h` : '0h'}</span>
                     </div>
                   </div>
@@ -839,7 +887,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 items-stretch">
-        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] shadow-sm border border-slate-200/60 dark:border-white/5 p-8 flex flex-col">
+        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-8 border border-slate-200/60 dark:border-white/5 shadow-sm flex flex-col h-full min-h-[300px]">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-3">
             <div>
               <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><CalendarDays className="w-5 h-5 text-emerald-500"/> Mapa de Constância</h3>
@@ -2138,7 +2186,7 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
         {/* BLOCO 1: PERSONALIZAÇÃO VISUAL E UX */}
         <div className="bg-white dark:bg-[#111e36] p-8 rounded-[2rem] border border-slate-200/60 dark:border-white/5 shadow-sm">
           <h3 className="text-lg font-black text-slate-800 dark:text-white mb-8 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4">
-            <ImageIcon className={`w-5 h-5 ${themeColors.brightText}`}/> Identidade & UX
+            <Palette className={`w-5 h-5 ${themeColors.brightText}`}/> Identidade & UX
           </h3>
           
           <div className="space-y-6">
@@ -2530,7 +2578,7 @@ export default function App() {
     });
   }, [dailyLogs, projectConfig.horasDia]);
 
-  // Função core do Algoritmo Multiplicador Dinâmico (SM-2 Light)
+  // Função core do Algoritmo Multiplicador Dinâmico (SM-2 Light) + Reset à Meia-Noite
   const handleReviewFeedback = (assId, feedbackType) => {
     setReviewStats(prev => ({ ...prev, [feedbackType]: (prev[feedbackType] || 0) + 1 }));
     
@@ -2542,34 +2590,36 @@ export default function App() {
 
     setUserProgress(prev => {
       const current = prev[assId] || {};
-      const now = new Date().getTime();
+      const now = new Date();
       let currentInterval = current.reviewInterval || 0;
       let newInterval = 1;
 
       if (feedbackType === 'dificil') {
-        newInterval = 1; // Voltou ao zero (rever amanhã)
+        newInterval = 1; 
       } else if (feedbackType === 'bom') {
-        // Se for a primeira vez que avalia, usa a base das configs, senão, multiplica por 2.
         newInterval = currentInterval <= 1 ? (projectConfig.revBom || 7) : Math.round(currentInterval * 2);
       } else if (feedbackType === 'facil') {
-        // Se for a primeira vez que avalia, usa a base das configs, senão, multiplica por 2.5.
         newInterval = currentInterval <= 1 ? (projectConfig.revFacil || 15) : Math.round(currentInterval * 2.5);
       }
       
-      // Teto máximo de espaçamento (ex: não passar de 365 dias para não desparecer para sempre)
       newInterval = Math.min(newInterval, 365);
 
       addXP(15); 
       triggerVisualFlash(assId);
+      
+      // O Segredo da Meia-Noite: Forçamos a hora da próxima revisão para as 00:00:00 do dia alvo
+      const nextReviewDate = new Date(now);
+      nextReviewDate.setDate(now.getDate() + newInterval);
+      nextReviewDate.setHours(0, 0, 0, 0); // Vira a meia-noite exatamente!
       
       return { 
         ...prev, 
         [assId]: { 
           ...current, 
           revisado: true, 
-          lastReviewedTimestamp: now, 
-          nextReviewTimestamp: now + (1000 * 60 * 60 * 24 * newInterval),
-          reviewInterval: newInterval // Salva o intervalo na db para usar como multiplicador na próxima
+          lastReviewedTimestamp: now.getTime(), 
+          nextReviewTimestamp: nextReviewDate.getTime(),
+          reviewInterval: newInterval 
         } 
       };
     });
@@ -2583,10 +2633,15 @@ export default function App() {
       if (type === 'questoes' && !newState.questoes) { newState.revisado = false; }
       if (type === 'revisado') {
         if (newState.revisado) {
-          // Quando marca revisto no checkbox manualmente, dispara a "primeira" revisão forçada (ex: amanhã)
-          const now = new Date().getTime();
-          newState.lastReviewedTimestamp = now;
-          newState.nextReviewTimestamp = now + (1000 * 60 * 60 * 24 * 1);
+          const now = new Date();
+          
+          // O Segredo da Meia-Noite: A 1ª revisão agendada pela caixa cai exatamente amanhã às 00:00:00
+          const tomorrow = new Date(now);
+          tomorrow.setDate(now.getDate() + 1);
+          tomorrow.setHours(0, 0, 0, 0);
+          
+          newState.lastReviewedTimestamp = now.getTime();
+          newState.nextReviewTimestamp = tomorrow.getTime();
           newState.reviewInterval = 1; 
           addXP(10);
         } else {
@@ -2616,7 +2671,7 @@ export default function App() {
 
   const now = new Date().getTime();
   
-  // CORREÇÃO: Contagem rigorosa (só conta se a data da revisão agendada já estiver expirada)
+  // CORREÇÃO: Contagem rigorosa de pendências (apenas com base no Timestamp da meia-noite)
   const pendingReviewsCount = Object.entries(userProgress).filter(([id, data]) => {
     if (!activeSubjectIds.has(id)) return false;
     if (!data.estudado) return false;
