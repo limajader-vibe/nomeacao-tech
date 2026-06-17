@@ -591,7 +591,7 @@ const AuthScreen = ({ auth, themeColors }) => {
 // ==========================================
 // ABA DASHBOARD / CENTRO DE COMANDO
 // ==========================================
-function TabDashboard({ config, progressPerc, gamification, setGamification, dailyLogs, setDailyLogs, userLevel, themeColors, reviewStats, dailyReviewStats, edital, activeSubjectIds, userProgress, pendingReviewsCount, setActiveTab }) {
+function TabDashboard({ config, progressPerc, gamification, setGamification, dailyLogs, setDailyLogs, userLevel, themeColors, reviewStats, dailyReviewStats, edital, activeSubjectIds, userProgress, pendingReviewsCount, setActiveTab, customSprint }) {
   const today = new Date().toLocaleDateString();
   const todayHours = dailyLogs[today] || 0;
   
@@ -662,40 +662,90 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
   const totalReviews = reviewStats?.facil + reviewStats?.bom + reviewStats?.dificil || 0;
   const successRate = totalReviews > 0 ? (((reviewStats.facil + reviewStats.bom) / totalReviews) * 100).toFixed(1) : 0;
 
-  const formattedDate = new Intl.DateTimeFormat('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' }).format(new Date());
+  // Lógica Dinâmica da Saudação e Status
+  const formattedDate = new Intl.DateTimeFormat('pt-PT', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }).format(new Date()).replace(/\./g, '');
+  
+  const hour = new Date().getHours();
+  let greeting = 'Boa noite';
+  if (hour >= 5 && hour < 12) greeting = 'Bom dia';
+  else if (hour >= 12 && hour < 18) greeting = 'Boa tarde';
+  
+  const firstName = config.userName ? config.userName.split(' ')[0] : 'Concurseiro';
+
+  const activeSprintItems = customSprint?.slice(0, 2) || [];
+  
+  let statusText = '';
+  if (pendingReviewsCount > 0 && activeSprintItems.length > 0) {
+     statusText = `Você tem ${pendingReviewsCount} revisão(ões) em atraso e ${activeSprintItems.length} matéria(s) na Mesa de Foco.`;
+  } else if (pendingReviewsCount > 0) {
+     statusText = `Você tem ${pendingReviewsCount} avaliação(ões) em atraso na sua memória.`;
+  } else if (activeSprintItems.length > 0) {
+     statusText = `A sua memória está blindada! Você tem ${activeSprintItems.length} matéria(s) na Mesa de Foco hoje.`;
+  } else {
+     statusText = `Tudo limpo! A sua memória está em dia e não há missões ativas.`;
+  }
 
   return (
     <div className="space-y-6 animate-in fade-in pb-10">
       
-      {/* ALERTA TÁTICO: BANNER DE REVISÕES */}
-      {pendingReviewsCount > 0 && (
-        <div className="bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 p-5 rounded-2xl mb-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 animate-in slide-in-from-top-4 shadow-sm">
-           <div className="flex items-start gap-3">
-              <AlertTriangle className="w-6 h-6 text-red-500 shrink-0 mt-0.5" />
-              <div>
-                 <h4 className="text-red-600 dark:text-red-500 font-black tracking-wide uppercase text-xs mb-1">Alerta Tático de Esquecimento</h4>
-                 <p className="text-sm text-slate-700 dark:text-slate-300">Você tem <strong className="text-red-600 dark:text-white">{pendingReviewsCount} tópicos</strong> evaporando da memória hoje. Faça as suas revisões antes de iniciar novas missões.</p>
-              </div>
-           </div>
-           <button onClick={() => setActiveTab('revisoes')} className="shrink-0 bg-red-500 hover:bg-red-600 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-md transition-colors w-full md:w-auto cursor-pointer">
-             Ir para Revisões
-           </button>
-        </div>
-      )}
-
-      <SectionHeader 
-        overline="Visão Geral" 
-        title="Centro de Comando" 
-        subtitle={`Fotografia tática · ${formattedDate}`} 
-        icon={Activity}
-        themeColors={themeColors}
-        extra={
-          <div className={`border ${themeColors.borderLight} rounded-2xl p-4 flex flex-col items-center justify-center ${themeColors.bgSuperLight} shadow-sm min-w-[120px]`}>
+      {/* NOVO CABEÇALHO PERSONALIZADO E NEXT ACTION CARD */}
+      <div className="mb-10">
+        <div className="flex justify-between items-start mb-6">
+          <div>
+            <p className="text-[10px] font-black text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2 flex items-center gap-2">
+              <span>Painel</span> <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-white/20"></span> <span>{formattedDate.toUpperCase()}</span>
+            </p>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight">
+              {greeting}, {firstName}.
+            </h2>
+            <p className="text-base text-slate-500 dark:text-white/60 font-medium">
+              {statusText}
+            </p>
+          </div>
+          
+          <div className={`hidden md:flex border ${themeColors.borderLight} rounded-2xl p-4 flex-col items-center justify-center ${themeColors.bgSuperLight} shadow-sm min-w-[120px]`}>
             <span className={`text-[10px] font-black ${themeColors.brightText} tracking-widest uppercase mb-1`}>Progresso</span>
             <span className={`text-3xl font-black ${themeColors.brightText} leading-none`}>{progressPerc}%</span>
           </div>
-        }
-      />
+        </div>
+
+        {/* CARTÃO DE PRÓXIMA AÇÃO (Next Action) */}
+        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 md:p-8 border border-slate-200/60 dark:border-white/5 shadow-sm relative overflow-hidden group">
+          {/* Decoração sutil de fundo */}
+          <div className="absolute right-0 top-0 opacity-5 dark:opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
+             {pendingReviewsCount > 0 ? <BrainCircuit className="w-64 h-64 text-red-500" /> : activeSprintItems.length > 0 ? <Target className={`w-64 h-64 ${themeColors.brightText}`} /> : <CheckCircle className="w-64 h-64 text-emerald-500" />}
+          </div>
+
+          {pendingReviewsCount > 0 ? (
+            <div className="relative z-10">
+              <span className="flex items-center gap-2 text-[10px] font-black text-red-500 uppercase tracking-widest mb-3"><div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div> REVISÕES CRÍTICAS</span>
+              <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Limpar Motor de Revisão</h3>
+              <p className="text-sm text-slate-600 dark:text-white/60 mb-6 max-w-lg">O algoritmo detetou tópicos evaporando da sua memória de longo prazo. Recupere-os antes de avançar.</p>
+              <button onClick={() => setActiveTab('revisoes')} className="bg-red-500 hover:bg-red-600 text-white px-8 py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg hover:shadow-red-500/30 flex items-center gap-2 cursor-pointer w-full md:w-auto justify-center">
+                Iniciar Revisões <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          ) : activeSprintItems.length > 0 ? (
+            <div className="relative z-10">
+              <span className={`flex items-center gap-2 text-[10px] font-black ${themeColors.brightText} uppercase tracking-widest mb-3`}><div className={`w-2 h-2 rounded-full ${themeColors.bgSolid} animate-pulse`}></div> SPRINT DO DIA</span>
+              <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-2 truncate max-w-2xl">{activeSprintItems.map(i => i.assTitulo).join(' • ')}</h3>
+              <p className="text-sm text-slate-600 dark:text-white/60 mb-6 max-w-lg">A sua mesa de foco está configurada. Entre na zona e cumpra as missões de hoje.</p>
+              <button onClick={() => setActiveTab('cronograma')} className={`${themeColors.bgSolid} ${themeColors.bgHover} text-white px-8 py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg ${themeColors.shadowHover} flex items-center gap-2 cursor-pointer w-full md:w-auto justify-center`}>
+                Entrar na Mesa de Foco <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="relative z-10">
+              <span className="flex items-center gap-2 text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-3"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> MISSÃO CUMPRIDA</span>
+              <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Ofensiva Diária Garantida</h3>
+              <p className="text-sm text-slate-600 dark:text-white/60 mb-6 max-w-lg">Não há missões pendentes. Planeje os próximos passos para manter a consistência.</p>
+              <button onClick={() => setActiveTab('planner')} className="bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-800 dark:text-white px-8 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 cursor-pointer w-full md:w-auto justify-center border border-slate-200 dark:border-white/10">
+                Planejar Próxima Semana <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* LINHA 1: KPIs PREMIUM */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -802,7 +852,7 @@ function TabDashboard({ config, progressPerc, gamification, setGamification, dai
               return (
                 <div key={i} className="flex flex-col items-center flex-1 group">
                   <div className="w-full h-40 flex items-end justify-center relative">
-                    <div className={`w-full max-w-[24px] rounded-t-lg transition-all duration-700 ease-out hover:opacity-80 ${isToday ? 'bg-sky-500' : 'bg-slate-100 dark:bg-white/5'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '8px' : '0' }}>
+                    <div className={`w-full max-w-[24px] rounded-t-lg transition-all duration-700 ease-out hover:opacity-80 ${isToday ? 'bg-sky-500' : 'bg-slate-100 dark:bg-[#0d1526] border dark:border-white/5'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '8px' : '0' }}>
                       <span className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 dark:bg-white dark:text-slate-900 text-white text-[10px] font-black px-2 py-1 rounded pointer-events-none transition-opacity z-10 shadow-sm">{hours > 0 ? `${hours}h` : '0h'}</span>
                     </div>
                   </div>
@@ -2848,7 +2898,7 @@ export default function App() {
         {/* CONTENT AREA EXPANDIDA */}
         <main className="flex-1 p-4 md:p-8 lg:p-10 overflow-y-auto pb-28 md:pb-10 text-left transition-all duration-300 relative">
           <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full transition-all duration-500 h-full flex flex-col">
-            {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} dailyReviewStats={dailyReviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} />}
+            {activeTab === 'dashboard' && <TabDashboard config={projectConfig} progressPerc={progressPerc} gamification={gamification} setGamification={setGamification} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} userLevel={userLevel} themeColors={themeColors} reviewStats={reviewStats} dailyReviewStats={dailyReviewStats} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} />}
             {activeTab === 'disciplinas' && <TabDisciplinas edital={edital} setEdital={setEdital} progress={userProgress} setUserProgress={setUserProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} setActiveTab={setActiveTab} addXP={addXP} triggerVisualFlash={triggerVisualFlash} flashElementId={flashElementId} />}
             {activeTab === 'planner' && <TabPlanner customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setActiveTab={setActiveTab} themeColors={themeColors} progress={userProgress} toggleProgress={toggleProgress} flashElementId={flashElementId} />}
             {activeTab === 'cronograma' && <TabCronograma customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} addXP={addXP} triggerConfetti={triggerConfetti} themeColors={themeColors} handleAutoLog={handleAutoLog} flashElementId={flashElementId} pendingReviewsCount={pendingReviewsCount} />}
