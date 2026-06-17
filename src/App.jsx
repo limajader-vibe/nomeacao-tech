@@ -2327,31 +2327,11 @@ function TabAdmin({ auth, config, setConfig, userProgress, setUserProgress, gami
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
-              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/40 block mb-2">Concurso Alvo</label>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/40 block mb-2">Concurso Alvo (Sua Missão)</label>
               <input 
                 type="text" 
                 value={localConfig.concurso} 
                 onChange={e => setLocalConfig({...localConfig, concurso: e.target.value})}
-                className={`w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none ${themeColors.ring} transition-colors`}
-              />
-            </div>
-            
-            <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/40 block mb-2">Cargo</label>
-              <input 
-                type="text" 
-                value={localConfig.cargo} 
-                onChange={e => setLocalConfig({...localConfig, cargo: e.target.value})}
-                className={`w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none ${themeColors.ring} transition-colors`}
-              />
-            </div>
-
-            <div>
-              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-white/40 block mb-2">Banca</label>
-              <input 
-                type="text" 
-                value={localConfig.banca} 
-                onChange={e => setLocalConfig({...localConfig, banca: e.target.value})}
                 className={`w-full p-4 rounded-xl border border-slate-300 dark:border-white/10 bg-slate-50 dark:bg-[#0d1526] text-slate-800 dark:text-white outline-none ${themeColors.ring} transition-colors`}
               />
             </div>
@@ -2797,8 +2777,8 @@ export default function App() {
               <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain" />
             </div>
             <div className="flex flex-col min-w-0">
-              <span className={`text-[9px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-widest truncate max-w-[150px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
-              <h2 className={`font-black text-sm leading-tight tracking-tight truncate max-w-[150px] text-slate-800 dark:text-white`}>{projectConfig.appName}</h2>
+              <h2 className={`font-black text-base leading-tight tracking-tight truncate max-w-[150px] text-slate-800 dark:text-white`}>{projectConfig.appName}</h2>
+              <span className={`text-[9px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-widest truncate max-w-[150px] mt-0.5`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
@@ -2810,58 +2790,58 @@ export default function App() {
 
         {/* SIDEBAR DESKTOP */}
         <aside className={`hidden md:flex w-[280px] bg-white dark:bg-[#0d1526] shadow-xl flex-col z-10 shrink-0 border-r border-slate-200/80 dark:border-white/5 sticky top-0 h-screen overflow-hidden transition-colors duration-300`}>
-          <div className={`p-6 bg-slate-50/50 dark:bg-transparent border-b border-slate-200/80 dark:border-white/5 relative transition-colors duration-500 shrink-0`}>
+          
+          {/* CABEÇALHO DA SIDEBAR COM GRADIENTE INFERIOR SUAVE */}
+          <div className={`p-6 bg-slate-50/50 dark:bg-transparent relative transition-colors duration-500 shrink-0`}>
+            
+            {/* GRADIENTE DIVISÓRIO SUAVE (Substitui o border-b) */}
+            <div className="absolute bottom-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-white/10 to-transparent"></div>
             
             <button onClick={() => setIsDarkMode(!isDarkMode)} className={`absolute top-6 right-6 p-2 bg-white dark:bg-[#111e36] hover:bg-slate-50 dark:hover:bg-white/5 border border-slate-200/60 dark:border-white/5 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-white/40 z-10`}>
               {isDarkMode ? <Sun className={`w-4 h-4 ${themeColors.brightText}`} /> : <Moon className={`w-4 h-4 text-slate-600`} />}
             </button>
 
-            <div className="flex items-center gap-4 min-w-0 mb-8 pr-10 mt-1">
-              <div className={`w-12 h-12 bg-white dark:bg-white/5 rounded-2xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 dark:border-white/10 shadow-sm p-1.5`}>
+            {/* MARCA DA PLATAFORMA */}
+            <div className="flex items-center gap-3 min-w-0 mb-6 pr-10">
+              <div className={`w-10 h-10 bg-white dark:bg-white/5 rounded-xl flex items-center justify-center overflow-hidden shrink-0 border border-slate-200 dark:border-white/10 shadow-sm p-1`}>
                 <img src={projectConfig.logoUrl} alt="Logo" onError={(e) => { e.target.src = 'https://cdn-icons-png.flaticon.com/512/2942/2942784.png'; }} className="w-full h-full object-contain" />
               </div>
-              <div className="flex flex-col min-w-0">
-                <span className={`text-[9px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-widest truncate max-w-[120px]`}>Olá, {projectConfig.userName.split(' ')[0]}</span>
-                <h2 className={`font-black text-lg tracking-tight truncate text-slate-800 dark:text-white`} title={projectConfig.appName}>{projectConfig.appName}</h2>
-              </div>
+              <h2 className={`font-black text-xl tracking-tight truncate text-slate-800 dark:text-white`} title={projectConfig.appName}>{projectConfig.appName}</h2>
             </div>
             
-            <div className="flex flex-col gap-4">
-              <div>
-                <p className={`text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-widest leading-tight mb-1 truncate`}>{projectConfig.concurso}</p>
-                <h3 className={`text-lg font-black leading-tight truncate mb-3 text-slate-800 dark:text-white`}>{projectConfig.cargo}</h3>
-                
-                <div className="flex flex-col xl:flex-row gap-2 w-full mb-2">
-                  <span className={`flex flex-1 items-center justify-center gap-1.5 bg-white dark:bg-[#111e36] px-2.5 py-1.5 rounded-lg text-[9px] uppercase tracking-widest font-bold text-slate-600 dark:text-white/60 border border-slate-200 dark:border-white/5 shadow-sm truncate`} title={projectConfig.banca}>
-                    {projectConfig.banca}
-                  </span>
-                  <span className={`flex shrink-0 items-center justify-center gap-1.5 bg-white dark:bg-[#111e36] px-2.5 py-1.5 rounded-lg text-[9px] uppercase tracking-widest font-bold text-slate-600 dark:text-white/60 border border-slate-200 dark:border-white/5 shadow-sm`}>
-                    <Target size={12} className={themeColors.brightText} /> {projectConfig.horasDia}h
-                  </span>
+            {/* CARTÃO DE VISITA DO ESTUDANTE */}
+            <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-2xl border p-5 transition-all hover:shadow-md cursor-pointer shadow-sm flex flex-col gap-4 ${themeColors.bgSuperLight} ${themeColors.borderLight}`}>
+              
+              {/* Avatar e Patente */}
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 border-2 ${themeColors.borderSolid} bg-white dark:bg-[#0d1526] ${themeColors.primaryText} shadow-inner`}>
+                  <span className="font-black text-xl">{projectConfig.userName.charAt(0).toUpperCase()}</span>
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="text-[10px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-widest mb-0.5">Olá,</span>
+                  <h3 className="text-base font-black text-slate-800 dark:text-white leading-tight truncate" title={projectConfig.userName}>{projectConfig.userName.split(' ')[0]}</h3>
+                  <p className={`text-[10px] font-bold ${themeColors.brightText} truncate mt-0.5`}>{userLevel.titulo} • Lvl {userLevel.nivel}</p>
                 </div>
               </div>
 
-              <div onClick={() => setShowLevelMap(true)} className={`group relative overflow-hidden rounded-2xl bg-white dark:bg-[#111e36] border border-slate-200 dark:border-white/5 p-4 transition-all hover:shadow-md cursor-pointer shadow-sm`}>
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex items-center gap-3">
-                    <Award size={24} className={`${themeColors.brightText} ${themeColors.glow} group-hover:scale-110 transition-transform duration-300`} />
-                    <div className="flex flex-col">
-                      <span className="text-sm font-black text-slate-800 dark:text-white leading-none">Lvl {userLevel.nivel}</span>
-                      <span className="text-[9px] text-slate-500 dark:text-white/40 font-bold uppercase tracking-widest mt-1 truncate max-w-[90px]">{userLevel.titulo}</span>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-end">
-                    <div className={`flex items-center gap-1 ${themeColors.primaryText} ${themeColors.bgSuperLight} px-2 py-1 rounded border ${themeColors.borderLight} flex-shrink-0`}>
-                      <Flame size={12} className="fill-current animate-pulse" />
-                      <span className="text-[10px] font-black">{gamification.streak}</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="relative w-full h-1.5 bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden mt-2">
-                  <div className={`absolute left-0 top-0 h-full ${themeColors.bgSolid} transition-all duration-1000 ease-out`} style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
-                </div>
+              {/* Missão e XP */}
+              <div className="flex flex-col gap-1 mt-1">
+                 <span className="text-[9px] uppercase font-black text-slate-400 dark:text-white/30 tracking-widest">Missão Atual</span>
+                 <span className="text-xs font-bold text-slate-700 dark:text-white/80 truncate mb-3" title={projectConfig.concurso}>{projectConfig.concurso}</span>
+                 
+                 <div className="flex justify-between items-end mb-1.5">
+                     <span className="text-[9px] font-black text-slate-400 dark:text-white/40 uppercase tracking-widest">XP: {gamification.xp} / {userLevel.max}</span>
+                     <div className="flex items-center gap-1.5 text-orange-600 dark:text-orange-400 bg-orange-100/50 dark:bg-orange-500/20 px-2 py-1 rounded-md border border-orange-200 dark:border-orange-500/30 shadow-sm transition-transform group-hover:scale-105">
+                       <Flame size={12} className="text-orange-500 fill-orange-500 animate-pulse drop-shadow-[0_0_8px_rgba(249,115,22,0.8)]" />
+                       <span className="text-[10px] font-black">{gamification.streak} dias</span>
+                     </div>
+                 </div>
+                 <div className="w-full h-1 bg-slate-200/50 dark:bg-white/10 rounded-full overflow-hidden">
+                   <div className={`h-full ${themeColors.bgSolid} transition-all duration-1000 ease-out`} style={{ width: `${(gamification.xp / userLevel.max) * 100}%` }}></div>
+                 </div>
               </div>
             </div>
+
           </div>
 
           <nav className="flex-1 p-5 space-y-2 overflow-y-auto custom-scrollbar flex flex-col bg-transparent">
