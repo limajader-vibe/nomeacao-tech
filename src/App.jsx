@@ -3,9 +3,9 @@ import {
   PieChart, Calendar, CheckCircle, Clock, Target, BookOpen, 
   Layers, ChevronDown, Folder, ChevronRight, PlayCircle, 
   RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Pencil, Settings,
-  Edit, AlertTriangle, ChevronUp, Activity, Award, ListPlus, ArrowRight, ArrowLeft, BarChart2,
+  Edit, AlertTriangle, ChevronUp, Activity, ListPlus, ArrowRight, ArrowLeft, BarChart2,
   CalendarDays, LayoutGrid, BrainCircuit, ShieldAlert, Download, Sliders, Lock, LogOut,
-  Filter, Play, Pause, Coffee, X, Menu, Minus, Upload, Palette, FolderOpen, ChevronsDown, ChevronsUp, Crosshair, Target as TargetIcon, Zap, Eye, Map
+  Filter, Play, Pause, Coffee, X, Menu, Minus, Upload, Palette, FolderOpen, ChevronsDown, ChevronsUp, Crosshair, Target as TargetIcon, Zap, Map, Flame
 } from 'lucide-react';
 
 // --- FIREBASE CLOUD STORAGE SETUP ---
@@ -237,7 +237,6 @@ function StopwatchWidget({ themeColors, isTimerActive, toggleTimer, displayTimer
     <div className={`flex items-center justify-between bg-white dark:bg-[#111e36] border ${isTimerActive ? `${themeColors.borderSolid} shadow-lg ${themeColors.shadowHover}` : 'border-slate-200/60 dark:border-white/5'} p-4 rounded-2xl mb-6 transition-all duration-300`}>
        <div className="flex items-center gap-4">
          <div className="relative w-12 h-12 flex items-center justify-center shrink-0">
-           {/* Anel de progresso estático que roda quando ativo */}
            <div className={`absolute inset-0 rounded-full border-[3px] border-slate-100 dark:border-white/5 ${isTimerActive ? 'animate-[spin_3s_linear_infinite] border-t-transparent border-r-transparent ' + themeColors.borderSolid : ''}`}></div>
            <div className={`absolute inset-0 flex items-center justify-center ${isTimerActive ? 'animate-pulse' : ''}`}>
                <Clock className={`w-5 h-5 ${isTimerActive ? themeColors.brightText : 'text-slate-400 dark:text-slate-500'}`} />
@@ -403,9 +402,9 @@ const AuthScreen = ({ auth, themeColors }) => {
 };
 
 // ==========================================
-// ABA: QG (DASHBOARD ANALÍTICO DE ELITE)
+// ABA: QG (DASHBOARD INICIANTE - MINIMALISMO)
 // ==========================================
-function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edital, activeSubjectIds, userProgress, pendingReviewsCount, setActiveTab, customSprint, totalAssuntos, globalAccuracy }) {
+function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edital, activeSubjectIds, userProgress, pendingReviewsCount, setActiveTab, customSprint, totalAssuntos, currentStreak }) {
   const today = new Date().toLocaleDateString();
   const todayHours = dailyLogs[today] || 0;
   
@@ -426,22 +425,19 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
 
   const totalMastered = Object.entries(userProgress).filter(([id, data]) => activeSubjectIds.has(id) && data.estudado && data.questoes && data.revisado).length;
 
-  // Precisão por Disciplina para Destaques/Ameaças
-  const discStats = {};
+  // Raio-X de Avanço por Disciplina
+  const discProgress = [];
   edital.forEach(b => b.disciplinas.forEach(d => {
-      let t = 0, a = 0;
+      const totalDisc = d.assuntos.length;
+      if (totalDisc === 0) return;
+      let completedDisc = 0;
       d.assuntos.forEach(ass => {
          const p = userProgress[ass.id];
-         if(p && p.questoesTotal) { t += p.questoesTotal; a += p.questoesAcertos; }
+         if(p && p.estudado && p.questoes && p.revisado) completedDisc++;
       });
-      discStats[d.id] = { id: d.id, nome: d.nome, total: t, acertos: a, acc: t > 0 ? Math.round((a/t)*100) : -1 };
+      discProgress.push({ id: d.id, nome: d.nome, perc: Math.round((completedDisc/totalDisc)*100) });
   }));
-  
-  const validDiscs = Object.values(discStats).filter(d => d.acc >= 0);
-  validDiscs.sort((a,b) => b.acc - a.acc);
-  
-  const topFortes = validDiscs.slice(0, 3);
-  const topAmeacas = validDiscs.slice().reverse().slice(0, 3);
+  discProgress.sort((a,b) => b.perc - a.perc);
 
   const todayObj = new Date(); todayObj.setHours(23, 59, 59, 999);
   
@@ -529,7 +525,7 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
         </div>
       </div>
 
-      {/* OS 3 PILARES ESSENCIAIS (O MAPA, O TERMÔMETRO, O MOTOR) */}
+      {/* OS 3 PILARES ESSENCIAIS (O MAPA, A CONSTÂNCIA, O MOTOR) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
         {/* PILAR 1: O Mapa (Progresso do Edital) */}
@@ -552,32 +548,31 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
           </div>
         </div>
 
-        {/* PILAR 2: O Termômetro (Precisão Global) */}
-        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-emerald-500 dark:border-l-emerald-500">
+        {/* PILAR 2: A Constância (Dias Ativos) */}
+        <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-orange-500 dark:border-l-orange-500">
           <div className="flex justify-between items-start mb-4">
-            <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">O Termômetro (Precisão)</p>
-            <div className="p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-500/5">
-              <TargetIcon className="w-5 h-5 text-emerald-500"/>
+            <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">A Constância</p>
+            <div className="p-2.5 rounded-xl border border-orange-200 dark:border-orange-500/20 bg-orange-50/50 dark:bg-orange-500/5">
+              <Flame className="w-5 h-5 text-orange-500"/>
             </div>
           </div>
           <div className="flex-1 flex items-end gap-2 mt-2 relative min-h-[48px]">
             <div className="flex items-baseline gap-1.5">
-                <span className={`text-5xl font-black leading-none ${globalAccuracy >= 80 ? 'text-emerald-500' : 'text-amber-500'}`}>{globalAccuracy}</span>
-                <span className="text-lg font-bold text-slate-400 dark:text-white/30">%</span>
+                <span className={`text-5xl font-black leading-none ${currentStreak > 0 ? 'text-orange-500' : 'text-slate-800 dark:text-white'}`}>{currentStreak}</span>
             </div>
           </div>
           <div className="mt-8">
             <div className="w-full h-1.5 bg-slate-100 dark:bg-[#0d1526] rounded-full overflow-hidden mb-3">
-              <div className={`h-full transition-all duration-1000 ${globalAccuracy >= 80 ? 'bg-emerald-500' : 'bg-amber-500'}`} style={{ width: `${globalAccuracy}%` }}></div>
+              <div className={`h-full transition-all duration-1000 ${currentStreak > 0 ? 'bg-orange-500' : 'bg-slate-300 dark:bg-slate-700'}`} style={{ width: `${Math.min((currentStreak / 30) * 100, 100)}%` }}></div>
             </div>
-            <p className={`text-[10px] font-bold tracking-wide text-slate-400 dark:text-white/30`}>Taxa global de acertos</p>
+            <p className={`text-[10px] font-bold tracking-wide text-slate-400 dark:text-white/30`}>Dias seguidos batendo a meta</p>
           </div>
         </div>
 
         {/* PILAR 3: O Motor (Batalha de Hoje) */}
         <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-purple-500 dark:border-l-purple-500">
           <div className="flex justify-between items-start mb-4 relative z-10">
-            <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">O Motor (Batalha de Hoje)</p>
+            <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">O Motor (Hoje)</p>
             <div className="p-2.5 rounded-xl border border-purple-200 dark:border-purple-500/20 bg-purple-50/50 dark:bg-purple-500/5">
               <Clock className="w-5 h-5 text-purple-500"/>
             </div>
@@ -641,45 +636,24 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
           </div>
         </div>
 
-        {/* INSIGHT B: Radar de Ameaças (Baseado na Precisão) */}
+        {/* INSIGHT B: Avanço por Disciplina */}
         <div className="bg-white dark:bg-[#111e36] rounded-[2rem] shadow-sm border border-slate-200/60 dark:border-white/5 p-8 flex flex-col h-full max-h-[320px]">
           <div className="flex justify-between items-center mb-6 shrink-0">
-             <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><ShieldAlert className={`w-5 h-5 ${themeColors.brightText}`}/> Destaques & Ameaças</h3>
-             <span className="text-[10px] bg-slate-100 dark:bg-white/5 px-2 py-1 rounded font-bold text-slate-500 dark:text-white/50 uppercase tracking-widest">Base: Precisão (%)</span>
+             <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><Layers className={`w-5 h-5 ${themeColors.brightText}`}/> Avanço por Disciplina</h3>
           </div>
           
-          <div className="flex-1 flex flex-col gap-6 overflow-y-auto pr-2 custom-scrollbar">
-            {/* Top Fortes */}
-            <div>
-               <h4 className="text-[10px] uppercase font-black tracking-widest text-emerald-500 mb-3">Linha da Frente (Fortes)</h4>
-               {topFortes.length === 0 ? <p className="text-sm text-slate-400 dark:text-white/30">Faça questões para gerar dados.</p> : topFortes.map(d => (
-                 <div key={d.id} className="mb-3 last:mb-0">
+          <div className="flex-1 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
+               {discProgress.length === 0 ? <p className="text-sm text-slate-400 dark:text-white/30">Sem disciplinas registadas.</p> : discProgress.map(d => (
+                 <div key={d.id}>
                     <div className="flex justify-between items-end mb-1">
                       <span className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate pr-3">{d.nome}</span>
-                      <span className="text-xs font-black text-emerald-500 shrink-0">{d.acc}%</span>
+                      <span className={`text-xs font-black shrink-0 ${d.perc === 100 ? 'text-emerald-500' : themeColors.primaryText}`}>{d.perc}%</span>
                     </div>
                     <div className="h-1.5 w-full bg-slate-100 dark:bg-[#0d1526] rounded-full overflow-hidden">
-                      <div className="h-full transition-all duration-1000 rounded-full bg-emerald-500" style={{width: `${d.acc}%`}}></div>
+                      <div className={`h-full transition-all duration-1000 rounded-full ${d.perc === 100 ? 'bg-emerald-500' : themeColors.bgSolid}`} style={{width: `${d.perc}%`}}></div>
                     </div>
                  </div>
                ))}
-            </div>
-            
-            {/* Top Ameaças */}
-            <div>
-               <h4 className="text-[10px] uppercase font-black tracking-widest text-red-500 mb-3">Retaguarda (Ameaças Críticas)</h4>
-               {topAmeacas.length === 0 ? <p className="text-sm text-slate-400 dark:text-white/30">Sem ameaças registadas.</p> : topAmeacas.map(d => (
-                 <div key={d.id} className="mb-3 last:mb-0">
-                    <div className="flex justify-between items-end mb-1">
-                      <span className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate pr-3">{d.nome}</span>
-                      <span className="text-xs font-black text-red-500 shrink-0">{d.acc}%</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-slate-100 dark:bg-[#0d1526] rounded-full overflow-hidden">
-                      <div className="h-full transition-all duration-1000 rounded-full bg-red-500" style={{width: `${d.acc}%`}}></div>
-                    </div>
-                 </div>
-               ))}
-            </div>
           </div>
         </div>
       </div>
@@ -1328,12 +1302,8 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
   );
 }
 
-function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, themeColors, isTimerActive, toggleTimer, displayTimerSeconds, pendingReviewsCount, saveQuestoesStats }) {
+function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, themeColors, isTimerActive, toggleTimer, displayTimerSeconds, pendingReviewsCount }) {
   const [draggedIndex, setDraggedIndex] = useState(null);
-  
-  const [questoesInputId, setQuestoesInputId] = useState(null);
-  const [qTotal, setQTotal] = useState('');
-  const [qAcertos, setQAcertos] = useState('');
 
   const handleDragStart = (e, index) => {
     setDraggedIndex(index);
@@ -1358,16 +1328,6 @@ function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsC
   const handleCompleteSprint = () => {
     setSprintsCompleted(prev => prev + 1); 
     setCustomSprint(prev => prev.slice(1)); 
-  };
-
-  const handleSaveQuestoes = (assId) => {
-    const t = parseInt(qTotal);
-    const a = parseInt(qAcertos);
-    if(isNaN(t) || isNaN(a) || t <= 0 || a > t || a < 0) return;
-    saveQuestoesStats(assId, t, a);
-    setQuestoesInputId(null);
-    setQTotal('');
-    setQAcertos('');
   };
 
   // Trava de Titânio: Verifica se o alvo no topo tem as 3 etapas cumpridas
@@ -1465,7 +1425,6 @@ function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsC
             const isEstudado = progress[item.assId]?.estudado || false;
             const isQuestoes = progress[item.assId]?.questoes || false;
             const isRevisado = progress[item.assId]?.revisado || false;
-            const accuracy = progress[item.assId]?.accuracy;
 
             return (
               <React.Fragment key={item.assId}>
@@ -1509,33 +1468,10 @@ function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsC
                         <span className="font-bold text-xs uppercase tracking-wide">1. Teoria</span>
                       </label>
 
-                      {/* 2. QUESTÕES (NOVO CADERNO DE ERROS INLINE) */}
-                      <label className={`flex flex-col gap-2 ${isQuestoes ? themeColors.primaryText : 'text-slate-500 dark:text-white/50'}`}>
-                          <div className={`flex items-center gap-3.5 ${!isEstudado ? 'opacity-50' : 'cursor-pointer hover:text-slate-800 dark:hover:text-white transition-colors'}`}>
-                            <input type="checkbox" checked={isQuestoes} disabled={!isEstudado} onChange={() => {
-                                if(!isQuestoes) { setQuestoesInputId(item.assId); }
-                                else { toggleProgress(item.assId, 'questoes'); }
-                            }} className={`w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-white/20 bg-transparent ${themeColors.primaryText} ${themeColors.ring} focus:ring-0 outline-none`} />
-                            
-                            <span className="font-bold text-xs uppercase tracking-wide flex items-center gap-2">
-                               2. Questões
-                               {isQuestoes && accuracy !== undefined && (
-                                   <span className={`px-2 py-0.5 rounded-md text-[9px] font-black tracking-widest text-white shadow-sm ${accuracy >= 80 ? 'bg-emerald-500' : 'bg-red-500'}`}>
-                                       {accuracy >= 80 ? '🎯 Elite' : '🔥 Ameaça'} ({accuracy}%)
-                                   </span>
-                               )}
-                            </span>
-                          </div>
-                          
-                          {/* Mini-Formulário Aberto Inline */}
-                          {questoesInputId === item.assId && (
-                              <div className="pl-8 pt-2 pb-1 flex flex-wrap items-center gap-2 animate-in fade-in slide-in-from-top-2">
-                                  <input type="number" placeholder="Total" value={qTotal} onChange={e=>setQTotal(e.target.value)} className={`w-16 p-2 text-xs rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0d1526] outline-none ${themeColors.ring} text-slate-800 dark:text-white`} />
-                                  <input type="number" placeholder="Acertos" value={qAcertos} onChange={e=>setQAcertos(e.target.value)} className={`w-16 p-2 text-xs rounded-lg border border-slate-300 dark:border-white/10 bg-white dark:bg-[#0d1526] outline-none ${themeColors.ring} text-slate-800 dark:text-white`} />
-                                  <button onClick={() => handleSaveQuestoes(item.assId)} className={`text-[10px] uppercase tracking-widest font-black px-4 py-2 rounded-lg ${themeColors.bgSolid} ${themeColors.bgHover} text-white shadow-sm transition-colors cursor-pointer`}>Salvar</button>
-                                  <button onClick={() => setQuestoesInputId(null)} className="text-[10px] uppercase tracking-widest font-black px-4 py-2 rounded-lg bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-white/60 hover:bg-slate-300 dark:hover:bg-white/20 transition-colors cursor-pointer">Cancelar</button>
-                              </div>
-                          )}
+                      {/* 2. QUESTÕES (SIMPLIFICADO) */}
+                      <label className={`flex items-center gap-3.5 ${!isEstudado ? 'opacity-50' : 'cursor-pointer hover:text-slate-800 dark:hover:text-white transition-colors'} ${isQuestoes ? themeColors.primaryText : 'text-slate-500 dark:text-white/50'}`}>
+                        <input type="checkbox" checked={isQuestoes} disabled={!isEstudado} onChange={() => toggleProgress(item.assId, 'questoes')} className={`w-5 h-5 rounded cursor-pointer disabled:opacity-50 shrink-0 border-slate-300 dark:border-white/20 bg-transparent ${themeColors.primaryText} ${themeColors.ring} focus:ring-0 outline-none`} />
+                        <span className="font-bold text-xs uppercase tracking-wide flex items-center gap-2">2. Questões (Bateria TEC)</span>
                       </label>
 
                       {/* 3. REVISÃO */}
@@ -1598,20 +1534,18 @@ function TabMemoria({ progress, handleReviewFeedback, edital, activeSubjectIds, 
     return `${dateStr} (em ${diff} dias)`;
   };
 
-  // Motor Multiplicador de Retenção Dinâmico (Com Penalidade se < 80%)
+  // Motor Multiplicador de Retenção Dinâmico
   const getNextIntervalDays = (assId, feedbackType) => {
     const currentInterval = progress[assId]?.reviewInterval || 0;
-    const accuracy = progress[assId]?.accuracy !== undefined ? progress[assId].accuracy : 100;
-    const penalty = accuracy < 80 ? 0.5 : 1; 
 
     if (feedbackType === 'dificil') return 1;
     if (feedbackType === 'bom') {
       let next = currentInterval <= 1 ? (projectConfig.revBom || 7) : (currentInterval * 2);
-      return Math.max(1, Math.round(Math.min(365, next) * penalty));
+      return Math.max(1, Math.round(Math.min(365, next)));
     }
     if (feedbackType === 'facil') {
       let next = currentInterval <= 1 ? (projectConfig.revFacil || 15) : (currentInterval * 2.5);
-      return Math.max(1, Math.round(Math.min(365, next) * penalty));
+      return Math.max(1, Math.round(Math.min(365, next)));
     }
     return 1;
   };
@@ -1644,7 +1578,6 @@ function TabMemoria({ progress, handleReviewFeedback, edital, activeSubjectIds, 
               revisoesPendentes.map((data) => {
                 const daysBom = getNextIntervalDays(data.id, 'bom');
                 const daysFacil = getNextIntervalDays(data.id, 'facil');
-                const accuracy = progress[data.id]?.accuracy;
 
                 return (
                   <div key={data.id} className={`bg-white dark:bg-[#111e36] border p-6 rounded-2xl shadow-sm flex flex-col gap-4 border-l-4 transition-colors duration-300 border-slate-200/60 dark:border-white/5 border-l-red-500 hover:shadow-md`}>
@@ -1652,9 +1585,6 @@ function TabMemoria({ progress, handleReviewFeedback, edital, activeSubjectIds, 
                       <div className="pr-4">
                         <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-white/40 tracking-widest flex items-center gap-2 mb-1.5">
                             {data.discNome}
-                            {accuracy !== undefined && accuracy < 80 && (
-                                <span className="bg-red-500/10 text-red-500 border border-red-500/20 px-1.5 py-0.5 rounded text-[8px] flex items-center gap-1"><Flame className="w-2.5 h-2.5"/> {accuracy}%</span>
-                            )}
                         </span>
                         <h4 className="font-bold text-slate-800 dark:text-white text-lg leading-tight">{data.titulo}</h4>
                       </div>
@@ -1724,7 +1654,7 @@ function TabMemoria({ progress, handleReviewFeedback, edital, activeSubjectIds, 
 // ==========================================
 // ABA 5: ENGRENAGENS (ADMINISTRAÇÃO)
 // ==========================================
-function TabEngrenagens({ auth, config, setConfig, userProgress, setUserProgress, edital, setEdital, customSprint, setCustomSprint, initialEdital, setDailyLogs, setDailyReviewStats, themeColors }) {
+function TabEngrenagens({ auth, config, setConfig, userProgress, setUserProgress, edital, setEdital, customSprint, setCustomSprint, initialEdital, setDailyLogs, themeColors }) {
   const [localConfig, setLocalConfig] = useState({
     ...config,
     revBom: config.revBom || 7,
@@ -1785,7 +1715,6 @@ function TabEngrenagens({ auth, config, setConfig, userProgress, setUserProgress
     if (confirmResetProgress) {
       setUserProgress({});
       setCustomSprint([]);
-      setDailyReviewStats({});
       setConfirmResetProgress(false);
       alert("Progresso de estudo limpo com sucesso!");
     } else {
@@ -1799,7 +1728,6 @@ function TabEngrenagens({ auth, config, setConfig, userProgress, setUserProgress
       setUserProgress({});
       setCustomSprint([]);
       setDailyLogs({});
-      setDailyReviewStats({});
       setEdital(initialEdital);
       setConfirmFactoryReset(false);
       alert("Sistema restaurado para o Padrão de Fábrica.");
@@ -2063,11 +1991,7 @@ export default function App() {
   const [userProgress, setUserProgress] = useState({});
   const [customSprint, setCustomSprint] = useState([]);
   const [sprintsCompleted, setSprintsCompleted] = useState(0);
-  
   const [dailyLogs, setDailyLogs] = useState({});
-  const [reviewStats, setReviewStats] = useState(() => getStorage('nomeacao_prod_review_stats', { facil: 0, bom: 0, dificil: 0 }));
-  const [dailyReviewStats, setDailyReviewStats] = useState(() => getStorage('nomeacao_daily_reviews', {})); 
-  const [dailyAccuracy, setDailyAccuracy] = useState(() => getStorage('nomeacao_daily_accuracy', {}));
 
   // === ESTADO GLOBAL DO CRONÓMETRO ===
   const [isTimerActive, setIsTimerActive] = useState(false);
@@ -2103,9 +2027,6 @@ export default function App() {
           if (data.customSprint) setCustomSprint(data.customSprint);
           if (data.sprintsCompleted !== undefined) setSprintsCompleted(data.sprintsCompleted);
           if (data.dailyLogs) setDailyLogs(data.dailyLogs);
-          if (data.reviewStats) setReviewStats(data.reviewStats);
-          if (data.dailyReviewStats) setDailyReviewStats(data.dailyReviewStats);
-          if (data.dailyAccuracy) setDailyAccuracy(data.dailyAccuracy);
           if (data.isDarkMode !== undefined) setIsDarkMode(data.isDarkMode);
         }
         setIsCloudReady(true);
@@ -2134,18 +2055,6 @@ export default function App() {
   useEffect(() => { saveToCloud('customSprint', customSprint); }, [customSprint, isCloudReady]);
   useEffect(() => { saveToCloud('sprintsCompleted', sprintsCompleted); }, [sprintsCompleted, isCloudReady]);
   useEffect(() => { saveToCloud('dailyLogs', dailyLogs); }, [dailyLogs, isCloudReady]);
-  useEffect(() => { 
-    setStorage('nomeacao_prod_review_stats', reviewStats);
-    saveToCloud('reviewStats', reviewStats); 
-  }, [reviewStats, isCloudReady]);
-  useEffect(() => { 
-    setStorage('nomeacao_daily_reviews', dailyReviewStats);
-    saveToCloud('dailyReviewStats', dailyReviewStats); 
-  }, [dailyReviewStats, isCloudReady]);
-  useEffect(() => { 
-    setStorage('nomeacao_daily_accuracy', dailyAccuracy);
-    saveToCloud('dailyAccuracy', dailyAccuracy); 
-  }, [dailyAccuracy, isCloudReady]);
 
   // === LÓGICA CORE DO CRONÓMETRO DE ELITE ===
   const handleAutoLog = useCallback((hoursToAdd) => {
@@ -2199,37 +2108,60 @@ export default function App() {
   const todayStrLocal = new Date().toLocaleDateString();
   const displayTimerSeconds = Math.floor((dailyLogs[todayStrLocal] || 0) * 3600) + unloggedSeconds;
 
+  // Lógica do Current Streak (Dias Seguidos a Bater a Meta)
+  const calculateCurrentStreak = () => {
+     let streak = 0;
+     const today = new Date();
+     // Verifica se bateu a meta hoje
+     const todayHours = dailyLogs[today.toLocaleDateString()] || 0;
+     
+     // Se já bateu hoje, conta 1. Se não bateu hoje, o streak ainda pode estar vivo de ontem.
+     let d = new Date(today);
+     if (todayHours >= projectConfig.horasDia) {
+         streak++;
+         d.setDate(d.getDate() - 1);
+     } else {
+         // O streak de hoje ainda é 0, vamos ver se ontem bateu para manter a corrente
+         d.setDate(d.getDate() - 1);
+         const yesterdayHours = dailyLogs[d.toLocaleDateString()] || 0;
+         if (yesterdayHours < projectConfig.horasDia) {
+             return 0; // Não bateu nem hoje nem ontem, streak quebrado.
+         }
+     }
+
+     // Conta os dias para trás
+     while(true) {
+         const dateStr = d.toLocaleDateString();
+         const hours = dailyLogs[dateStr] || 0;
+         if (hours >= projectConfig.horasDia) {
+             streak++;
+             d.setDate(d.getDate() - 1);
+         } else {
+             break;
+         }
+     }
+     return streak;
+  };
+  const currentStreak = useMemo(() => calculateCurrentStreak(), [dailyLogs, projectConfig.horasDia]);
+
 
   const handleReviewFeedback = (assId, feedbackType) => {
-    setReviewStats(prev => ({ ...prev, [feedbackType]: (prev[feedbackType] || 0) + 1 }));
-    
-    const today = new Date().toLocaleDateString();
-    setDailyReviewStats(prev => {
-      const current = prev[today] || { facil: 0, bom: 0, dificil: 0 };
-      return { ...prev, [today]: { ...current, [feedbackType]: current[feedbackType] + 1 } };
-    });
-
     setUserProgress(prev => {
       const current = prev[assId] || {};
       const now = new Date();
       let currentInterval = current.reviewInterval || 0;
-      
-      const accuracy = current.accuracy !== undefined ? current.accuracy : 100;
-      const modifier = accuracy < 80 ? 0.5 : 1;
       
       let newInterval = 1;
 
       if (feedbackType === 'dificil') {
         newInterval = 1; 
       } else if (feedbackType === 'bom') {
-        let baseNext = currentInterval <= 1 ? (projectConfig.revBom || 7) : (currentInterval * 2);
-        newInterval = Math.max(1, Math.round(baseNext * modifier));
+        newInterval = currentInterval <= 1 ? (projectConfig.revBom || 7) : (currentInterval * 2);
       } else if (feedbackType === 'facil') {
-        let baseNext = currentInterval <= 1 ? (projectConfig.revFacil || 15) : (currentInterval * 2.5);
-        newInterval = Math.max(1, Math.round(baseNext * modifier));
+        newInterval = currentInterval <= 1 ? (projectConfig.revFacil || 15) : (currentInterval * 2.5);
       }
       
-      newInterval = Math.min(newInterval, 365);
+      newInterval = Math.min(Math.round(newInterval), 365);
       
       const nextReviewDate = new Date(now);
       nextReviewDate.setDate(now.getDate() + newInterval);
@@ -2276,20 +2208,6 @@ export default function App() {
     });
   };
 
-  const saveQuestoesStats = (assId, total, acertos) => {
-      setUserProgress(prev => {
-          const current = prev[assId] || {};
-          const accuracy = total > 0 ? Math.round((acertos / total) * 100) : 0;
-          return { ...prev, [assId]: { ...current, questoes: true, questoesTotal: total, questoesAcertos: acertos, accuracy: accuracy } };
-      });
-      
-      const today = new Date().toLocaleDateString();
-      setDailyAccuracy(prev => {
-         const curr = prev[today] || { total: 0, acertos: 0 };
-         return { ...prev, [today]: { total: curr.total + total, acertos: curr.acertos + acertos } };
-      });
-  };
-
   const resetProgress = (assId) => { setUserProgress(prev => ({ ...prev, [assId]: { estudado: false, questoes: false, revisado: false, lastReviewedTimestamp: null, nextReviewTimestamp: null, reviewInterval: 0, masteredAt: null } })); };
 
   const toggleSprintItem = (discId, assId, discNome, assTitulo, temp, linkTec) => {
@@ -2314,18 +2232,13 @@ export default function App() {
 
   const totalAssuntos = activeSubjectIds.size;
   const totalCheckboxes = totalAssuntos * 3; 
-  let globalAcertos = 0;
-  let globalQuestoesTotal = 0;
 
   const completedCheckboxes = Object.entries(userProgress).reduce((acc, [assId, data]) => {
     if (!activeSubjectIds.has(assId)) return acc;
-    if (data.questoesTotal) globalQuestoesTotal += data.questoesTotal;
-    if (data.questoesAcertos) globalAcertos += data.questoesAcertos;
     return acc + (data.estudado ? 1 : 0) + (data.questoes ? 1 : 0) + (data.revisado ? 1 : 0);
   }, 0);
   
   const progressPerc = totalCheckboxes === 0 ? 0 : Math.round((completedCheckboxes / totalCheckboxes) * 100);
-  const globalAccuracy = globalQuestoesTotal > 0 ? Math.round((globalAcertos / globalQuestoesTotal) * 100) : 100;
 
   const navPhases = [
     { phase: 'Comando', items: [
@@ -2433,11 +2346,6 @@ export default function App() {
                  <div className="w-full h-1.5 bg-slate-200/50 dark:bg-white/10 rounded-full overflow-hidden mb-3">
                    <div className={`h-full ${themeColors.bgSolid} transition-all duration-1000 ease-out`} style={{ width: `${progressPerc}%` }}></div>
                  </div>
-
-                 <div className="flex justify-between items-end mb-1.5 mt-2">
-                     <span className="text-[9px] font-black text-slate-400 dark:text-white/40 uppercase tracking-widest">Precisão Global</span>
-                     <span className={`text-[10px] font-black ${globalAccuracy >= 80 ? 'text-emerald-500' : globalAccuracy >= 60 ? 'text-amber-500' : 'text-red-500'}`}>{globalAccuracy}%</span>
-                 </div>
               </div>
             </div>
           </div>
@@ -2476,11 +2384,11 @@ export default function App() {
         {/* CONTENT AREA EXPANDIDA */}
         <main className={`flex-1 p-4 md:p-8 lg:p-10 overflow-y-auto ${isDeepWork ? 'pb-4' : 'pb-28 md:pb-10'} text-left transition-all duration-300 relative`}>
           <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full transition-all duration-500 h-full flex flex-col">
-            {activeTab === 'qg' && <TabQG config={projectConfig} progressPerc={progressPerc} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} themeColors={themeColors} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} totalAssuntos={totalAssuntos} globalAccuracy={globalAccuracy} />}
+            {activeTab === 'qg' && <TabQG config={projectConfig} progressPerc={progressPerc} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} themeColors={themeColors} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} totalAssuntos={totalAssuntos} currentStreak={currentStreak} />}
             {activeTab === 'arsenal' && <TabArsenal edital={edital} setEdital={setEdital} progress={userProgress} setUserProgress={setUserProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} setActiveTab={setActiveTab} />}
-            {activeTab === 'metas' && <TabMetas customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} themeColors={themeColors} isTimerActive={isTimerActive} toggleTimer={toggleTimer} displayTimerSeconds={displayTimerSeconds} pendingReviewsCount={pendingReviewsCount} saveQuestoesStats={saveQuestoesStats} />}
+            {activeTab === 'metas' && <TabMetas customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} themeColors={themeColors} isTimerActive={isTimerActive} toggleTimer={toggleTimer} displayTimerSeconds={displayTimerSeconds} pendingReviewsCount={pendingReviewsCount} />}
             {activeTab === 'memoria' && <TabMemoria progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} projectConfig={projectConfig} />}
-            {activeTab === 'engrenagens' && <TabEngrenagens auth={auth} config={projectConfig} setConfig={setProjectConfig} userProgress={userProgress} setUserProgress={setUserProgress} edital={edital} setEdital={setEdital} customSprint={customSprint} setCustomSprint={setCustomSprint} initialEdital={initialEdital} setDailyLogs={setDailyLogs} setDailyReviewStats={setDailyReviewStats} themeColors={themeColors} />}
+            {activeTab === 'engrenagens' && <TabEngrenagens auth={auth} config={projectConfig} setConfig={setProjectConfig} userProgress={userProgress} setUserProgress={setUserProgress} edital={edital} setEdital={setEdital} customSprint={customSprint} setCustomSprint={setCustomSprint} initialEdital={initialEdital} setDailyLogs={setDailyLogs} themeColors={themeColors} />}
           </div>
         </main>
 
