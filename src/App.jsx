@@ -5,7 +5,7 @@ import {
   RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Pencil, Settings,
   Edit, AlertTriangle, ChevronUp, Activity, ListPlus, ArrowRight, ArrowLeft, BarChart2,
   CalendarDays, LayoutGrid, BrainCircuit, ShieldAlert, Download, Sliders, Lock, LogOut,
-  Filter, Play, Pause, Coffee, X, Menu, Minus, Upload, Palette, FolderOpen, ChevronsDown, ChevronsUp, Crosshair, Target as TargetIcon, Zap, Map, Flame
+  Filter, Play, Pause, Coffee, X, Menu, Minus, Upload, Palette, FolderOpen, ChevronsDown, ChevronsUp, Crosshair, Zap, Map, Flame
 } from 'lucide-react';
 
 // --- FIREBASE CLOUD STORAGE SETUP ---
@@ -402,7 +402,7 @@ const AuthScreen = ({ auth, themeColors }) => {
 };
 
 // ==========================================
-// ABA: QG (DASHBOARD INICIANTE - MINIMALISMO)
+// ABA: PAINEL GERAL (DASHBOARD INICIANTE - MINIMALISMO)
 // ==========================================
 function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edital, activeSubjectIds, userProgress, pendingReviewsCount, setActiveTab, customSprint, totalAssuntos, currentStreak }) {
   const today = new Date().toLocaleDateString();
@@ -462,11 +462,11 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
   
   let statusText = '';
   if (pendingReviewsCount > 0) {
-     statusText = `1º Passo: Você tem ${pendingReviewsCount} revisão(ões) na linha de frente. Limpe-as primeiro.`;
+     statusText = `1º Passo: Você tem ${pendingReviewsCount} revisão(ões) na fila. Limpe-as primeiro.`;
   } else if (activeSprintItems.length > 0) {
-     statusText = `2º Passo: Revisões limpas! O seu foco agora são as metas na Mesa de Foco.`;
+     statusText = `2º Passo: Revisões limpas! O seu foco agora é Estudar Hoje.`;
   } else {
-     statusText = `3º Passo: Meta cumprida por hoje. Vá descansar ou adicione novos alvos no Arsenal.`;
+     statusText = `3º Passo: Missão cumprida por hoje. Vá descansar ou adicione novos alvos em Disciplinas/Metas.`;
   }
 
   return (
@@ -477,7 +477,7 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
         <div className="flex justify-between items-start mb-6">
           <div>
             <p className="text-[10px] font-black text-slate-400 dark:text-white/40 uppercase tracking-widest mb-2 flex items-center gap-2">
-              <span>QG</span> <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-white/20"></span> <span>{formattedDate.toUpperCase()}</span>
+              <span>Painel Geral</span> <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-white/20"></span> <span>{formattedDate.toUpperCase()}</span>
             </p>
             <h2 className="text-4xl md:text-5xl font-extrabold text-slate-800 dark:text-white mb-2 tracking-tight">
               {greeting}, {firstName}.
@@ -491,7 +491,7 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
         {/* CARTÃO DE PRÓXIMA AÇÃO (Loop de Hábitos Simplificado) */}
         <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 md:p-8 border border-slate-200/60 dark:border-white/5 shadow-sm relative overflow-hidden group">
           <div className="absolute right-0 top-0 opacity-5 dark:opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4">
-             {pendingReviewsCount > 0 ? <BrainCircuit className="w-64 h-64 text-red-500" /> : activeSprintItems.length > 0 ? <Target className={`w-64 h-64 ${themeColors.brightText}`} /> : <CheckCircle className="w-64 h-64 text-emerald-500" />}
+             {pendingReviewsCount > 0 ? <RefreshCcw className="w-64 h-64 text-red-500" /> : activeSprintItems.length > 0 ? <Target className={`w-64 h-64 ${themeColors.brightText}`} /> : <CheckCircle className="w-64 h-64 text-emerald-500" />}
           </div>
 
           {pendingReviewsCount > 0 ? (
@@ -505,35 +505,35 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
             </div>
           ) : activeSprintItems.length > 0 ? (
             <div className="relative z-10">
-              <span className={`flex items-center gap-2 text-[10px] font-black ${themeColors.brightText} uppercase tracking-widest mb-3`}><div className={`w-2 h-2 rounded-full ${themeColors.bgSolid} animate-pulse`}></div> 2º PASSO: EXECUTAR META</span>
+              <span className={`flex items-center gap-2 text-[10px] font-black ${themeColors.brightText} uppercase tracking-widest mb-3`}><div className={`w-2 h-2 rounded-full ${themeColors.bgSolid} animate-pulse`}></div> 2º PASSO: ESTUDAR HOJE</span>
               <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-2 truncate max-w-2xl">{activeSprintItems.map(i => i.assTitulo).join(' • ')}</h3>
-              <p className="text-sm text-slate-600 dark:text-white/60 mb-6 max-w-lg">Memória blindada. O caminho está livre para absorver conhecimento novo na Mesa de Foco.</p>
+              <p className="text-sm text-slate-600 dark:text-white/60 mb-6 max-w-lg">Memória blindada. O caminho está livre para absorver conhecimento novo.</p>
               <button onClick={() => setActiveTab('metas')} className={`${themeColors.bgSolid} ${themeColors.bgHover} text-white px-8 py-3.5 rounded-xl font-bold text-sm transition-all shadow-lg ${themeColors.shadowHover} flex items-center gap-2 cursor-pointer w-full md:w-auto justify-center`}>
-                Entrar nas Metas <ArrowRight className="w-4 h-4" />
+                Ir para Estudar Hoje <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           ) : (
             <div className="relative z-10">
               <span className="flex items-center gap-2 text-[10px] font-black text-emerald-500 uppercase tracking-widest mb-3"><div className="w-2 h-2 rounded-full bg-emerald-500"></div> 3º PASSO: DESCANSO OU PLANEJAMENTO</span>
               <h3 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">Operação Concluída</h3>
-              <p className="text-sm text-slate-600 dark:text-white/60 mb-6 max-w-lg">Não há metas pendentes. O músculo cresce no repouso, mas se quiser, abasteça o Arsenal para amanhã.</p>
+              <p className="text-sm text-slate-600 dark:text-white/60 mb-6 max-w-lg">Não há metas pendentes. O músculo cresce no repouso, mas se quiser, abasteça o seu plano para amanhã.</p>
               <button onClick={() => setActiveTab('arsenal')} className="bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 text-slate-800 dark:text-white px-8 py-3.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 cursor-pointer w-full md:w-auto justify-center border border-slate-200 dark:border-white/10">
-                Ir para O Arsenal <ArrowRight className="w-4 h-4" />
+                Disciplinas/Metas <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* OS 3 PILARES ESSENCIAIS (O MAPA, A CONSTÂNCIA, O MOTOR) */}
+      {/* OS 3 PILARES ESSENCIAIS */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        {/* PILAR 1: O Mapa (Progresso do Edital) */}
+        {/* PILAR 1: Disciplinas Concluídas */}
         <div className={`bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 ${themeColors.borderLeft}`}>
           <div className="flex justify-between items-start mb-4">
-            <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">O Mapa (Progresso)</p>
+            <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">Disciplinas Concluídas</p>
             <div className={`p-2.5 rounded-xl border ${themeColors.borderLight} ${themeColors.bgSuperLight}`}>
-              <Map className={`w-5 h-5 ${themeColors.brightText}`}/>
+              <PieChart className={`w-5 h-5 ${themeColors.brightText}`}/>
             </div>
           </div>
           <div className="flex-1 flex items-baseline gap-1 mt-2">
@@ -548,12 +548,12 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
           </div>
         </div>
 
-        {/* PILAR 2: A Constância (Dias Ativos) */}
+        {/* PILAR 2: Dias Seguidos */}
         <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-orange-500 dark:border-l-orange-500">
           <div className="flex justify-between items-start mb-4">
-            <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">A Constância</p>
+            <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">Dias Seguidos</p>
             <div className="p-2.5 rounded-xl border border-orange-200 dark:border-orange-500/20 bg-orange-50/50 dark:bg-orange-500/5">
-              <Flame className="w-5 h-5 text-orange-500"/>
+              <CalendarDays className="w-5 h-5 text-orange-500"/>
             </div>
           </div>
           <div className="flex-1 flex items-end gap-2 mt-2 relative min-h-[48px]">
@@ -569,10 +569,10 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
           </div>
         </div>
 
-        {/* PILAR 3: O Motor (Batalha de Hoje) */}
+        {/* PILAR 3: Horas Estudadas Hoje */}
         <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-6 shadow-sm border border-slate-200/60 dark:border-white/5 flex flex-col relative overflow-hidden border-l-4 border-l-purple-500 dark:border-l-purple-500">
           <div className="flex justify-between items-start mb-4 relative z-10">
-            <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">O Motor (Hoje)</p>
+            <p className="text-xs font-black text-slate-500 dark:text-white/40 uppercase tracking-widest mt-1">Horas Estudadas Hoje</p>
             <div className="p-2.5 rounded-xl border border-purple-200 dark:border-purple-500/20 bg-purple-50/50 dark:bg-purple-500/5">
               <Clock className="w-5 h-5 text-purple-500"/>
             </div>
@@ -594,7 +594,7 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
             <div className="w-full h-1.5 bg-slate-100 dark:bg-[#0d1526] rounded-full overflow-hidden mb-3">
               <div className="h-full bg-purple-500 transition-all duration-1000" style={{ width: `${Math.min((todayHours / config.horasDia) * 100, 100)}%` }}></div>
             </div>
-            <p className="text-[10px] font-bold text-slate-400 dark:text-white/30 tracking-wide">Meta diária de voo</p>
+            <p className="text-[10px] font-bold text-slate-400 dark:text-white/30 tracking-wide">Meta diária de estudos</p>
           </div>
         </div>
 
@@ -602,11 +602,11 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6 items-stretch">
         
-        {/* INSIGHT A: Constância de Voo */}
+        {/* INSIGHT A: Histórico de Horas */}
         <div className="bg-white dark:bg-[#111e36] rounded-[2rem] p-8 border border-slate-200/60 dark:border-white/5 shadow-sm flex flex-col h-full min-h-[300px]">
           <div className="flex flex-col justify-between items-start mb-8 gap-1">
-             <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><BarChart2 className={`w-5 h-5 text-purple-500`}/> Constância de Voo</h3>
-             <p className="text-xs text-slate-500 dark:text-white/40">O seu esforço puro nos últimos 14 dias.</p>
+             <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><BarChart2 className={`w-5 h-5 text-purple-500`}/> Histórico de Horas (Últimos 14 Dias)</h3>
+             <p className="text-xs text-slate-500 dark:text-white/40">O seu tempo de dedicação ao longo das semanas.</p>
           </div>
           
           <div className="flex-1 flex items-end justify-between gap-2 mt-auto pt-4 relative">
@@ -636,10 +636,10 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
           </div>
         </div>
 
-        {/* INSIGHT B: Avanço por Disciplina */}
+        {/* INSIGHT B: Progresso por Matéria */}
         <div className="bg-white dark:bg-[#111e36] rounded-[2rem] shadow-sm border border-slate-200/60 dark:border-white/5 p-8 flex flex-col h-full max-h-[320px]">
           <div className="flex justify-between items-center mb-6 shrink-0">
-             <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><Layers className={`w-5 h-5 ${themeColors.brightText}`}/> Avanço por Disciplina</h3>
+             <h3 className="font-bold text-lg text-slate-800 dark:text-white flex items-center gap-2"><Layers className={`w-5 h-5 ${themeColors.brightText}`}/> Progresso por Matéria</h3>
           </div>
           
           <div className="flex-1 flex flex-col gap-4 overflow-y-auto pr-2 custom-scrollbar">
@@ -910,9 +910,9 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
       
       <SectionHeader 
         overline="Planejamento" 
-        title="O Arsenal" 
-        subtitle="A sua Biblioteca de Armas. Envie metas direto para a Mesa de Foco." 
-        icon={FolderOpen}
+        title="Disciplinas/Metas" 
+        subtitle="A sua Biblioteca de Matérias. Envie tópicos para Estudar Hoje." 
+        icon={BookOpen}
         themeColors={themeColors}
         extra={
           <button onClick={() => { setIsEditing(!isEditing); setEditingTopicId(null); setBulkInput({discId: null, text: ''}); setSelectedAssuntosBulk(new Set()); setInlineEditingId(null); }} className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-bold text-sm transition-colors w-full sm:w-auto shadow-sm cursor-pointer ${isEditing ? `${themeColors.bgSolid} ${themeColors.bgHover} text-white ${themeColors.shadowHover}` : `bg-white dark:bg-[#111e36] text-slate-700 dark:text-white hover:bg-slate-50 dark:hover:bg-white/5 border border-slate-200/60 dark:border-white/10`}`}>
@@ -1060,7 +1060,7 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
           {!activeDisc ? (
              <EmptyState 
                 icon={BookOpen}
-                title="Biblioteca de Matérias"
+                title="Disciplinas/Metas"
                 message="Navegue pelo índice à esquerda. Aqui você tem a visão limpa e estruturada de cada tópico do seu edital."
                 themeColors={themeColors}
              />
@@ -1343,9 +1343,9 @@ function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsC
       
       <SectionHeader 
         overline="Execução" 
-        title="Metas do Dia" 
+        title="Estudar Hoje" 
         subtitle="A sua linha da frente. Concentre-se apenas no topo da lista." 
-        icon={TargetIcon}
+        icon={Target}
         themeColors={themeColors}
         extra={
           <button 
@@ -1362,7 +1362,7 @@ function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsC
             {!isTopItemMastered && customSprint.length > 0 ? (
               <><Lock className="w-5 h-5" /> Bloqueado (Cumpra as 3 Etapas)</>
             ) : (
-              <><CheckCircle className="w-5 h-5" /> Concluir Meta do Topo</>
+              <><CheckCircle className="w-5 h-5" /> Concluir Tópico do Topo</>
             )}
           </button>
         }
@@ -1376,8 +1376,8 @@ function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsC
         <EmptyState 
            icon={ShoppingCart}
            title="Área Limpa!"
-           message="Você completou as metas de hoje. Vá ao Arsenal adicionar novos alvos."
-           actionLabel="Ir para O Arsenal"
+           message="Você completou o que tinha para hoje. Vá em Disciplinas/Metas para adicionar novos alvos."
+           actionLabel="Disciplinas/Metas"
            onAction={() => setActiveTab('arsenal')}
            themeColors={themeColors}
         />
@@ -1401,7 +1401,7 @@ function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsC
                      </div>
                   </div>
                   <button onClick={() => setActiveTab('memoria')} className="bg-red-500 hover:bg-red-600 text-white px-8 py-4 rounded-xl font-black transition-all shadow-xl hover:shadow-red-500/40 w-full md:w-auto shrink-0 cursor-pointer flex items-center gap-2">
-                     <Activity className="w-5 h-5" /> Iniciar Aquecimento
+                     <Activity className="w-5 h-5" /> Iniciar Revisões
                   </button>
                </div>
                
@@ -1414,7 +1414,7 @@ function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsC
           {pendingReviewsCount > 0 && customSprint.length > 0 && (
              <div className="absolute inset-0 top-32 z-10 bg-slate-100/50 dark:bg-[#0d1526]/60 backdrop-blur-[2px] rounded-[2rem] flex flex-col items-center justify-center border border-slate-200/50 dark:border-white/5 pointer-events-none">
                 <Lock className="w-12 h-12 text-slate-400 dark:text-white/30 mb-2 opacity-50" />
-                <span className="font-black text-slate-500 dark:text-white/40 uppercase tracking-widest text-sm opacity-80">Metas Bloqueadas pelo Aquecimento</span>
+                <span className="font-black text-slate-500 dark:text-white/40 uppercase tracking-widest text-sm opacity-80">Bloqueado pelas Revisões Pendentes</span>
              </div>
           )}
 
@@ -1451,7 +1451,7 @@ function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsC
                     <GripVertical className="w-5 h-5 cursor-grab" title="Arrastar para reordenar" />
                   </div>
                   
-                  {isFocus && globalIdx === 0 && <span className={`absolute top-0 right-16 -translate-y-1/2 ${themeColors.bgSolid} text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-sm border border-white/20 z-10 flex items-center gap-1`}><TargetIcon className="w-3 h-3"/> Alvo Principal</span>}
+                  {isFocus && globalIdx === 0 && <span className={`absolute top-0 right-16 -translate-y-1/2 ${themeColors.bgSolid} text-white text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-sm border border-white/20 z-10 flex items-center gap-1`}><Target className="w-3 h-3"/> Alvo Principal</span>}
 
                   <div className={isFocus ? 'pr-14' : 'pr-20'}>
                     <span className={`text-[10px] font-black uppercase tracking-widest text-slate-500 dark:${themeColors.brightText} mb-1 block truncate`}>{item.discNome}</span>
@@ -1498,7 +1498,7 @@ function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsC
 }
 
 // ==========================================
-// ABA 4: MEMÓRIA ATIVA (MOTOR DE REVISÃO)
+// ABA 4: REVISÕES (MOTOR DE REVISÃO)
 // ==========================================
 function TabMemoria({ progress, handleReviewFeedback, edital, activeSubjectIds, themeColors, projectConfig }) {
   let todosAssuntos = [];
@@ -1555,16 +1555,16 @@ function TabMemoria({ progress, handleReviewFeedback, edital, activeSubjectIds, 
       
       <SectionHeader 
         overline="Retenção" 
-        title="Memória Ativa" 
+        title="Revisões" 
         subtitle="Onde o algoritmo não deixa a matéria morrer. Avalie com honestidade." 
-        icon={BrainCircuit}
+        icon={RefreshCcw}
         themeColors={themeColors}
       />
 
       <div className="grid md:grid-cols-2 gap-8 mt-8">
         <div>
           <h3 className="text-lg font-bold text-red-600 dark:text-red-400 flex items-center gap-2 mb-6 border-b border-red-100 dark:border-red-900/30 pb-3">
-            <AlertTriangle className="w-5 h-5"/> Fila de Revisão Crítica
+            <AlertTriangle className="w-5 h-5"/> Revisões Pendentes
           </h3>
           <div className="space-y-4">
             {revisoesPendentes.length === 0 ? (
@@ -1652,7 +1652,7 @@ function TabMemoria({ progress, handleReviewFeedback, edital, activeSubjectIds, 
 }
 
 // ==========================================
-// ABA 5: ENGRENAGENS (ADMINISTRAÇÃO)
+// ABA 5: CONFIGURAÇÕES DO SISTEMA
 // ==========================================
 function TabEngrenagens({ auth, config, setConfig, userProgress, setUserProgress, edital, setEdital, customSprint, setCustomSprint, initialEdital, setDailyLogs, themeColors }) {
   const [localConfig, setLocalConfig] = useState({
@@ -1742,7 +1742,7 @@ function TabEngrenagens({ auth, config, setConfig, userProgress, setUserProgress
       
       <SectionHeader 
         overline="Sistema" 
-        title="Engrenagens" 
+        title="Configurações do Sistema" 
         subtitle="Personalize a sua plataforma e proteja a sua operação de estudo." 
         icon={Settings}
         themeColors={themeColors}
@@ -1826,7 +1826,7 @@ function TabEngrenagens({ auth, config, setConfig, userProgress, setUserProgress
         {/* BLOCO 2: CONFIGURAÇÕES DE ESTUDO */}
         <div className="bg-white dark:bg-[#111e36] p-8 rounded-[2rem] border border-slate-200/60 dark:border-white/5 shadow-sm">
           <h3 className="text-lg font-black text-slate-800 dark:text-white mb-8 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4">
-            <TargetIcon className={`w-5 h-5 ${themeColors.brightText}`}/> Configurações da Meta
+            <Target className={`w-5 h-5 ${themeColors.brightText}`}/> Configurações da Meta
           </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -2242,17 +2242,17 @@ export default function App() {
 
   const navPhases = [
     { phase: 'Comando', items: [
-      { id: 'qg', icon: Activity, label: 'QG' }
+      { id: 'qg', icon: LayoutGrid, label: 'Painel Geral' }
     ]},
     { phase: 'Planejamento', items: [
-      { id: 'arsenal', icon: FolderOpen, label: 'O Arsenal' }
+      { id: 'arsenal', icon: BookOpen, label: 'Disciplinas/Metas' }
     ]},
     { phase: 'Execução', items: [
-      { id: 'metas', icon: TargetIcon, label: 'Metas do Dia', badge: customSprint.length }, 
-      { id: 'memoria', icon: BrainCircuit, label: 'Memória Ativa', badge: pendingReviewsCount }
+      { id: 'metas', icon: Target, label: 'Estudar Hoje', badge: customSprint.length }, 
+      { id: 'memoria', icon: RefreshCcw, label: 'Revisões', badge: pendingReviewsCount }
     ]},
     { phase: 'Sistema', items: [
-      { id: 'engrenagens', icon: Settings, label: 'Engrenagens' }
+      { id: 'engrenagens', icon: Settings, label: 'Configurações do Sistema' }
     ]}
   ];
 
@@ -2270,10 +2270,10 @@ export default function App() {
   }
 
   const mobileNavItems = [
-    { id: 'qg', icon: Activity, label: 'QG' },
-    { id: 'arsenal', icon: FolderOpen, label: 'Arsenal' },
-    { id: 'metas', icon: TargetIcon, label: 'Metas', badge: customSprint.length },
-    { id: 'memoria', icon: BrainCircuit, label: 'Memória', badge: pendingReviewsCount }
+    { id: 'qg', icon: LayoutGrid, label: 'Painel' },
+    { id: 'arsenal', icon: BookOpen, label: 'Disciplinas' },
+    { id: 'metas', icon: Target, label: 'Estudar', badge: customSprint.length },
+    { id: 'memoria', icon: RefreshCcw, label: 'Revisões', badge: pendingReviewsCount }
   ];
 
   const firstName = (projectConfig.userName || 'Concurseiro').split(' ')[0];
@@ -2340,7 +2340,7 @@ export default function App() {
 
               <div className="flex flex-col gap-1 mt-1 pt-4 border-t border-slate-200/50 dark:border-white/10">
                  <div className="flex justify-between items-end mb-1.5">
-                     <span className="text-[9px] font-black text-slate-400 dark:text-white/40 uppercase tracking-widest">Domínio do Edital</span>
+                     <span className="text-[9px] font-black text-slate-400 dark:text-white/40 uppercase tracking-widest">Edital Concluído</span>
                      <span className="text-[10px] font-black text-slate-800 dark:text-white">{progressPerc}%</span>
                  </div>
                  <div className="w-full h-1.5 bg-slate-200/50 dark:bg-white/10 rounded-full overflow-hidden mb-3">
