@@ -2164,6 +2164,13 @@ export default function App() {
     }
   }, [isTimerActive, unloggedSeconds, handleAutoLog]);
 
+  // CORREÇÃO TÁTICA: Auto-Pause ao sair da aba de Metas (Liberta o utilizador do Deep Work)
+  useEffect(() => {
+    if (activeTab !== 'metas' && isTimerActive) {
+      setIsTimerActive(false);
+    }
+  }, [activeTab, isTimerActive]);
+
   const toggleTimer = () => setIsTimerActive(!isTimerActive);
 
   // Calcula o tempo que aparece no visor (Horas Totais do Dia + Segundos Correntes)
