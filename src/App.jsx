@@ -5,7 +5,7 @@ import {
   RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Pencil, Settings,
   Edit, AlertTriangle, ChevronUp, Activity, ListPlus, ArrowRight, ArrowLeft, BarChart2,
   CalendarDays, LayoutGrid, BrainCircuit, ShieldAlert, Download, Sliders, Lock, LogOut,
-  Filter, Play, Pause, Coffee, X, Menu, Minus, Upload, Palette, FolderOpen, ChevronsDown, ChevronsUp, Crosshair, Zap, Map, Flame, Compass, BookCheck
+  Filter, Play, Pause, Coffee, X, Menu, Minus, Upload, Palette, FolderOpen, ChevronsDown, ChevronsUp, Crosshair, Zap, Map, Flame, HelpCircle, BookCheck
 } from 'lucide-react';
 
 // --- FIREBASE CLOUD STORAGE SETUP ---
@@ -165,7 +165,7 @@ export const THEMES = {
     primaryText: 'text-rose-600 dark:text-rose-400',
     brightText: 'text-rose-500 dark:text-rose-500',
     bgSolid: 'bg-rose-500',
-    bgHover: 'hover:bg-rose-600',
+    bgHover: 'bg-rose-600',
     bgSuperLight: 'bg-rose-50 dark:bg-rose-500/10',
     borderLight: 'border-rose-200 dark:border-rose-500/20',
     borderSolid: 'border-rose-500 dark:border-rose-500',
@@ -676,104 +676,122 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
 }
 
 // ==========================================
-// ABA 5: DOUTRINA DE ELITE (MANUAL)
+// MODAL: COMO USAR (MANUAL FLUTUANTE)
 // ==========================================
-function TabDoutrina({ themeColors }) {
+const ModalGuia = ({ onClose, themeColors }) => {
   return (
-    <div className="space-y-6 animate-in fade-in pb-10 text-left">
-      <SectionHeader 
-        overline="Manual de Operações" 
-        title="Doutrina de Elite" 
-        subtitle="O caminho das pedras. Leia antes de iniciar a sua operação." 
-        icon={Compass}
-        themeColors={themeColors}
-      />
-
-      <div className="bg-white dark:bg-[#111e36] p-6 md:p-8 rounded-[2rem] border border-slate-200/60 dark:border-white/5 shadow-sm">
-        <h3 className={`text-xl font-black ${themeColors.brightText} mb-6 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4 uppercase tracking-wide`}>
-          <Map className="w-6 h-6"/> Fase 1: O Fluxo de Combate
-        </h3>
-        <p className="text-slate-600 dark:text-white/70 mb-6 font-medium">A sua rotina de estudos na plataforma resume-se a 3 passos inquebráveis:</p>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
+      <div className="absolute inset-0 bg-slate-900/60 dark:bg-[#0d1526]/80 backdrop-blur-sm cursor-pointer" onClick={onClose}></div>
+      
+      <div className="bg-white dark:bg-[#111e36] rounded-[2rem] shadow-2xl border border-slate-200 dark:border-white/10 w-full max-w-4xl max-h-[90vh] flex flex-col relative z-10 animate-in zoom-in-95 duration-200 overflow-hidden">
         
-        <div className="space-y-6">
-          <div className="bg-slate-50 dark:bg-[#0d1526] p-5 rounded-2xl border border-slate-100 dark:border-white/5">
-            <h4 className="font-bold text-slate-800 dark:text-white text-lg mb-2 flex items-center gap-2"><span className={`${themeColors.bgSolid} text-white w-6 h-6 rounded-full flex items-center justify-center text-xs`}>1</span> O Planeamento (Aba "Disciplinas/Metas")</h4>
-            <p className="text-sm text-slate-600 dark:text-white/60 leading-relaxed"><strong className="text-slate-700 dark:text-white/80">O que fazer:</strong> Este é o seu ponto de partida. Vá a esta aba para cadastrar e organizar todo o seu edital. Quando for começar a semana, clique no botão <strong className="text-slate-700 dark:text-white/80">"+ Meta"</strong> ao lado dos assuntos que quer estudar. Isto enviará a matéria diretamente para a sua fila de execução.</p>
-          </div>
+        {/* CABEÇALHO DO MODAL */}
+        <div className="flex justify-between items-center p-6 md:p-8 border-b border-slate-100 dark:border-white/5 shrink-0 bg-white/50 dark:bg-[#111e36]/50">
+           <h2 className={`text-2xl font-black text-slate-800 dark:text-white flex items-center gap-3`}>
+             <HelpCircle className={`w-8 h-8 text-sky-500`} /> 
+             <div>
+               <span className={`block text-[10px] uppercase tracking-widest text-sky-500 font-bold mb-1`}>Ajuda & Instruções</span>
+               Como Usar o Sistema
+             </div>
+           </h2>
+           <button onClick={onClose} className="p-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 rounded-full transition-colors cursor-pointer text-slate-500 dark:text-white/50">
+             <X className="w-5 h-5"/>
+           </button>
+        </div>
+        
+        {/* CONTEÚDO ROLÁVEL */}
+        <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-10 custom-scrollbar text-left">
+          
+          {/* FASE 1 */}
+          <div>
+            <h3 className={`text-xl font-black ${themeColors.brightText} mb-6 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4 uppercase tracking-wide`}>
+              <Map className="w-6 h-6"/> Fase 1: O Fluxo de Combate
+            </h3>
+            <p className="text-slate-600 dark:text-white/70 mb-6 font-medium">A sua rotina de estudos na plataforma resume-se a 3 passos inquebráveis:</p>
+            
+            <div className="space-y-4">
+              <div className="bg-slate-50 dark:bg-[#0d1526] p-5 rounded-2xl border border-slate-100 dark:border-white/5">
+                <h4 className="font-bold text-slate-800 dark:text-white text-base mb-2 flex items-center gap-2"><span className={`${themeColors.bgSolid} text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]`}>1</span> O Planeamento (Aba "Disciplinas/Metas")</h4>
+                <p className="text-sm text-slate-600 dark:text-white/60 leading-relaxed"><strong className="text-slate-700 dark:text-white/80">O que fazer:</strong> Este é o seu ponto de partida. Vá a esta aba para cadastrar e organizar todo o seu edital. Quando for começar a semana, clique no botão <strong className="text-slate-700 dark:text-white/80">"+ Meta"</strong> ao lado dos assuntos que quer estudar. Isto enviará a matéria diretamente para a sua fila de execução.</p>
+              </div>
 
-          <div className="bg-slate-50 dark:bg-[#0d1526] p-5 rounded-2xl border border-slate-100 dark:border-white/5">
-            <h4 className="font-bold text-slate-800 dark:text-white text-lg mb-2 flex items-center gap-2"><span className={`${themeColors.bgSolid} text-white w-6 h-6 rounded-full flex items-center justify-center text-xs`}>2</span> O Avanço (Aba "Estudar Hoje")</h4>
-            <div className="text-sm text-slate-600 dark:text-white/60 leading-relaxed space-y-2">
-               <p><strong className="text-slate-700 dark:text-white/80">O que fazer:</strong> É aqui que a guerra se ganha.</p>
-               <ol className="list-decimal pl-5 space-y-1">
-                 <li>Ao sentar-se na cadeira, acione o <strong className="text-slate-700 dark:text-white/80">Cronómetro</strong> (Play).</li>
-                 <li>Foque-se no Alvo Principal no topo da lista. Cumpra rigorosamente as 3 etapas: Ler a Teoria, Fazer as Questões e Agendar a Revisão Automática.</li>
-                 <li><strong className="text-red-500">Atenção:</strong> Só quando as 3 caixas estiverem marcadas é que o cadeado se quebra e o botão verde <strong className="text-slate-700 dark:text-white/80">"Concluir Tópico do Topo"</strong> é desbloqueado. Clique nele para fechar a meta e avançar.</li>
-               </ol>
+              <div className="bg-slate-50 dark:bg-[#0d1526] p-5 rounded-2xl border border-slate-100 dark:border-white/5">
+                <h4 className="font-bold text-slate-800 dark:text-white text-base mb-2 flex items-center gap-2"><span className={`${themeColors.bgSolid} text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]`}>2</span> O Avanço (Aba "Estudar Hoje")</h4>
+                <div className="text-sm text-slate-600 dark:text-white/60 leading-relaxed space-y-2">
+                   <p><strong className="text-slate-700 dark:text-white/80">O que fazer:</strong> É aqui que a guerra se ganha.</p>
+                   <ol className="list-decimal pl-5 space-y-1">
+                     <li>Ao sentar-se na cadeira, acione o <strong className="text-slate-700 dark:text-white/80">Cronómetro</strong> (Play).</li>
+                     <li>Foque-se no Alvo Principal no topo da lista. Cumpra rigorosamente as 3 etapas: Ler a Teoria, Fazer as Questões e Agendar a Revisão Automática.</li>
+                     <li><strong className="text-red-500">Atenção:</strong> Só quando as 3 caixas estiverem marcadas é que o cadeado se quebra e o botão verde <strong className="text-slate-700 dark:text-white/80">"Concluir Tópico do Topo"</strong> é desbloqueado. Clique nele para fechar a meta e avançar.</li>
+                   </ol>
+                </div>
+              </div>
+
+              <div className="bg-slate-50 dark:bg-[#0d1526] p-5 rounded-2xl border border-slate-100 dark:border-white/5">
+                <h4 className="font-bold text-slate-800 dark:text-white text-base mb-2 flex items-center gap-2"><span className={`${themeColors.bgSolid} text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px]`}>3</span> A Manutenção (Aba "Revisões")</h4>
+                <p className="text-sm text-slate-600 dark:text-white/60 leading-relaxed"><strong className="text-slate-700 dark:text-white/80">O que fazer:</strong> O cérebro humano é um balde furado; o que não é revisto, evapora. Se o sistema detetar que tem tópicos a expirar, ele vai bloquear as suas metas novas de propósito. Terá de vir a esta aba e avaliar com honestidade (Difícil, Bom ou Fácil) como está a sua memória daquele assunto. Só com a "Fila Crítica" limpa é que o sistema lhe dará autorização para voltar ao Passo 2.</p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-slate-50 dark:bg-[#0d1526] p-5 rounded-2xl border border-slate-100 dark:border-white/5">
-            <h4 className="font-bold text-slate-800 dark:text-white text-lg mb-2 flex items-center gap-2"><span className={`${themeColors.bgSolid} text-white w-6 h-6 rounded-full flex items-center justify-center text-xs`}>3</span> A Manutenção (Aba "Revisões")</h4>
-            <p className="text-sm text-slate-600 dark:text-white/60 leading-relaxed"><strong className="text-slate-700 dark:text-white/80">O que fazer:</strong> O cérebro humano é um balde furado; o que não é revisto, evapora. Se o sistema detetar que tem tópicos a expirar, ele vai bloquear as suas metas novas de propósito. Terá de vir a esta aba e avaliar com honestidade (Difícil, Bom ou Fácil) como está a sua memória daquele assunto. Só com a "Fila Crítica" limpa é que o sistema lhe dará autorização para voltar ao Passo 2.</p>
+          {/* FASE 2 */}
+          <div>
+            <h3 className={`text-xl font-black ${themeColors.brightText} mb-6 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4 uppercase tracking-wide`}>
+              <LayoutGrid className="w-6 h-6"/> Fase 2: Entendendo os Seus Radares
+            </h3>
+            <p className="text-slate-600 dark:text-white/70 mb-6 font-medium">No seu Painel Geral, não há números de vaidade. Tudo o que lá está dita o seu sucesso real:</p>
+            
+            <ul className="space-y-4 text-sm text-slate-600 dark:text-white/60">
+              <li className="flex items-start gap-3 bg-slate-50 dark:bg-[#0d1526] p-4 rounded-xl border border-slate-100 dark:border-white/5">
+                 <PieChart className="w-5 h-5 mt-0.5 text-blue-500 shrink-0"/>
+                 <p><strong className="text-slate-800 dark:text-white">Disciplinas Concluídas:</strong> A sua bússola de longo prazo. Mostra a percentagem exata do edital que já dominou de forma definitiva (Teoria + Questões + Revisão).</p>
+              </li>
+              <li className="flex items-start gap-3 bg-slate-50 dark:bg-[#0d1526] p-4 rounded-xl border border-slate-100 dark:border-white/5">
+                 <CalendarDays className="w-5 h-5 mt-0.5 text-orange-500 shrink-0"/>
+                 <p><strong className="text-slate-800 dark:text-white">Dias Seguidos:</strong> O seu escudo contra a preguiça. Se atingir a sua meta de horas diárias no cronómetro, o seu calendário avança. Se falhar um dia, a corrente quebra e o número volta a zero. Proteja esta sequência com a sua vida.</p>
+              </li>
+              <li className="flex items-start gap-3 bg-slate-50 dark:bg-[#0d1526] p-4 rounded-xl border border-slate-100 dark:border-white/5">
+                 <Clock className="w-5 h-5 mt-0.5 text-purple-500 shrink-0"/>
+                 <p><strong className="text-slate-800 dark:text-white">Horas Estudadas Hoje:</strong> O seu termómetro de esforço diário. Aciona-se com o seu cronómetro. Bata a meta e vá descansar em paz.</p>
+              </li>
+            </ul>
           </div>
+
+          {/* FASE 3 */}
+          <div>
+            <h3 className={`text-xl font-black ${themeColors.brightText} mb-6 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4 uppercase tracking-wide`}>
+              <Target className="w-6 h-6"/> Fase 3: Os 5 Mandamentos do Guru
+            </h3>
+            
+            <div className="space-y-4">
+              <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 text-sm">
+                 <strong className="text-amber-800 dark:text-amber-400 block mb-1">1. A Constância vence a Intensidade</strong>
+                 <span className="text-amber-700/80 dark:text-amber-400/80">É melhor estudar 2 horas com foco todos os dias do que tentar estudar 10 horas no domingo e passar a semana exausto. O seu número de "Dias Seguidos" é o seu maior troféu.</span>
+              </div>
+              <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-sm">
+                 <strong className="text-emerald-800 dark:text-emerald-400 block mb-1">2. Estudo sem questões é ilusão</strong>
+                 <span className="text-emerald-700/80 dark:text-emerald-400/80">Ler a teoria e sublinhar dá uma falsa sensação de inteligência. A verdade só aparece no campo de batalha das questões. Nunca avance de tópico sem se testar.</span>
+              </div>
+              <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 text-sm">
+                 <strong className="text-rose-800 dark:text-rose-400 block mb-1">3. A dor da Revisão é o que aprova</strong>
+                 <span className="text-rose-700/80 dark:text-rose-400/80">Revisar é desconfortável porque o cérebro tem de fazer esforço para se lembrar. Mas é exatamente essa força que "chumba" a memória a longo prazo. Confie no algoritmo da plataforma.</span>
+              </div>
+              <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 text-sm">
+                 <strong className="text-blue-800 dark:text-blue-400 block mb-1">4. Seja implacável com o Cronómetro Líquido</strong>
+                 <span className="text-blue-700/80 dark:text-blue-400/80">Levantou-se para beber água ou pegou no telemóvel? Pause o relógio. Seja cruelmente honesto com o seu tempo de cadeira.</span>
+              </div>
+              <div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-500/10 border border-purple-100 dark:border-purple-500/20 text-sm">
+                 <strong className="text-purple-800 dark:text-purple-400 block mb-1">5. O músculo cresce no repouso</strong>
+                 <span className="text-purple-700/80 dark:text-purple-400/80">Bateu a meta de horas do dia e fechou os tópicos? Desligue o sistema sem culpa. A ansiedade de "precisar de estudar mais" apenas gera esgotamento (burnout). Confie no processo.</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-
-      <div className="bg-white dark:bg-[#111e36] p-6 md:p-8 rounded-[2rem] border border-slate-200/60 dark:border-white/5 shadow-sm mt-6">
-        <h3 className={`text-xl font-black ${themeColors.brightText} mb-6 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4 uppercase tracking-wide`}>
-          <LayoutGrid className="w-6 h-6"/> Fase 2: Entendendo os Seus Radares
-        </h3>
-        <p className="text-slate-600 dark:text-white/70 mb-6 font-medium">No seu Painel Geral, não há números de vaidade. Tudo o que lá está dita o seu sucesso real:</p>
-        
-        <ul className="space-y-4 text-sm text-slate-600 dark:text-white/60">
-          <li className="flex items-start gap-3">
-             <PieChart className="w-5 h-5 mt-0.5 text-blue-500 shrink-0"/>
-             <p><strong className="text-slate-800 dark:text-white">Disciplinas Concluídas:</strong> A sua bússola de longo prazo. Mostra a percentagem exata do edital que já dominou de forma definitiva (Teoria + Questões + Revisão).</p>
-          </li>
-          <li className="flex items-start gap-3">
-             <CalendarDays className="w-5 h-5 mt-0.5 text-orange-500 shrink-0"/>
-             <p><strong className="text-slate-800 dark:text-white">Dias Seguidos:</strong> O seu escudo contra a preguiça. Se atingir a sua meta de horas diárias no cronómetro, o seu calendário avança. Se falhar um dia, a corrente quebra e o número volta a zero. Proteja esta sequência com a sua vida.</p>
-          </li>
-          <li className="flex items-start gap-3">
-             <Clock className="w-5 h-5 mt-0.5 text-purple-500 shrink-0"/>
-             <p><strong className="text-slate-800 dark:text-white">Horas Estudadas Hoje:</strong> O seu termómetro de esforço diário. Aciona-se com o seu cronómetro. Bata a meta e vá descansar em paz.</p>
-          </li>
-        </ul>
-      </div>
-
-      <div className="bg-white dark:bg-[#111e36] p-6 md:p-8 rounded-[2rem] border border-slate-200/60 dark:border-white/5 shadow-sm mt-6">
-        <h3 className={`text-xl font-black ${themeColors.brightText} mb-6 flex items-center gap-2 border-b border-slate-100 dark:border-white/5 pb-4 uppercase tracking-wide`}>
-          <Target className="w-6 h-6"/> Fase 3: Os 5 Mandamentos do Guru
-        </h3>
-        
-        <div className="space-y-4">
-          <div className="p-4 rounded-xl bg-amber-50 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 text-sm">
-             <strong className="text-amber-800 dark:text-amber-400 block mb-1">1. A Constância vence a Intensidade</strong>
-             <span className="text-amber-700/80 dark:text-amber-400/80">É melhor estudar 2 horas com foco todos os dias do que tentar estudar 10 horas no domingo e passar a semana exausto. O seu número de "Dias Seguidos" é o seu maior troféu.</span>
-          </div>
-          <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-100 dark:border-emerald-500/20 text-sm">
-             <strong className="text-emerald-800 dark:text-emerald-400 block mb-1">2. Estudo sem questões é ilusão</strong>
-             <span className="text-emerald-700/80 dark:text-emerald-400/80">Ler a teoria e sublinhar dá uma falsa sensação de inteligência. A verdade só aparece no campo de batalha das questões. Nunca avance de tópico sem se testar.</span>
-          </div>
-          <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-500/10 border border-rose-100 dark:border-rose-500/20 text-sm">
-             <strong className="text-rose-800 dark:text-rose-400 block mb-1">3. A dor da Revisão é o que aprova</strong>
-             <span className="text-rose-700/80 dark:text-rose-400/80">Revisar é desconfortável porque o cérebro tem de fazer esforço para se lembrar. Mas é exatamente essa força que "chumba" a memória a longo prazo. Confie no algoritmo da plataforma.</span>
-          </div>
-          <div className="p-4 rounded-xl bg-blue-50 dark:bg-blue-500/10 border border-blue-100 dark:border-blue-500/20 text-sm">
-             <strong className="text-blue-800 dark:text-blue-400 block mb-1">4. Seja implacável com o Cronómetro Líquido</strong>
-             <span className="text-blue-700/80 dark:text-blue-400/80">Levantou-se para beber água ou pegou no telemóvel? Pause o relógio. Seja cruelmente honesto com o seu tempo de cadeira.</span>
-          </div>
-          <div className="p-4 rounded-xl bg-purple-50 dark:bg-purple-500/10 border border-purple-100 dark:border-purple-500/20 text-sm">
-             <strong className="text-purple-800 dark:text-purple-400 block mb-1">5. O músculo cresce no repouso</strong>
-             <span className="text-purple-700/80 dark:text-purple-400/80">Bateu a meta de horas do dia e fechou os tópicos? Desligue o sistema sem culpa. A ansiedade de "precisar de estudar mais" apenas gera esgotamento (burnout). Confie no processo.</span>
-          </div>
-        </div>
-      </div>
-
     </div>
   );
-}
+};
 
 function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprintItem, customSprint, resetProgress, themeColors, setActiveTab }) {
   const [expanded, setExpanded] = useState({});
@@ -2107,6 +2125,8 @@ export default function App() {
   const [sprintsCompleted, setSprintsCompleted] = useState(0);
   const [dailyLogs, setDailyLogs] = useState({});
 
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
+
   // === ESTADO GLOBAL DO CRONÓMETRO ===
   const [isTimerActive, setIsTimerActive] = useState(false);
   const [unloggedSeconds, setUnloggedSeconds] = useState(0);
@@ -2356,8 +2376,7 @@ export default function App() {
 
   const navPhases = [
     { phase: 'Comando', items: [
-      { id: 'qg', icon: LayoutGrid, label: 'Painel Geral' },
-      { id: 'doutrina', icon: Compass, label: 'Doutrina de Elite' }
+      { id: 'qg', icon: LayoutGrid, label: 'Painel Geral' }
     ]},
     { phase: 'Planejamento', items: [
       { id: 'arsenal', icon: BookOpen, label: 'Disciplinas/Metas' }
@@ -2388,8 +2407,7 @@ export default function App() {
     { id: 'qg', icon: LayoutGrid, label: 'Painel' },
     { id: 'arsenal', icon: BookOpen, label: 'Metas' },
     { id: 'metas', icon: Target, label: 'Estudar', badge: customSprint.length },
-    { id: 'memoria', icon: RefreshCcw, label: 'Revisões', badge: pendingReviewsCount },
-    { id: 'doutrina', icon: Compass, label: 'Doutrina' }
+    { id: 'memoria', icon: RefreshCcw, label: 'Revisões', badge: pendingReviewsCount }
   ];
 
   const firstName = (projectConfig.userName || 'Concurseiro').split(' ')[0];
@@ -2418,6 +2436,9 @@ export default function App() {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <button onClick={() => setIsGuideOpen(true)} className={`p-2 bg-sky-50 dark:bg-sky-500/10 hover:bg-sky-100 dark:hover:bg-sky-500/20 border border-sky-200/60 dark:border-sky-500/20 rounded-full transition-colors cursor-pointer shadow-sm text-sky-600 dark:text-sky-400`} title="Como Usar o Sistema">
+              <HelpCircle className="w-4 h-4" />
+            </button>
             <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 bg-slate-50 dark:bg-[#111e36] hover:bg-slate-100 dark:hover:bg-white/5 border border-slate-200/60 dark:border-white/5 rounded-full transition-colors cursor-pointer shadow-sm`}>
               {isDarkMode ? <Sun className={`w-4 h-4 ${themeColors.brightText}`} /> : <Moon className={`w-4 h-4 text-slate-600`} />}
             </button>
@@ -2428,9 +2449,14 @@ export default function App() {
         <aside className={`${isDeepWork ? 'hidden' : 'hidden md:flex'} w-[280px] bg-white dark:bg-[#0d1526] shadow-xl flex-col z-10 shrink-0 border-r border-slate-200/80 dark:border-white/5 sticky top-0 h-screen overflow-hidden transition-colors duration-300`}>
           <div className={`p-6 bg-slate-50/50 dark:bg-transparent border-b border-slate-200/80 dark:border-white/5 relative transition-colors duration-500 shrink-0`}>
             
-            <button onClick={() => setIsDarkMode(!isDarkMode)} className={`absolute top-6 right-6 p-2 bg-white dark:bg-[#111e36] hover:bg-slate-50 dark:hover:bg-white/5 border border-slate-200/60 dark:border-white/5 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-white/40 z-10`}>
-              {isDarkMode ? <Sun className={`w-4 h-4 ${themeColors.brightText}`} /> : <Moon className={`w-4 h-4 text-slate-600`} />}
-            </button>
+            <div className="absolute top-6 right-6 flex flex-col items-center gap-2 z-10">
+              <button onClick={() => setIsDarkMode(!isDarkMode)} className={`p-2 bg-white dark:bg-[#111e36] hover:bg-slate-50 dark:hover:bg-white/5 border border-slate-200/60 dark:border-white/5 rounded-full transition-colors cursor-pointer shadow-sm text-slate-500 dark:text-white/40`} title="Alternar Tema">
+                {isDarkMode ? <Sun className={`w-4 h-4 ${themeColors.brightText}`} /> : <Moon className={`w-4 h-4 text-slate-600`} />}
+              </button>
+              <button onClick={() => setIsGuideOpen(true)} className={`p-2 bg-sky-50 dark:bg-sky-500/10 hover:bg-sky-100 dark:hover:bg-sky-500/20 border border-sky-200/60 dark:border-sky-500/20 rounded-full transition-colors cursor-pointer shadow-sm text-sky-600 dark:text-sky-400`} title="Como Usar o Sistema">
+                <HelpCircle className="w-4 h-4" />
+              </button>
+            </div>
 
             {/* MARCA DA PLATAFORMA */}
             <div className="flex items-center gap-3 min-w-0 mb-6 pr-10">
@@ -2501,13 +2527,15 @@ export default function App() {
         <main className={`flex-1 p-4 md:p-8 lg:p-10 overflow-y-auto ${isDeepWork ? 'pb-4' : 'pb-28 md:pb-10'} text-left transition-all duration-300 relative`}>
           <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full transition-all duration-500 h-full flex flex-col">
             {activeTab === 'qg' && <TabQG config={projectConfig} progressPerc={progressPerc} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} themeColors={themeColors} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} totalAssuntos={totalAssuntos} currentStreak={currentStreak} />}
-            {activeTab === 'doutrina' && <TabDoutrina themeColors={themeColors} />}
             {activeTab === 'arsenal' && <TabArsenal edital={edital} setEdital={setEdital} progress={userProgress} setUserProgress={setUserProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} setActiveTab={setActiveTab} />}
             {activeTab === 'metas' && <TabMetas customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} themeColors={themeColors} isTimerActive={isTimerActive} toggleTimer={toggleTimer} displayTimerSeconds={displayTimerSeconds} pendingReviewsCount={pendingReviewsCount} />}
             {activeTab === 'memoria' && <TabMemoria progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} projectConfig={projectConfig} />}
             {activeTab === 'engrenagens' && <TabEngrenagens auth={auth} config={projectConfig} setConfig={setProjectConfig} userProgress={userProgress} setUserProgress={setUserProgress} edital={edital} setEdital={setEdital} customSprint={customSprint} setCustomSprint={setCustomSprint} initialEdital={initialEdital} setDailyLogs={setDailyLogs} themeColors={themeColors} />}
           </div>
         </main>
+
+        {/* RENDERIZAÇÃO DO MODAL DE AJUDA FLUTUANTE */}
+        {isGuideOpen && <ModalGuia onClose={() => setIsGuideOpen(false)} themeColors={themeColors} />}
 
         {/* MOBILE BOTTOM NAVIGATION BAR */}
         <nav className={`${isDeepWork ? 'hidden' : 'flex md:hidden'} fixed bottom-0 left-0 w-full bg-white dark:bg-[#0d1526] border-t border-slate-200 dark:border-white/5 justify-between items-end px-2 py-2 pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-50`}>
