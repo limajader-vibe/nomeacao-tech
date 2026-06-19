@@ -441,10 +441,11 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
 
   const todayObj = new Date(); todayObj.setHours(23, 59, 59, 999);
   
+  // CORREÇÃO DO GRÁFICO (Sem reverse)
   const last14Days = Array.from({length: 14}).map((_, i) => {
     const d = new Date(); d.setDate(d.getDate() - (13 - i));
     return { dateObj: d, dateStr: d.toLocaleDateString(), dayLabel: d.toLocaleDateString('pt-BR', { weekday: 'short' }).charAt(0).toUpperCase() };
-  }).reverse(); 
+  }); 
   
   const maxHoursLogged = Math.max(...last14Days.map(d => dailyLogs[d.dateStr] || 0));
   const maxHours = Math.max(maxHoursLogged, config.horasDia * 1.2, 2); 
@@ -609,30 +610,43 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
              <p className="text-xs text-slate-500 dark:text-white/40">O seu tempo de dedicação ao longo das semanas.</p>
           </div>
           
-          <div className="flex-1 flex items-end justify-between gap-2 mt-auto pt-4 relative">
-            {/* Meta Line */}
-            <div className="absolute w-full border-t border-dashed border-purple-500/30 flex items-center justify-end pr-1" style={{ bottom: `${(config.horasDia / maxHours) * 100}%` }}>
-              <span className="text-[10px] font-bold text-purple-500 bg-white dark:bg-[#111e36] px-1.5 -translate-y-1/2">Meta: {config.horasDia}h</span>
-            </div>
+          <div className="flex-1 flex flex-col mt-auto pt-4">
+            {/* Chart Area (Bars and Line share exact same height reference) */}
+            <div className="flex-1 relative flex items-end justify-between gap-2 min-h-[160px]">
+              {/* Meta Line */}
+              <div className="absolute left-0 w-full border-b border-dashed border-purple-500/40 z-10" style={{ bottom: `${(config.horasDia / maxHours) * 100}%` }}></div>
+              <div className="absolute right-0 flex items-center justify-end pr-1 z-10 translate-y-1/2" style={{ bottom: `${(config.horasDia / maxHours) * 100}%` }}>
+                <span className="text-[10px] font-bold text-purple-500 bg-white dark:bg-[#111e36] px-1.5 rounded-full">Meta: {config.horasDia}h</span>
+              </div>
 
-            {/* Bars for Hours (Clean) */}
-            {last14Days.map((day, i) => {
-              const hours = dailyLogs[day.dateStr] || 0;
-              const heightPerc = (hours / maxHours) * 100;
-              const isToday = i === 13;
-              return (
-                <div key={i} className="flex flex-col items-center flex-1 group z-20">
-                  <div className="w-full h-40 flex items-end justify-center relative">
+              {/* Bars for Hours */}
+              {last14Days.map((day, i) => {
+                const hours = dailyLogs[day.dateStr] || 0;
+                const heightPerc = (hours / maxHours) * 100;
+                const isToday = i === 13;
+                return (
+                  <div key={i} className="w-full h-full flex items-end justify-center relative group z-20">
                     <div className={`w-full max-w-[24px] rounded-t-lg transition-all duration-700 ease-out hover:opacity-80 ${isToday ? 'bg-purple-500' : 'bg-slate-200 dark:bg-[#0d1526] border dark:border-white/5'} relative`} style={{ height: `${heightPerc}%`, minHeight: hours > 0 ? '4px' : '0' }}>
                       <div className="opacity-0 group-hover:opacity-100 absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-800 dark:bg-white dark:text-slate-900 text-white text-[10px] font-black px-2 py-1.5 rounded pointer-events-none transition-opacity shadow-sm flex flex-col items-center gap-0.5 min-w-max">
                           <span>{hours > 0 ? `${hours}h` : '0h'}</span>
                       </div>
                     </div>
                   </div>
-                  <span className={`text-[10px] font-black mt-3 uppercase ${isToday ? 'text-purple-500' : 'text-slate-400 dark:text-white/30'}`}>{day.dayLabel}</span>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+            
+            {/* Labels Area */}
+            <div className="flex justify-between gap-2 mt-3">
+              {last14Days.map((day, i) => {
+                const isToday = i === 13;
+                return (
+                  <span key={`label-${i}`} className={`flex-1 text-center text-[10px] font-black uppercase ${isToday ? 'text-purple-500' : 'text-slate-400 dark:text-white/30'}`}>
+                    {day.dayLabel}
+                  </span>
+                );
+              })}
+            </div>
           </div>
         </div>
 
