@@ -1370,6 +1370,14 @@ function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsC
     setQAcertos('');
   };
 
+  // Trava de Titânio: Verifica se o alvo no topo tem as 3 etapas cumpridas
+  const topItem = customSprint.length > 0 ? customSprint[0] : null;
+  const isTopItemMastered = topItem ? (
+    progress[topItem.assId]?.estudado &&
+    progress[topItem.assId]?.questoes &&
+    progress[topItem.assId]?.revisado
+  ) : false;
+
   return (
     <div className="space-y-6 animate-in fade-in text-left pb-10">
       
@@ -1380,8 +1388,22 @@ function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsC
         icon={TargetIcon}
         themeColors={themeColors}
         extra={
-          <button disabled={customSprint.length === 0} onClick={handleCompleteSprint} className={`w-full md:w-auto px-8 py-3.5 rounded-xl font-black flex items-center justify-center gap-2 transition-all cursor-pointer bg-emerald-500 text-white disabled:opacity-50 shadow-md hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/20`}>
-            <CheckCircle className="w-5 h-5" /> Concluir Meta do Topo
+          <button 
+            disabled={customSprint.length === 0 || !isTopItemMastered} 
+            onClick={handleCompleteSprint} 
+            className={`w-full md:w-auto px-8 py-3.5 rounded-xl font-black flex items-center justify-center gap-2 transition-all shadow-md ${
+              customSprint.length === 0
+                ? 'bg-slate-200 dark:bg-white/5 text-slate-400 dark:text-white/20 cursor-not-allowed opacity-50'
+                : !isTopItemMastered
+                ? 'bg-slate-200 dark:bg-white/10 text-slate-500 dark:text-white/40 cursor-not-allowed border border-slate-300 dark:border-white/10'
+                : 'bg-emerald-500 text-white cursor-pointer hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/20'
+            }`}
+          >
+            {!isTopItemMastered && customSprint.length > 0 ? (
+              <><Lock className="w-5 h-5" /> Bloqueado (Cumpra as 3 Etapas)</>
+            ) : (
+              <><CheckCircle className="w-5 h-5" /> Concluir Meta do Topo</>
+            )}
           </button>
         }
       />
