@@ -5,7 +5,7 @@ import {
   RefreshCcw, Save, Trash2, Moon, Sun, ShoppingCart, ExternalLink, GripVertical, Plus, Pencil, Settings,
   Edit, AlertTriangle, ChevronUp, Activity, ListPlus, ArrowRight, ArrowLeft, BarChart2,
   CalendarDays, LayoutGrid, BrainCircuit, ShieldAlert, Download, Sliders, Lock, LogOut,
-  Filter, Play, Pause, Coffee, X, Menu, Minus, Upload, Palette, FolderOpen, ChevronsDown, ChevronsUp, Crosshair, Zap, Map, Flame, HelpCircle, BookCheck
+  Filter, Play, Pause, Coffee, X, Menu, Minus, Upload, Palette, FolderOpen, ChevronsDown, ChevronsUp, Crosshair, Zap, Map, Flame, Compass, BookCheck, Cpu, HelpCircle
 } from 'lucide-react';
 
 // --- FIREBASE CLOUD STORAGE SETUP ---
@@ -185,9 +185,67 @@ const initialEdital = [
   {
     id: 'bloco-gerais', nome: 'Conhecimentos Gerais (Base)', icone: 'Layers',
     disciplinas: [
-      { id: 'port', nome: 'Língua Portuguesa', cor: 'text-rose-700 bg-rose-100', 
+      { id: 'port', nome: 'Língua Portuguesa', isEspecifica: false, 
         assuntos: [{ id: 'port_1', titulo: 'Compreensão de Textos', temp: '🔥 QUENTE', linkTec: '', indent: 0 }] 
       }
+    ]
+  }
+];
+
+const templateTITribunais = [
+  {
+    id: 'b_gerais', nome: 'Conhecimentos Gerais', icone: 'Layers',
+    disciplinas: [
+      { id: 'd_port', nome: 'Língua Portuguesa', isEspecifica: false, assuntos: [
+        { id: 't_p1', titulo: 'Compreensão e Interpretação de Textos', temp: '', linkTec: '', indent: 0 },
+        { id: 't_p2', titulo: 'Tipologia Textual', temp: '', linkTec: '', indent: 0 },
+        { id: 't_p3', titulo: 'Ortografia Oficial', temp: '', linkTec: '', indent: 0 },
+        { id: 't_p4', titulo: 'Sintaxe da Oração e do Período', temp: '', linkTec: '', indent: 0 },
+        { id: 't_p5', titulo: 'Pontuação', temp: '', linkTec: '', indent: 0 }
+      ]},
+      { id: 'd_const', nome: 'Dir. Constitucional', isEspecifica: false, assuntos: [
+        { id: 't_c1', titulo: 'Direitos e Deveres Individuais e Coletivos', temp: '', linkTec: '', indent: 0 },
+        { id: 't_c2', titulo: 'Direitos Sociais', temp: '', linkTec: '', indent: 0 },
+        { id: 't_c3', titulo: 'Poder Judiciário - Disposições Gerais', temp: '', linkTec: '', indent: 0 }
+      ]},
+      { id: 'd_adm', nome: 'Dir. Administrativo', isEspecifica: false, assuntos: [
+        { id: 't_a1', titulo: 'Princípios Básicos da Administração Pública', temp: '', linkTec: '', indent: 0 },
+        { id: 't_a2', titulo: 'Atos Administrativos', temp: '', linkTec: '', indent: 0 },
+        { id: 't_a3', titulo: 'Poderes Administrativos', temp: '', linkTec: '', indent: 0 }
+      ]},
+      { id: 'd_rlm', nome: 'Raciocínio Lógico Matemático', isEspecifica: false, assuntos: [
+        { id: 't_rm1', titulo: 'Proposições e Conectivos Lógicos', temp: '', linkTec: '', indent: 0 },
+        { id: 't_rm2', titulo: 'Tabelas Verdade', temp: '', linkTec: '', indent: 0 }
+      ]}
+    ]
+  },
+  {
+    id: 'b_espec', nome: 'Conhecimentos Específicos (TI)', icone: 'Layers',
+    disciplinas: [
+      { id: 'd_bd', nome: 'Banco de Dados', isEspecifica: true, assuntos: [
+        { id: 't_b1', titulo: 'Conceitos Básicos e Arquitetura SGBD', temp: '', linkTec: '', indent: 0 },
+        { id: 't_b2', titulo: 'Modelagem Conceitual e Relacional', temp: '', linkTec: '', indent: 0 },
+        { id: 't_b3', titulo: 'Dependência Funcional e Normalização', temp: '', linkTec: '', indent: 0 },
+        { id: 't_b4', titulo: 'Linguagem SQL (DML, DDL, DCL)', temp: '', linkTec: '', indent: 0 }
+      ]},
+      { id: 'd_eng', nome: 'Engenharia de Software', isEspecifica: true, assuntos: [
+        { id: 't_e1', titulo: 'Ciclo de Vida do Software', temp: '', linkTec: '', indent: 0 },
+        { id: 't_e2', titulo: 'Metodologias Ágeis (Scrum, Kanban, XP)', temp: '', linkTec: '', indent: 0 },
+        { id: 't_e3', titulo: 'UML - Casos de Uso e Classes', temp: '', linkTec: '', indent: 0 },
+        { id: 't_e4', titulo: 'Arquitetura de Software e Padrões', temp: '', linkTec: '', indent: 0 }
+      ]},
+      { id: 'd_redes', nome: 'Redes de Computadores', isEspecifica: true, assuntos: [
+        { id: 't_r1', titulo: 'Conceitos Básicos e Topologias', temp: '', linkTec: '', indent: 0 },
+        { id: 't_r2', titulo: 'Arquitetura OSI e TCP/IP', temp: '', linkTec: '', indent: 0 },
+        { id: 't_r3', titulo: 'Protocolos de Camada de Aplicação', temp: '', linkTec: '', indent: 0 },
+        { id: 't_r4', titulo: 'Roteamento e Switching', temp: '', linkTec: '', indent: 0 }
+      ]},
+      { id: 'd_sec', nome: 'Segurança da Informação', isEspecifica: true, assuntos: [
+        { id: 't_s1', titulo: 'Princípios (Confidencialidade, Integridade, etc)', temp: '', linkTec: '', indent: 0 },
+        { id: 't_s2', titulo: 'Criptografia Simétrica e Assimétrica', temp: '', linkTec: '', indent: 0 },
+        { id: 't_s3', titulo: 'Assinatura e Certificado Digital', temp: '', linkTec: '', indent: 0 },
+        { id: 't_s4', titulo: 'Malwares e Ataques', temp: '', linkTec: '', indent: 0 }
+      ]}
     ]
   }
 ];
@@ -855,6 +913,12 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
     setEdital(prev => [...prev, newBloco]); setExpanded(prev => ({ ...prev, [newId]: true }));
   };
   const handleEditDiscNome = (blocoId, discId, newNome) => { setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: b.disciplinas.map(d => d.id === discId ? { ...d, nome: newNome } : d) } : b)); };
+
+  // IMPLEMENTAÇÃO INTERNA: toggleDisciplinaEspecifica
+  const toggleDisciplinaEspecifica = (blocoId, discId) => {
+    setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: b.disciplinas.map(d => d.id === discId ? { ...d, isEspecifica: !d.isEspecifica } : d) } : b));
+  };
+
   const handleDeleteDisciplinaClick = (blocoId, discId) => {
     if (confirmDeleteId === `disc_${discId}`) { 
       setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: b.disciplinas.filter(d => d.id !== discId) } : b)); 
@@ -864,7 +928,7 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
     else { setConfirmDeleteId(`disc_${discId}`); setTimeout(() => setConfirmDeleteId(null), 3000); }
   };
   const handleAddDisciplina = (blocoId) => {
-    const newDisc = { id: `d_${Date.now()}`, nome: 'Nova Disciplina', cor: 'text-indigo-700 bg-indigo-100', assuntos: [] };
+    const newDisc = { id: `d_${Date.now()}`, nome: 'Nova Disciplina', isEspecifica: false, assuntos: [] };
     setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: [...b.disciplinas, newDisc] } : b));
   };
 
@@ -994,6 +1058,16 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
     })})));
   };
 
+  // IMPLEMENTAÇÃO INTERNA: loadTemplateTITribunais
+  const loadTemplateTITribunais = () => {
+    if (window.confirm("ATENÇÃO: Carregar este template substituirá TODO o seu edital atual pelas matérias de TI e Gerais. O seu progresso antigo será preservado. Deseja prosseguir?")) {
+      setEdital(templateTITribunais);
+      setSelectedDiscId(templateTITribunais[0].disciplinas[0].id);
+      setIsEditing(false);
+      alert("Edital carregado e estruturado com sucesso!");
+    }
+  };
+
   const isFullyMastered = useCallback((assId) => { const p = progress[assId]; return p?.estudado && p?.questoes && p?.revisado; }, [progress]);
   
   const getSimpleStatus = (assId, isInSprint) => {
@@ -1054,9 +1128,16 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
       />
 
       {isEditing && (
-        <div className="bg-amber-50 dark:bg-[#111e36] border border-amber-200 dark:border-white/5 p-4 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0 shadow-sm">
-          <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
-          <div className="text-sm text-amber-800 dark:text-white/60 leading-relaxed flex-1"><strong>Modo Edição Ativo:</strong> Arraste e solte (Vertical e Horizontal). Faça <strong className="underline">duplo clique</strong> num nome para editá-lo. Pressione <kbd className="bg-amber-100 dark:bg-white/10 px-1 rounded text-amber-900 dark:text-white">Enter</kbd> para guardar.</div>
+        <div className="flex flex-col lg:flex-row gap-4">
+          <div className="bg-amber-50 dark:bg-[#111e36] border border-amber-200 dark:border-white/5 p-4 rounded-2xl flex items-center gap-3 shrink-0 shadow-sm flex-1">
+            <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
+            <div className="text-sm text-amber-800 dark:text-white/60 leading-relaxed"><strong>Modo Edição Ativo:</strong> Arraste e solte. Dê <strong className="underline">duplo clique</strong> num nome para editá-lo. Use o ícone de <strong className="text-sky-500">Raio (⚡)</strong> para definir as matérias específicas (Peso Maior).</div>
+          </div>
+          
+          <button onClick={loadTemplateTITribunais} className="bg-slate-800 dark:bg-[#0d1526] hover:bg-slate-900 dark:hover:bg-white/5 text-white border border-slate-700 dark:border-white/10 px-6 py-4 rounded-2xl flex items-center justify-center gap-3 font-bold text-sm shadow-lg shrink-0 cursor-pointer transition-colors">
+            <Cpu className="w-5 h-5 text-sky-400" />
+            Carregar Template: TI Tribunais
+          </button>
         </div>
       )}
 
@@ -1135,7 +1216,7 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
                           <CircularProgress percent={progressoCircular} themeColors={themeColors} />
                           
                           {isEditing ? (
-                             <div className="flex-1 flex items-center gap-2">
+                             <div className="flex-1 flex items-center gap-1.5">
                                {inlineEditingId === disc.id ? (
                                   <input 
                                      autoFocus 
@@ -1146,13 +1227,19 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
                                      className={`font-bold text-sm flex-1 bg-transparent border-b ${themeColors.borderSolid} outline-none text-slate-800 dark:text-white w-full`} 
                                   />
                                ) : (
-                                  <span onDoubleClick={(e) => { e.stopPropagation(); setInlineEditValue(disc.nome); setInlineEditingId(disc.id); }} className="font-bold text-sm flex-1 truncate cursor-text" title="Duplo clique para editar">{disc.nome}</span>
+                                  <span onDoubleClick={(e) => { e.stopPropagation(); setInlineEditValue(disc.nome); setInlineEditingId(disc.id); }} className={`font-bold text-sm flex-1 truncate cursor-text ${disc.isEspecifica ? 'text-amber-600 dark:text-amber-500' : ''}`} title="Duplo clique para editar">{disc.nome}</span>
                                )}
+                               <button onClick={(e) => { e.stopPropagation(); toggleDisciplinaEspecifica(bloco.id, disc.id); }} className={`p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer ${disc.isEspecifica ? 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400' : 'bg-slate-100 text-slate-400 hover:text-sky-500 dark:bg-white/5 dark:text-white/30'}`} title={disc.isEspecifica ? "Matéria Específica (Peso Alto)" : "Matéria Geral (Peso Padrão)"}>
+                                  <Zap className="w-3.5 h-3.5" />
+                               </button>
                                <Pencil onClick={() => { setInlineEditValue(disc.nome); setInlineEditingId(disc.id); }} className={`w-3.5 h-3.5 text-slate-400 hover:${themeColors.brightText} cursor-pointer opacity-0 group-hover:opacity-100`} />
                                <Trash2 onClick={() => handleDeleteDisciplinaClick(bloco.id, disc.id)} className="w-3.5 h-3.5 text-red-400 hover:text-red-500 cursor-pointer opacity-0 group-hover:opacity-100" />
                              </div>
                           ) : (
-                            <span className="font-bold text-sm flex-1 truncate">{disc.nome}</span>
+                            <span className={`font-bold text-sm flex-1 truncate flex items-center gap-1.5 ${disc.isEspecifica ? 'text-slate-800 dark:text-white' : ''}`}>
+                               {disc.nome}
+                               {disc.isEspecifica && <Zap className="w-3.5 h-3.5 text-amber-500 shrink-0" title="Matéria Específica (Peso Alto)"/>}
+                            </span>
                           )}
                           
                           {!isEditing && (
@@ -1208,7 +1295,10 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
                    <Layers className="w-3.5 h-3.5" />
                    <span className="truncate max-w-[150px]">{activeBloco?.nome}</span>
                    <ChevronRight className="w-3 h-3 opacity-50 shrink-0" />
-                   <span className={`${themeColors.brightText} truncate`}>{activeDisc.nome}</span>
+                   <span className={`${themeColors.brightText} truncate flex items-center gap-1`}>
+                      {activeDisc.nome}
+                      {activeDisc.isEspecifica && <Zap className="w-3 h-3 text-amber-500" title="Matéria Específica"/>}
+                   </span>
                 </div>
                 
                 <div className="flex items-start justify-between gap-4">
@@ -1434,7 +1524,7 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
   );
 }
 
-function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, themeColors, isTimerActive, toggleTimer, displayTimerSeconds, pendingReviewsCount }) {
+function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsCompleted, setActiveTab, progress, toggleProgress, themeColors, isTimerActive, toggleTimer, displayTimerSeconds, pendingReviewsCount, config, handleAbastecerMotor }) {
   const [draggedIndex, setDraggedIndex] = useState(null);
 
   const handleDragStart = (e, index) => {
@@ -1505,14 +1595,18 @@ function TabMetas({ customSprint, setCustomSprint, sprintsCompleted, setSprintsC
 
       {/* METAS */}
       {customSprint.length === 0 && pendingReviewsCount === 0 ? (
-        <EmptyState 
-           icon={ShoppingCart}
-           title="Área Limpa!"
-           message="Você completou o que tinha para hoje. Vá em Disciplinas/Metas para adicionar novos alvos."
-           actionLabel="Disciplinas/Metas"
-           onAction={() => setActiveTab('arsenal')}
-           themeColors={themeColors}
-        />
+        <div className="bg-white dark:bg-[#111e36] border border-slate-200 dark:border-white/5 border-dashed rounded-[2rem] p-10 md:p-16 flex flex-col items-center justify-center mt-8 shadow-sm text-center">
+          <div className={`w-24 h-24 ${themeColors.bgSuperLight} rounded-full flex items-center justify-center mb-8 shadow-inner border border-slate-100 dark:border-white/5`}>
+            <Zap className={`w-12 h-12 ${themeColors.brightText}`} />
+          </div>
+          <h3 className="text-3xl font-black text-slate-800 dark:text-white mb-4 tracking-tight">Motor Desabastecido</h3>
+          <p className="text-base text-slate-500 dark:text-white/60 mb-10 max-w-lg leading-relaxed">
+            Deixe o algoritmo traçar o seu plano de hoje baseado na sua meta de <strong className="text-slate-800 dark:text-white">{config.horasDia} horas</strong> e no peso tático das matérias cadastradas.
+          </p>
+          <button onClick={handleAbastecerMotor} className={`${themeColors.bgSolid} ${themeColors.bgHover} text-white px-10 py-5 rounded-2xl text-lg font-black cursor-pointer transition-all shadow-xl hover:shadow-2xl hover:scale-105 flex items-center gap-3`}>
+            <Cpu className="w-6 h-6"/> Abastecer Motor Automaticamente
+          </button>
+        </div>
       ) : (
         <div className="flex flex-col gap-4 mt-6 relative">
           
@@ -2352,6 +2446,84 @@ export default function App() {
     });
   };
 
+  // === MOTOR DE ABASTECIMENTO (IDEIA 3) ===
+  const handleAbastecerMotor = () => {
+    const targetTopics = Math.max(1, Math.round(projectConfig.horasDia));
+    
+    let targetSpec = Math.ceil(targetTopics * 0.75);
+    let targetGen = targetTopics - targetSpec;
+
+    const unmasteredPerDisc = {};
+    edital.forEach(bloco => {
+      bloco.disciplinas.forEach(disc => {
+        const unmastered = disc.assuntos.filter(ass => {
+          const p = userProgress[ass.id];
+          return !(p?.estudado && p?.questoes && p?.revisado);
+        });
+        if (unmastered.length > 0) {
+          unmasteredPerDisc[disc.id] = {
+            id: disc.id,
+            nome: disc.nome,
+            isEspecifica: disc.isEspecifica || false,
+            topics: unmastered
+          };
+        }
+      });
+    });
+
+    const specPool = Object.values(unmasteredPerDisc).filter(d => d.isEspecifica);
+    const genPool = Object.values(unmasteredPerDisc).filter(d => !d.isEspecifica);
+
+    let selected = [];
+
+    const pickTopics = (pool, target) => {
+      let picked = [];
+      let poolIdx = 0;
+      let sanity = 0;
+      while (picked.length < target && pool.length > 0 && sanity < 1000) {
+        const disc = pool[poolIdx % pool.length];
+        if (disc.topics.length > 0) {
+          const topic = disc.topics.shift();
+          picked.push({
+            discId: disc.id,
+            assId: topic.id,
+            discNome: disc.nome,
+            assTitulo: topic.titulo,
+            temp: topic.temp || '',
+            linkTec: topic.linkTec || ''
+          });
+          if (disc.topics.length === 0) {
+            pool.splice(poolIdx % pool.length, 1);
+            continue; 
+          }
+        }
+        poolIdx++;
+        sanity++;
+      }
+      return picked;
+    };
+
+    selected = [...selected, ...pickTopics(specPool, targetSpec)];
+    selected = [...selected, ...pickTopics(genPool, targetGen)];
+
+    const remaining = targetTopics - selected.length;
+    if (remaining > 0) {
+      const allLeft = [...specPool, ...genPool].filter(d => d.topics.length > 0);
+      selected = [...selected, ...pickTopics(allLeft, remaining)];
+    }
+
+    if (selected.length === 0) {
+      alert("Operação concluída: Todos os tópicos do seu edital já foram masterizados!");
+      return;
+    }
+
+    setCustomSprint(prev => {
+      const existIds = new Set(prev.map(p => p.assId));
+      const newAdditions = selected.filter(s => !existIds.has(s.assId));
+      return [...prev, ...newAdditions];
+    });
+  };
+
   const activeSubjectIds = new Set();
   edital.forEach(b => b.disciplinas.forEach(d => d.assuntos.forEach(a => activeSubjectIds.add(a.id))));
 
@@ -2374,6 +2546,7 @@ export default function App() {
   
   const progressPerc = totalCheckboxes === 0 ? 0 : Math.round((completedCheckboxes / totalCheckboxes) * 100);
 
+  // MENU DE NAVEGAÇÃO LIMPO (Apenas botões de ação)
   const navPhases = [
     { phase: 'Comando', items: [
       { id: 'qg', icon: LayoutGrid, label: 'Painel Geral' }
@@ -2403,6 +2576,7 @@ export default function App() {
     return <AuthScreen auth={auth} themeColors={themeColors} />;
   }
 
+  // MENU INFERIOR MOBILE LIMPO
   const mobileNavItems = [
     { id: 'qg', icon: LayoutGrid, label: 'Painel' },
     { id: 'arsenal', icon: BookOpen, label: 'Metas' },
@@ -2528,7 +2702,7 @@ export default function App() {
           <div className="max-w-7xl 2xl:max-w-[1600px] mx-auto w-full transition-all duration-500 h-full flex flex-col">
             {activeTab === 'qg' && <TabQG config={projectConfig} progressPerc={progressPerc} dailyLogs={dailyLogs} setDailyLogs={setDailyLogs} themeColors={themeColors} edital={edital} activeSubjectIds={activeSubjectIds} userProgress={userProgress} pendingReviewsCount={pendingReviewsCount} setActiveTab={setActiveTab} customSprint={customSprint} totalAssuntos={totalAssuntos} currentStreak={currentStreak} />}
             {activeTab === 'arsenal' && <TabArsenal edital={edital} setEdital={setEdital} progress={userProgress} setUserProgress={setUserProgress} toggleSprintItem={toggleSprintItem} customSprint={customSprint} resetProgress={resetProgress} themeColors={themeColors} setActiveTab={setActiveTab} />}
-            {activeTab === 'metas' && <TabMetas customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} themeColors={themeColors} isTimerActive={isTimerActive} toggleTimer={toggleTimer} displayTimerSeconds={displayTimerSeconds} pendingReviewsCount={pendingReviewsCount} />}
+            {activeTab === 'metas' && <TabMetas customSprint={customSprint} setCustomSprint={setCustomSprint} sprintsCompleted={sprintsCompleted} setSprintsCompleted={setSprintsCompleted} setActiveTab={setActiveTab} progress={userProgress} toggleProgress={toggleProgress} themeColors={themeColors} isTimerActive={isTimerActive} toggleTimer={toggleTimer} displayTimerSeconds={displayTimerSeconds} pendingReviewsCount={pendingReviewsCount} config={projectConfig} handleAbastecerMotor={handleAbastecerMotor} />}
             {activeTab === 'memoria' && <TabMemoria progress={userProgress} handleReviewFeedback={handleReviewFeedback} edital={edital} activeSubjectIds={activeSubjectIds} themeColors={themeColors} projectConfig={projectConfig} />}
             {activeTab === 'engrenagens' && <TabEngrenagens auth={auth} config={projectConfig} setConfig={setProjectConfig} userProgress={userProgress} setUserProgress={setUserProgress} edital={edital} setEdital={setEdital} customSprint={customSprint} setCustomSprint={setCustomSprint} initialEdital={initialEdital} setDailyLogs={setDailyLogs} themeColors={themeColors} />}
           </div>
