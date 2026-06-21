@@ -192,30 +192,17 @@ const initialEdital = [
   }
 ];
 
+// TEMPLATE ATUALIZADO COM ESTRUTURA HIERÁRQUICA (Assunto Principal -> Sub-assuntos)
 const templateTITribunais = [
   {
     id: 'b_gerais', nome: 'Conhecimentos Gerais', icone: 'Layers',
     disciplinas: [
       { id: 'd_port', nome: 'Língua Portuguesa', isEspecifica: false, assuntos: [
         { id: 't_p1', titulo: 'Compreensão e Interpretação de Textos', temp: '', linkTec: '', indent: 0 },
+        { id: 't_p1_1', titulo: 'Conceitos Basicos1', temp: '', linkTec: '', indent: 1 },
+        { id: 't_p1_2', titulo: 'Conceitos Basicos2', temp: '', linkTec: '', indent: 1 },
         { id: 't_p2', titulo: 'Tipologia Textual', temp: '', linkTec: '', indent: 0 },
-        { id: 't_p3', titulo: 'Ortografia Oficial', temp: '', linkTec: '', indent: 0 },
-        { id: 't_p4', titulo: 'Sintaxe da Oração e do Período', temp: '', linkTec: '', indent: 0 },
-        { id: 't_p5', titulo: 'Pontuação', temp: '', linkTec: '', indent: 0 }
-      ]},
-      { id: 'd_const', nome: 'Dir. Constitucional', isEspecifica: false, assuntos: [
-        { id: 't_c1', titulo: 'Direitos e Deveres Individuais e Coletivos', temp: '', linkTec: '', indent: 0 },
-        { id: 't_c2', titulo: 'Direitos Sociais', temp: '', linkTec: '', indent: 0 },
-        { id: 't_c3', titulo: 'Poder Judiciário - Disposições Gerais', temp: '', linkTec: '', indent: 0 }
-      ]},
-      { id: 'd_adm', nome: 'Dir. Administrativo', isEspecifica: false, assuntos: [
-        { id: 't_a1', titulo: 'Princípios Básicos da Administração Pública', temp: '', linkTec: '', indent: 0 },
-        { id: 't_a2', titulo: 'Atos Administrativos', temp: '', linkTec: '', indent: 0 },
-        { id: 't_a3', titulo: 'Poderes Administrativos', temp: '', linkTec: '', indent: 0 }
-      ]},
-      { id: 'd_rlm', nome: 'Raciocínio Lógico Matemático', isEspecifica: false, assuntos: [
-        { id: 't_rm1', titulo: 'Proposições e Conectivos Lógicos', temp: '', linkTec: '', indent: 0 },
-        { id: 't_rm2', titulo: 'Tabelas Verdade', temp: '', linkTec: '', indent: 0 }
+        { id: 't_p2_1', titulo: 'Exercícios de Tipologia', temp: '', linkTec: '', indent: 1 }
       ]}
     ]
   },
@@ -224,27 +211,24 @@ const templateTITribunais = [
     disciplinas: [
       { id: 'd_bd', nome: 'Banco de Dados', isEspecifica: true, assuntos: [
         { id: 't_b1', titulo: 'Conceitos Básicos e Arquitetura SGBD', temp: '', linkTec: '', indent: 0 },
+        { id: 't_b1_1', titulo: 'Conceitos Basicos1', temp: '', linkTec: '', indent: 1 },
+        { id: 't_b1_2', titulo: 'Conceitos Basicos2', temp: '', linkTec: '', indent: 1 },
         { id: 't_b2', titulo: 'Modelagem Conceitual e Relacional', temp: '', linkTec: '', indent: 0 },
-        { id: 't_b3', titulo: 'Dependência Funcional e Normalização', temp: '', linkTec: '', indent: 0 },
-        { id: 't_b4', titulo: 'Linguagem SQL (DML, DDL, DCL)', temp: '', linkTec: '', indent: 0 }
+        { id: 't_b2_1', titulo: 'Entidades e Relacionamentos', temp: '', linkTec: '', indent: 1 }
       ]},
       { id: 'd_eng', nome: 'Engenharia de Software', isEspecifica: true, assuntos: [
         { id: 't_e1', titulo: 'Ciclo de Vida do Software', temp: '', linkTec: '', indent: 0 },
+        { id: 't_e1_1', titulo: 'Conceitos Basicos1', temp: '', linkTec: '', indent: 1 },
+        { id: 't_e1_2', titulo: 'Conceitos Basicos2', temp: '', linkTec: '', indent: 1 },
         { id: 't_e2', titulo: 'Metodologias Ágeis (Scrum, Kanban, XP)', temp: '', linkTec: '', indent: 0 },
-        { id: 't_e3', titulo: 'UML - Casos de Uso e Classes', temp: '', linkTec: '', indent: 0 },
-        { id: 't_e4', titulo: 'Arquitetura de Software e Padrões', temp: '', linkTec: '', indent: 0 }
+        { id: 't_e2_1', titulo: 'Fundamentos do Scrum', temp: '', linkTec: '', indent: 1 }
       ]},
       { id: 'd_redes', nome: 'Redes de Computadores', isEspecifica: true, assuntos: [
         { id: 't_r1', titulo: 'Conceitos Básicos e Topologias', temp: '', linkTec: '', indent: 0 },
+        { id: 't_r1_1', titulo: 'Conceitos Basicos1', temp: '', linkTec: '', indent: 1 },
+        { id: 't_r1_2', titulo: 'Conceitos Basicos2', temp: '', linkTec: '', indent: 1 },
         { id: 't_r2', titulo: 'Arquitetura OSI e TCP/IP', temp: '', linkTec: '', indent: 0 },
-        { id: 't_r3', titulo: 'Protocolos de Camada de Aplicação', temp: '', linkTec: '', indent: 0 },
-        { id: 't_r4', titulo: 'Roteamento e Switching', temp: '', linkTec: '', indent: 0 }
-      ]},
-      { id: 'd_sec', nome: 'Segurança da Informação', isEspecifica: true, assuntos: [
-        { id: 't_s1', titulo: 'Princípios (Confidencialidade, Integridade, etc)', temp: '', linkTec: '', indent: 0 },
-        { id: 't_s2', titulo: 'Criptografia Simétrica e Assimétrica', temp: '', linkTec: '', indent: 0 },
-        { id: 't_s3', titulo: 'Assinatura e Certificado Digital', temp: '', linkTec: '', indent: 0 },
-        { id: 't_s4', titulo: 'Malwares e Ataques', temp: '', linkTec: '', indent: 0 }
+        { id: 't_r2_1', titulo: 'Camada Física e Enlace', temp: '', linkTec: '', indent: 1 }
       ]}
     ]
   }
@@ -499,7 +483,6 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
 
   const todayObj = new Date(); todayObj.setHours(23, 59, 59, 999);
   
-  // CORREÇÃO DO GRÁFICO (Sem reverse)
   const last14Days = Array.from({length: 14}).map((_, i) => {
     const d = new Date(); d.setDate(d.getDate() - (13 - i));
     return { dateObj: d, dateStr: d.toLocaleDateString(), dayLabel: d.toLocaleDateString('pt-BR', { weekday: 'short' }).charAt(0).toUpperCase() };
@@ -672,9 +655,8 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
             {/* Chart Area (Bars and Line share exact same height reference) */}
             <div className="flex-1 relative flex items-end justify-between gap-2 min-h-[160px]">
               {/* Meta Line */}
-              <div className="absolute left-0 w-full border-b border-dashed border-purple-500/40 z-10" style={{ bottom: `${(config.horasDia / maxHours) * 100}%` }}></div>
-              <div className="absolute right-0 flex items-center justify-end pr-1 z-10 translate-y-1/2" style={{ bottom: `${(config.horasDia / maxHours) * 100}%` }}>
-                <span className="text-[10px] font-bold text-purple-500 bg-white dark:bg-[#111e36] px-1.5 rounded-full">Meta: {config.horasDia}h</span>
+              <div className="absolute w-full border-t border-dashed border-purple-500/30 flex items-center justify-end pr-1 z-10" style={{ bottom: `${(config.horasDia / maxHours) * 100}%` }}>
+                <span className="text-[10px] font-bold text-purple-500 bg-white dark:bg-[#111e36] px-1.5 -translate-y-1/2">Meta: {config.horasDia}h</span>
               </div>
 
               {/* Bars for Hours */}
@@ -694,7 +676,7 @@ function TabQG({ config, progressPerc, dailyLogs, setDailyLogs, themeColors, edi
               })}
             </div>
             
-            {/* Labels Area */}
+            {/* Labels Area (Separated to not break chart coordinates) */}
             <div className="flex justify-between gap-2 mt-3">
               {last14Days.map((day, i) => {
                 const isToday = i === 13;
@@ -1128,7 +1110,7 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
       />
 
       {isEditing && (
-        <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex flex-col lg:flex-row gap-4 mb-4">
           <div className="bg-amber-50 dark:bg-[#111e36] border border-amber-200 dark:border-white/5 p-4 rounded-2xl flex items-center gap-3 shrink-0 shadow-sm flex-1">
             <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0" />
             <div className="text-sm text-amber-800 dark:text-white/60 leading-relaxed"><strong>Modo Edição Ativo:</strong> Arraste e solte. Dê <strong className="underline">duplo clique</strong> num nome para editá-lo. Use o ícone de <strong className="text-sky-500">Raio (⚡)</strong> para definir as matérias específicas (Peso Maior).</div>
