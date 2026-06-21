@@ -853,6 +853,21 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
   const [dragTargetIndent, setDragTargetIndent] = useState(0);
   const dragItem = useRef(null); 
 
+  const toggleDisciplinaEspecifica = (blocoId, discId) => {
+    setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: b.disciplinas.map(d => d.id === discId ? { ...d, isEspecifica: !d.isEspecifica } : d) } : b));
+  };
+
+  const loadTemplateTITribunais = () => {
+    if (window.confirm("ATENÇÃO: Carregar este template substituirá TODO o seu edital atual pelas matérias de TI e Gerais. O seu progresso antigo será preservado. Deseja prosseguir?")) {
+      setEdital(templateTITribunais);
+      if (templateTITribunais.length > 0 && templateTITribunais[0].disciplinas.length > 0) {
+        setSelectedDiscId(templateTITribunais[0].disciplinas[0].id);
+      }
+      setIsEditing(false);
+      alert("Edital carregado e estruturado com sucesso!");
+    }
+  };
+
   useEffect(() => {
     if (!selectedDiscId && edital.length > 0 && edital[0].disciplinas.length > 0) {
       setSelectedDiscId(edital[0].disciplinas[0].id);
@@ -895,11 +910,6 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
     setEdital(prev => [...prev, newBloco]); setExpanded(prev => ({ ...prev, [newId]: true }));
   };
   const handleEditDiscNome = (blocoId, discId, newNome) => { setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: b.disciplinas.map(d => d.id === discId ? { ...d, nome: newNome } : d) } : b)); };
-
-  // IMPLEMENTAÇÃO INTERNA: toggleDisciplinaEspecifica
-  const toggleDisciplinaEspecifica = (blocoId, discId) => {
-    setEdital(prev => prev.map(b => b.id === blocoId ? { ...b, disciplinas: b.disciplinas.map(d => d.id === discId ? { ...d, isEspecifica: !d.isEspecifica } : d) } : b));
-  };
 
   const handleDeleteDisciplinaClick = (blocoId, discId) => {
     if (confirmDeleteId === `disc_${discId}`) { 
@@ -1038,16 +1048,6 @@ function TabArsenal({ edital, setEdital, progress, setUserProgress, toggleSprint
        }
        return d;
     })})));
-  };
-
-  // IMPLEMENTAÇÃO INTERNA: loadTemplateTITribunais
-  const loadTemplateTITribunais = () => {
-    if (window.confirm("ATENÇÃO: Carregar este template substituirá TODO o seu edital atual pelas matérias de TI e Gerais. O seu progresso antigo será preservado. Deseja prosseguir?")) {
-      setEdital(templateTITribunais);
-      setSelectedDiscId(templateTITribunais[0].disciplinas[0].id);
-      setIsEditing(false);
-      alert("Edital carregado e estruturado com sucesso!");
-    }
   };
 
   const isFullyMastered = useCallback((assId) => { const p = progress[assId]; return p?.estudado && p?.questoes && p?.revisado; }, [progress]);
@@ -2431,14 +2431,26 @@ export default function App() {
   // === MOTOR DE ABASTECIMENTO (IDEIA 3) ===
   const handleAbastecerMotor = () => {
     const targetTopics = Math.max(1, Math.round(projectConfig.horasDia));
+    const inSprintIds = new Set(customSprint.map(i => i.assId));
+    const slotsToFill = targetTopics - customSprint.length;
+
+    if (slotsToFill <= 0) {
+      alert(`A sua meta de ${targetTopics} horas diárias já está preenchida na fila!`);
+      return;
+    }
     
-    let targetSpec = Math.ceil(targetTopics * 0.75);
-    let targetGen = targetTopics - targetSpec;
+    // Matemática Tática Refinada (Arredondamento Justo)
+    let targetSpec = Math.round(slotsToFill * 0.75);
+    if (slotsToFill > 1 && targetSpec === slotsToFill) {
+      targetSpec = slotsToFill - 1; // Garante sempre pelo menos 1 matéria Geral se houver 2+ vagas
+    }
+    let targetGen = slotsToFill - targetSpec;
 
     const unmasteredPerDisc = {};
     edital.forEach(bloco => {
       bloco.disciplinas.forEach(disc => {
         const unmastered = disc.assuntos.filter(ass => {
+          if (inSprintIds.has(ass.id)) return false; // Ignora o que já está na fila
           const p = userProgress[ass.id];
           return !(p?.estudado && p?.questoes && p?.revisado);
         });
@@ -2488,22 +2500,18 @@ export default function App() {
     selected = [...selected, ...pickTopics(specPool, targetSpec)];
     selected = [...selected, ...pickTopics(genPool, targetGen)];
 
-    const remaining = targetTopics - selected.length;
+    const remaining = slotsToFill - selected.length;
     if (remaining > 0) {
       const allLeft = [...specPool, ...genPool].filter(d => d.topics.length > 0);
       selected = [...selected, ...pickTopics(allLeft, remaining)];
     }
 
     if (selected.length === 0) {
-      alert("Operação concluída: Todos os tópicos do seu edital já foram masterizados!");
+      alert("Operação concluída: Não há mais tópicos pendentes no seu edital!");
       return;
     }
 
-    setCustomSprint(prev => {
-      const existIds = new Set(prev.map(p => p.assId));
-      const newAdditions = selected.filter(s => !existIds.has(s.assId));
-      return [...prev, ...newAdditions];
-    });
+    setCustomSprint(prev => [...prev, ...selected]);
   };
 
   const activeSubjectIds = new Set();
